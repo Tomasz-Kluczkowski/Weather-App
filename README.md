@@ -1,5 +1,4 @@
-# Personal-Projects
-Personal projects reside here.
+Repository for developement of the Weather App.
+Main language: Python 3.6
 
-This is the main repository in which all the personal projects will reside.
-At this moment in time they are all in Python but soon Java will join.
+Goal: To create a visual representation of a weather report obtained via Open Weather API.
