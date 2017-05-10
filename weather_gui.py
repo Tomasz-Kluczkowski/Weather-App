@@ -254,12 +254,13 @@ class WeatherApp(tk.Tk):
     def display_report(self, *args):
         """Obtains data from the report object and displays it in the main_canvas.
         *args contains event object passed automatically from loc_entry."""
-        # We expect a tuple returning from get_report. Item 0 contains error status.
+
         # Do nothing if no location is entered.
         if self.var_loc.get() == "":
             return
         data = report.get_report(self.var_loc.get(), self.var_units.get())
         # Error handling.
+        # We expect a tuple returning from get_report. Item 0 contains error status.
         self.error_status = data[0]
         if self.error_status == -1:
             self.error_message = data[1]
