@@ -1,12 +1,14 @@
 import tkinter as tk
+import string
 from weather_backend import Report
 from PIL import Image, ImageTk
 
-#TODO: Have to add then a combobox with selection of previous locations.
-#TODO: See if autocompletion is possible in the entry field.
-#TODO: Add a small button to open a selection list of previous locations.
-#TODO: Add displaying info in status_bar_label when entering text into loc_entry (press enter to get report) and
-#TODO: when hovering over buttons what they do.
+
+# TODO: Have to add then a combobox with selection of previous locations.
+# TODO: See if autocompletion is possible in the entry field.
+# TODO: Add a small button to open a selection list of previous locations.
+# TODO: Add displaying info in status_bar_label when entering text into loc_entry (press enter to get report) and
+# TODO: when hovering over buttons what they do.
 
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
@@ -32,6 +34,9 @@ class WeatherApp(tk.Tk):
                 status bar.
             error_message (Str) -- Last error message.
             error_status (Int) -- Value -1 means an error occurred and was not cleared. 0 means all ok.
+            w_d_cur (Dict) -- Dictionary containing current weather report.
+            w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
+            w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
             loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
             loc_label (tk.Label) -- Location label.
             var_loc (tk.StringVar) -- Tkinter text variable assigned to the 
@@ -125,32 +130,39 @@ class WeatherApp(tk.Tk):
                             sticky=tk.NSEW)
         # Pressing enter while in location entry calls get_report function.
         self.loc_entry.bind("<Return>", self.display_report)
+        # If there is an error message and user starts to correct location name, remove error.
+        self.loc_entry.bind("<Key>", self.clear_error_message)
+
         # Clear text from loc_entry button.
-        self.clear_loc_button = tk.Button(self.loc_frame, text="X",
-                                          command=self.clear_loc_entry, **clear_cnf)
-        self.clear_loc_button.grid(row=0, column=2, sticky=tk.W, padx=(0, 4),
-                                   pady=(4, 5))
-        self.clear_loc_button.bind("<Return>", self.clear_loc_entry)
+        self.search_img = tk.PhotoImage(file=r"Resources\Buttons\magnifier-tool.png")
+        self.search_button = tk.Button(self.loc_frame, image=self.search_img,
+                                       command=self.display_report, **clear_cnf)
+        self.search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4),
+                                pady=(4, 5))
+        # Press Enter to get report.
+        self.search_button.bind("<Return>", self.display_report)
+        # Action on entering the button with mouse.
+        self.search_button.bind("<Enter>", self.enter_search_button)
+        # Action on leaving the button with mouse.
+        self.search_button.bind("<Leave>", self.leave_search_button)
 
         # Metric units button.
         self.metric_button = tk.Button(self.loc_frame, text=u"\N{DEGREE SIGN}C",
                                        command=self.metric_pushed,
                                        **self.button_pushed_cnf)
-        self.metric_button.grid(row=0, column=3, padx=(4, 4), pady=(4, 4),
-                                sticky=tk.W)
+        self.metric_button.grid(row=0, column=3, padx=(2, 4), pady=(4, 5),
+                                sticky=tk.NSEW)
         # Action on entering the button with mouse.
         self.metric_button.bind("<Enter>", self.enter_metric_button)
         # Action on leaving the button with mouse.
         self.metric_button.bind("<Leave>", self.leave_metric_button)
 
-
-
         # Imperial units button.
         self.imperial_button = tk.Button(self.loc_frame, text=u"\N{DEGREE SIGN}F",
                                          command=self.imperial_pushed,
                                          **self.button_released_cnf)
-        self.imperial_button.grid(row=0, column=4, padx=(4, 4), pady=(4, 4),
-                                  sticky=tk.W)
+        self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
+                                  sticky=tk.NSEW)
         # Action on entering the button with mouse.
         self.imperial_button.bind("<Enter>", self.enter_imperial_button)
         # Action on leaving the button with mouse.
@@ -171,11 +183,11 @@ class WeatherApp(tk.Tk):
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
         self.status_bar_label.configure(relief="sunken")
 
-    def clear_loc_entry(self, *args):
-        """Empties text from loc_entry. *args contains event object passed 
-        automatically from clear_loc_button."""
-        self.loc_entry.delete(0, tk.END)
-        self.loc_entry.focus()
+    # def clear_loc_entry(self, *args):
+    #     """Empties text from loc_entry. *args contains event object passed
+    #     automatically from clear_loc_button."""
+    #     self.loc_entry.delete(0, tk.END)
+    #     self.loc_entry.focus()
 
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
@@ -218,10 +230,34 @@ class WeatherApp(tk.Tk):
         else:
             self.var_status.set("")
 
+    def enter_search_button(self, *args):
+        """Displays information on button function to the user in the status_bar_label.
+         *args contains event object passed automatically from metric_button."""
+        self.var_status.set("Press to get a weather report.")
+
+    def leave_search_button(self, *args):
+        """Clears status_bar_label after mouse leaves the clear_loc_button area.
+        *args contains event object passed automatically from metric_button."""
+        if self.error_status == -1:
+            self.var_status.set(self.error_message)
+        else:
+            self.var_status.set("")
+
+    def clear_error_message(self, event):
+        """Clears error messages from status_bar_label after user starts to correct an invalid location name.
+        Args:
+            event (event) -- tkinter.event object sent when a keyboard was pressed. 
+        """
+        if self.error_status == -1:
+            self.var_status.set("")
+
     def display_report(self, *args):
         """Obtains data from the report object and displays it in the main_canvas.
         *args contains event object passed automatically from loc_entry."""
         # We expect a tuple returning from get_report. Item 0 contains error status.
+        # Do nothing if no location is entered.
+        if self.var_loc.get() == "":
+            return
         data = report.get_report(self.var_loc.get(), self.var_units.get())
         # Error handling.
         self.error_status = data[0]

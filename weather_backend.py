@@ -34,20 +34,22 @@ class Report(object):
             location (Str) -- String containing location typed into loc_entry by the user.
             units (Str) -- String containing unit system selection from unit buttons.
         Returns:
-            status (Tuple) -- First item is the error status (-1 means error, 0 - all ok).
-                Second item is an error message in case of an exception or weather_dicts
-                - list of dictionaries with all weather reports.
+            status (Tuple) -- First item is the error status (-1 means error / 0 means all ok).
+                Second item is an error message in case of an exception or 
+                weather_dicts - list of dictionaries with all weather reports.
             
         """
 
         # Key obtained from Open Weather. Required to make any calls to their API.
         api_key = "fa730d41d41ae83226a227a150d927ac"
+
         # Base URL used to get weather reports. Notice formatting placeholders for report type, location and units.
         # {0} - space for report type, {1} - space for location, {2} - space for units.
+
         base_url = "http://api.openweathermap.org/data/2.5/{0}?q={1}{2}&APPID="
+
         # We must remove any gibberish from location string before making a call to the API.
         # For this translate function is the best tool.
-
         punctuation = string.punctuation
         translator = str.maketrans("", "", punctuation)
         location = location.translate(translator)
@@ -65,11 +67,10 @@ class Report(object):
                 response = requests.get(base_url.format(report_type, location,
                                                         units_prefix + units) + api_key)
             except requests.exceptions.ConnectionError:
-                # TODO: HANDLE ERRORS PROPERLY, create an error variable in the GUI to display it until error is cleared.
                 status = (-1, "Unable to establish internet connection. Please connect to the internet.")
                 return status
             weather_dict = response.json()
-            # had to add int(w_d["cod"]) as the output from API is int (for current) or string (for longer forecasts)
+            # Had to add int(w_d["cod"]) as the output from API is int (for current) / string (for longer forecasts).
             if int(weather_dict["cod"]) != 200:
                 status = (-1, "Error: {0}, {1}".format(weather_dict["cod"], weather_dict["message"]))
                 return status
