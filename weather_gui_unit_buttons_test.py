@@ -180,8 +180,8 @@ class WeatherApp(tk.Tk):
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
         *args contains event object passed automatically from metric_button."""
-        self.imperial_button.configure(**self.button_released_cnf)
-        self.metric_button.configure(**self.button_pushed_cnf)
+        self.imperial_button.configure(state="DISABLED")
+        self.metric_button.configure(state="NORMAL")
         self.var_units.set("metric")
 
     def enter_metric_button(self, *args):
@@ -201,8 +201,8 @@ class WeatherApp(tk.Tk):
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
         *args contains event object passed automatically from imperial_button."""
-        self.metric_button.configure(**self.button_released_cnf)
-        self.imperial_button.configure(**self.button_pushed_cnf)
+        self.metric_button.configure(state="DISABLED")
+        self.imperial_button.configure(state="NORMAL")
         self.var_units.set("imperial")
 
     def enter_imperial_button(self, *args):
