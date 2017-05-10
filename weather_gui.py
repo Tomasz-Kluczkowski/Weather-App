@@ -1,5 +1,5 @@
 import tkinter as tk
-import string
+import time
 from weather_backend import Report
 from PIL import Image, ImageTk
 
@@ -9,6 +9,7 @@ from PIL import Image, ImageTk
 # TODO: Add a small button to open a selection list of previous locations.
 # TODO: Add displaying info in status_bar_label when entering text into loc_entry (press enter to get report) and
 # TODO: when hovering over buttons what they do.
+# TODO: ADD delay in displaying the tooltips in the status_bar_label.
 
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
