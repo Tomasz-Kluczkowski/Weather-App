@@ -7,9 +7,10 @@ from PIL import Image, ImageTk
 # TODO: Have to add then a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add a small button to open a selection list of previous locations.
-# TODO: Add displaying info in status_bar_label when entering text into loc_entry (press enter to get report) and
-# TODO: when hovering over buttons what they do.
-# TODO: ADD delay in displaying the tooltips in the status_bar_label.
+# TODO: Add set to default location after successful call has been made.
+# TODO: Add a frame around the location name label and entry and search
+# TODO: button in dusty color to visualise that they belong together better.
+# TODO: Wrap around buttons in a class enabling hover text to be automatically added.
 
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
@@ -251,6 +252,7 @@ class WeatherApp(tk.Tk):
         """
         if self.error_status == -1:
             self.var_status.set("")
+            self.error_status = 0
 
     def display_report(self, *args):
         """Obtains data from the report object and displays it in the main_canvas.
@@ -267,10 +269,57 @@ class WeatherApp(tk.Tk):
             self.error_message = data[1]
             self.var_status.set(data[1])
         else:
-            # Clear error status upon successful response from API.
+            # Clear any error status and message upon successful response from API.
             self.var_status.set("")
+            self.error_message = ""
             # Unpack dictionaries from data
             self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
+
+class HoverButton(tk.Button):
+    """Improves upon the standard button by adding status bar display option.
+    
+    We can use the same configuration dictionary as for the  standard tk.Button.
+    The Weather App class object contains variable which will be used to display info in the status_bar_label.
+    Therefore we have to communicate with it and the WeatherApp object name is needed as one of the parameters.
+
+    Args:
+        tk.Button (tk.Button) -- Standard tkinter Button object which we inherit from.
+    """
+    def __init__(self, master, tip, app, cnf):
+        """Initialise MyButton.
+        
+        Args:
+            master (tk.widget) -- Master widget to which MyButton (slave) instance will belong.
+                The master widget is part of the WeatherApp object.
+            tip (Str) -- Tooltip text to display in the status_bar_label.
+            app (WeatherApp) -- WeatherApp object which is running the GUI.
+            cnf (Dict) -- Dictionary with the configuration for MyButton.
+            
+        Attributes:
+            tip (Str) -- Text to display in the status_bar_label of the app.
+            app (WeatherApp) -- Main WeatherApp object used to generate the GUI.
+        
+        """
+        super().__init__(app.master, cnf)
+        self.tip = tip
+        self.app = app
+        # Action on entering the button with mouse.
+        self.bind("<Enter>", self.enter_button)
+        # Action on leaving the button with mouse.
+        self.bind("<Leave>", self.leave_button)
+
+    def enter_button(self, *args):
+        """Displays information on button function to the user in the status_bar_label.
+         *args contains event object passed automatically from the button."""
+        self.app.var_status.set(self.tip)
+
+    def leave_button(self, *args):
+        """Clears status_bar_label after mouse leaves the button area.
+        *args contains event object passed automatically from the button."""
+        if self.app.error_status == -1:
+            self.app.var_status.set(self.app.error_message)
+        else:
+            self.app.var_status.set("")
 
 
 app = WeatherApp()
