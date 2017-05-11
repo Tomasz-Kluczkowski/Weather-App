@@ -1,7 +1,8 @@
 import tkinter as tk
-import time
-from weather_backend import Report
+
 from PIL import Image, ImageTk
+
+from weather_backend import Report
 
 
 # TODO: Have to add then a combobox with selection of previous locations.
@@ -10,7 +11,7 @@ from PIL import Image, ImageTk
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add a frame around the location name label and entry and search
 # TODO: button in dusty color to visualise that they belong together better.
-# TODO: Wrap around buttons in a class enabling hover text to be automatically added.
+# TODO: implement a controller to pass variables between classes.
 
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
@@ -118,9 +119,7 @@ class WeatherApp(tk.Tk):
                             sticky=tk.EW)
 
         # Location label.
-        # self.location_img = tk.PhotoImage(file=r"Resources\Labels\location.png")
         self.loc_label = tk.Label(self.loc_frame, text="Location name:", **label_cnf)
-        # image=self.location_img, compound=tk.CENTER)
         self.loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4), sticky=tk.NSEW)
 
         # Location entry.
@@ -130,45 +129,35 @@ class WeatherApp(tk.Tk):
         self.loc_entry.focus()
         self.loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                             sticky=tk.NSEW)
-        # Pressing enter while in location entry calls get_report function.
         self.loc_entry.bind("<Return>", self.display_report)
         # If there is an error message and user starts to correct location name, remove error.
         self.loc_entry.bind("<Key>", self.clear_error_message)
 
-        # Clear text from loc_entry button.
+        # Search button.
         self.search_img = tk.PhotoImage(file=r"Resources\Buttons\magnifier-tool.png")
-        self.search_button = tk.Button(self.loc_frame, image=self.search_img,
-                                       command=self.display_report, **clear_cnf)
-        self.search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4),
-                                pady=(4, 5))
+        self.search_button = HoverButton(self.loc_frame, "Press to get a weather report.",
+                                         self, clear_cnf, image=self.search_img,
+                                         command=self.display_report)
+        self.search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4), pady=(4, 5))
         # Press Enter to get report.
         self.search_button.bind("<Return>", self.display_report)
-        # Action on entering the button with mouse.
-        self.search_button.bind("<Enter>", self.enter_search_button)
-        # Action on leaving the button with mouse.
-        self.search_button.bind("<Leave>", self.leave_search_button)
 
         # Metric units button.
-        self.metric_button = tk.Button(self.loc_frame, text=u"\N{DEGREE SIGN}C",
-                                       command=self.metric_pushed,
-                                       **self.button_pushed_cnf)
+        self.metric_button = HoverButton(self.loc_frame, "Press to change units to metric.",
+                                         self, self.button_pushed_cnf,
+                                         text=u"\N{DEGREE SIGN}C", command=self.metric_pushed)
         self.metric_button.grid(row=0, column=3, padx=(2, 4), pady=(4, 5),
                                 sticky=tk.NSEW)
-        # Action on entering the button with mouse.
-        self.metric_button.bind("<Enter>", self.enter_metric_button)
-        # Action on leaving the button with mouse.
-        self.metric_button.bind("<Leave>", self.leave_metric_button)
 
         # Imperial units button.
-        self.imperial_button = tk.Button(self.loc_frame, text=u"\N{DEGREE SIGN}F",
-                                         command=self.imperial_pushed,
-                                         **self.button_released_cnf)
+        self.imperial_button = HoverButton(self.loc_frame,
+                                           "Press to change units to imperial.",
+                                           self,
+                                           self.button_released_cnf,
+                                           text=u"\N{DEGREE SIGN}F",
+                                           command=self.imperial_pushed)
         self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
                                   sticky=tk.NSEW)
-        # Action on entering the button with mouse.
-        self.imperial_button.bind("<Enter>", self.enter_imperial_button)
-        # Action on leaving the button with mouse.
-        self.imperial_button.bind("<Leave>", self.leave_imperial_button)
 
         # Main display area canvas.
         self.main_canvas = tk.Canvas(self, **canvas_cnf)
@@ -185,12 +174,6 @@ class WeatherApp(tk.Tk):
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
         self.status_bar_label.configure(relief="sunken")
 
-    # def clear_loc_entry(self, *args):
-    #     """Empties text from loc_entry. *args contains event object passed
-    #     automatically from clear_loc_button."""
-    #     self.loc_entry.delete(0, tk.END)
-    #     self.loc_entry.focus()
-
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
         *args contains event object passed automatically from metric_button."""
@@ -198,52 +181,12 @@ class WeatherApp(tk.Tk):
         self.metric_button.configure(**self.button_pushed_cnf)
         self.var_units.set("metric")
 
-    def enter_metric_button(self, *args):
-        """Displays information on button function to the user in the status_bar_label.
-         *args contains event object passed automatically from metric_button."""
-        self.var_status.set("Press to change units to metric")
-
-    def leave_metric_button(self, *args):
-        """Clears status_bar_label after mouse leaves the metric_button area.
-        *args contains event object passed automatically from metric_button.
-        """
-        if self.error_status == -1:
-            self.var_status.set(self.error_message)
-        else:
-            self.var_status.set("")
-
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
         *args contains event object passed automatically from imperial_button."""
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
         self.var_units.set("imperial")
-
-    def enter_imperial_button(self, *args):
-        """Displays information on button function to the user in the status_bar_label.
-         *args contains event object passed automatically from metric_button."""
-        self.var_status.set("Press to change units to imperial")
-
-    def leave_imperial_button(self, *args):
-        """Clears status_bar_label after mouse leaves the imperial_button area.
-        *args contains event object passed automatically from metric_button."""
-        if self.error_status == -1:
-            self.var_status.set(self.error_message)
-        else:
-            self.var_status.set("")
-
-    def enter_search_button(self, *args):
-        """Displays information on button function to the user in the status_bar_label.
-         *args contains event object passed automatically from metric_button."""
-        self.var_status.set("Press to get a weather report.")
-
-    def leave_search_button(self, *args):
-        """Clears status_bar_label after mouse leaves the clear_loc_button area.
-        *args contains event object passed automatically from metric_button."""
-        if self.error_status == -1:
-            self.var_status.set(self.error_message)
-        else:
-            self.var_status.set("")
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
@@ -275,34 +218,39 @@ class WeatherApp(tk.Tk):
             # Unpack dictionaries from data
             self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
 
+
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
     
     We can use the same configuration dictionary as for the  standard tk.Button.
     The Weather App class object contains variable which will be used to display info in the status_bar_label.
-    Therefore we have to communicate with it and the WeatherApp object name is needed as one of the parameters.
+    Therefore we have to communicate with it and the WeatherApp instance name is needed as one of the parameters.
 
     Args:
         tk.Button (tk.Button) -- Standard tkinter Button object which we inherit from.
+    
     """
-    def __init__(self, master, tip, app, cnf):
+
+    def __init__(self, master, tip, w_app, cnf, **args):
         """Initialise MyButton.
         
         Args:
             master (tk.widget) -- Master widget to which MyButton (slave) instance will belong.
                 The master widget is part of the WeatherApp object.
             tip (Str) -- Tooltip text to display in the status_bar_label.
-            app (WeatherApp) -- WeatherApp object which is running the GUI.
+            w_app (WeatherApp) -- WeatherApp instance which is running the GUI.
             cnf (Dict) -- Dictionary with the configuration for MyButton.
+            **args -- Keyword arguments to further initialise the button.
             
         Attributes:
             tip (Str) -- Text to display in the status_bar_label of the app.
-            app (WeatherApp) -- Main WeatherApp object used to generate the GUI.
+            w_app (WeatherApp) -- Main WeatherApp instance used to generate the
+                GUI.
         
         """
-        super().__init__(app.master, cnf)
+        super().__init__(master, cnf, **args)
         self.tip = tip
-        self.app = app
+        self.w_app = w_app
         # Action on entering the button with mouse.
         self.bind("<Enter>", self.enter_button)
         # Action on leaving the button with mouse.
@@ -311,15 +259,41 @@ class HoverButton(tk.Button):
     def enter_button(self, *args):
         """Displays information on button function to the user in the status_bar_label.
          *args contains event object passed automatically from the button."""
-        self.app.var_status.set(self.tip)
+        self.w_app.var_status.set(self.tip)
 
     def leave_button(self, *args):
         """Clears status_bar_label after mouse leaves the button area.
         *args contains event object passed automatically from the button."""
-        if self.app.error_status == -1:
-            self.app.var_status.set(self.app.error_message)
+        if self.w_app.error_status == -1:
+            self.w_app.var_status.set(self.w_app.error_message)
         else:
-            self.app.var_status.set("")
+            self.w_app.var_status.set("")
+
+
+class Controller(tk.Tk):
+    """Controller class which will help passing data between objects.
+    
+    Inherits from tk.TK object (main window). Will be used to store and pass data between front (GUI) and backend.
+    
+    Args:
+        tk.TK  -- base class for the Controller class.
+    
+    """
+
+    def __init__(self):
+        """Initialise the controller.
+        
+        Attributes:
+
+        """
+        self.app_data = {"var_units": tk.StringVar(value="metric"),
+                         "var_status": tk.StringVar(value=""),
+                         "error_message": "",
+                         "error_status": 0,
+                         "w_d_cur": {},
+                         "w_d_short": {},
+                         "w_d_long": {}
+                         }
 
 
 app = WeatherApp()
