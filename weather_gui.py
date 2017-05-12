@@ -1,9 +1,7 @@
 import tkinter as tk
-
 from PIL import Image, ImageTk
-
 from weather_backend import Report
-
+from controller import Controller
 
 # TODO: Have to add then a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
@@ -23,12 +21,16 @@ class WeatherApp(tk.Tk):
     
     """
 
-    def __init__(self):
+    def __init__(self, controller):
         """Initializes WeatherApp class.
         
-        This class is used to generate the graphic user interface for the Weather 
-        App. Its methods are directly related to the function of the buttons and 
-        entry.
+        This class is used to generate the graphic user interface for the Weather App.
+        Its methods are directly related to the function of the buttons and entry.
+        We will apply Model-View-Controller architecture to the project to decouple each segment from the other.
+        
+        Args:
+            controller (Controller) -- controller object which will store all the data required by each segment
+                of the application.
         
         Attributes:
             title (str) -- Main window title displayed when using application.
@@ -71,6 +73,8 @@ class WeatherApp(tk.Tk):
         lavender = "#6D7993"
         overcast = "#9099A2"
         paper = "#D5D5D5"
+        # Add controller to the class instance.
+        self.controller = controller
 
         # Configure main window.
         self.title("The Weather App")
@@ -269,33 +273,9 @@ class HoverButton(tk.Button):
         else:
             self.w_app.var_status.set("")
 
-
-class Controller(tk.Tk):
-    """Controller class which will help passing data between objects.
-    
-    Inherits from tk.TK object (main window). Will be used to store and pass data between front (GUI) and backend.
-    
-    Args:
-        tk.TK  -- base class for the Controller class.
-    
-    """
-
-    def __init__(self):
-        """Initialise the controller.
-        
-        Attributes:
-
-        """
-        self.app_data = {"var_units": tk.StringVar(value="metric"),
-                         "var_status": tk.StringVar(value=""),
-                         "error_message": "",
-                         "error_status": 0,
-                         "w_d_cur": {},
-                         "w_d_short": {},
-                         "w_d_long": {}
-                         }
-
-
-app = WeatherApp()
-report = Report()
-app.mainloop()
+# Launch application.
+if __name__ == "__main__":
+    controller = Controller()
+    app = WeatherApp(controller)
+    report = Report()
+    app.mainloop()
