@@ -14,7 +14,10 @@ from controller import Controller
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
     
-    Inherits from tk.TK object (main window).
+    Inherits from tk.TK object (main window).    
+        Its methods are directly related to the function of the buttons and entry.
+        We will apply Model-View-Controller(Adapter) architecture to the project to
+        decouple each segment from the other.
     
     Args:
         tk.TK  -- base class for the WeatherApp class
@@ -24,24 +27,12 @@ class WeatherApp(tk.Tk):
     def __init__(self, controller):
         """Initializes WeatherApp class.
         
-        This class is used to generate the graphic user interface for the Weather App.
-        Its methods are directly related to the function of the buttons and entry.
-        We will apply Model-View-Controller architecture to the project to decouple each segment from the other.
-        
         Args:
             controller (Controller) -- controller object which will store all the data required by each segment
                 of the application.
         
         Attributes:
             title (str) -- Main window title displayed when using application.
-            var_units (tk.StringVar) -- Value of selection of units (metric / imperial).
-            var_status (tk.StringVar) -- Stores error message to be displayed in the 
-                status bar.
-            error_message (Str) -- Last error message.
-            error_status (Int) -- Value -1 means an error occurred and was not cleared. 0 means all ok.
-            w_d_cur (Dict) -- Dictionary containing current weather report.
-            w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
-            w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
             loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
             loc_label (tk.Label) -- Location label.
             var_loc (tk.StringVar) -- Tkinter text variable assigned to the 
@@ -82,13 +73,13 @@ class WeatherApp(tk.Tk):
         # self.geometry("1000x800")
         self.resizable(width=tk.FALSE, height=tk.FALSE)
         # Set main variables.
-        self.var_units = tk.StringVar(value="metric")
-        self.var_status = tk.StringVar(value="")
-        self.error_message = ""
-        self.error_status = 0
-        self.w_d_cur = {}
-        self.w_d_short = {}
-        self.w_d_long = {}
+        # self.var_units = tk.StringVar(value="metric")
+        # self.var_status = tk.StringVar(value="")
+        # self.error_message = ""
+        # self.error_status = 0
+        # self.w_d_cur = {}
+        # self.w_d_short = {}
+        # self.w_d_long = {}
 
         # GUI style definitions.
         font = "Georgia 12"

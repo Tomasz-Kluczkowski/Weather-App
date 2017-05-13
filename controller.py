@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class Controller(tk.Tk):
-    """Controller class which will help passing data between objects.
+    """Controller(Adapter) class which will help passing data between objects.
 
     Inherits from tk.TK object (main window). 
     This class should allow a clear separation of functionality of each class used in the project and avoid calling
