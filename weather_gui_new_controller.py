@@ -6,7 +6,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from weather_backend import Report
-from controller import Controller
+from controller_no_TK import Controller
 
 # TODO: Have to add then a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
@@ -120,9 +120,7 @@ class WeatherApp(tk.Tk):
         self.loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4), sticky=tk.NSEW)
 
         # Location entry.
-        self.loc_entry = tk.Entry(self.loc_frame,
-                                  textvariable=self.controller.app_data["var_loc"],
-                                  **entry_cnf)
+        self.loc_entry = tk.Entry(self.loc_frame, **entry_cnf)
         self.loc_entry.focus()
         self.loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                             sticky=tk.NSEW)
@@ -166,7 +164,7 @@ class WeatherApp(tk.Tk):
         canvas_text = self.main_canvas.create_text(100, 100, text="test text", font=font, fill=paper, anchor=tk.NW)
 
         # Error/Status Bar.
-        self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
+        self.status_bar_label = tk.Label(self, text=controller.app_data["var_status"], **label_cnf)
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
         self.status_bar_label.configure(relief="sunken")
 
@@ -175,14 +173,14 @@ class WeatherApp(tk.Tk):
         *args contains event object passed automatically from metric_button."""
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
-        self.controller.app_data["var_units"].set("metric")
+        self.controller.app_data["var_units"] = "metric"
 
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
         *args contains event object passed automatically from imperial_button."""
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
-        self.controller.app_data["var_units"].set("imperial")
+        self.controller.app_data["var_units"] = "imperial"
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
@@ -190,30 +188,31 @@ class WeatherApp(tk.Tk):
             event (event) -- tkinter.event object sent when a keyboard was pressed. 
         """
         if self.controller.app_data["error_status"] == -1:
-            self.controller.app_data["var_status"].set("")
+            self.controller.app_data["var_status"] = ""
             self.controller.app_data["error_status"] = 0
 
     def display_report(self, *args):
         """Obtains data from the report object and displays it in the main_canvas.
         *args contains event object passed automatically from loc_entry."""
 
+        self.controller.app_data["var_loc"] = self.loc_entry.get()
         # Do nothing if no location is entered.
-        if self.controller.app_data["var_loc"].get() == "":
+        if self.controller.app_data["var_loc"] == "":
             return
-        data = report.get_report(self.controller.app_data["var_loc"].get(),
-                                 self.controller.app_data["var_units"].get())
+        data = report.get_report(self.controller.app_data["var_loc"],
+                                 self.controller.app_data["var_units"])
         # Error handling.
         # We expect a tuple returning from get_report. Item 0 contains error status.
         self.controller.app_data["error_status"] = data[0]
         if self.controller.app_data["error_status"] == -1:
             self.controller.app_data["error_message"] = data[1]
-            self.controller.app_data["var_status"].set(data[1])
+            self.controller.app_data["var_status"] = data[1]
         else:
             # Clear any error status and message upon successful response from API.
-            self.controller.app_data["var_status"].set("")
+            self.controller.app_data["var_status"] = ""
             self.controller.app_data["error_message"] = ""
             # Unpack dictionaries from data
-            # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
+            self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
 
 
 class HoverButton(tk.Button):
@@ -257,15 +256,15 @@ class HoverButton(tk.Button):
     def enter_button(self, *args):
         """Displays information on button function to the user in the status_bar_label.
          *args contains event object passed automatically from the button."""
-        self.controller.app_data["var_status"].set(self.tip)
+        self.controller.app_data["var_status"] = self.tip
 
     def leave_button(self, *args):
         """Clears status_bar_label after mouse leaves the button area.
         *args contains event object passed automatically from the button."""
         if self.controller.app_data["error_status"] == -1:
-            self.controller.app_data["var_status"].set(self.controller.app_data["error_message"])
+            self.controller.app_data["var_status"] = self.controller.app_data["error_message"]
         else:
-            self.controller.app_data["var_status"].set("")
+            self.controller.app_data["var_status"] = ""
 
 # Launch application.
 if __name__ == "__main__":

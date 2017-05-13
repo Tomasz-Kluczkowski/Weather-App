@@ -15,14 +15,19 @@ class Report(object):
     # TODO: This should only be passed to the database if the response from the API is 200 (valid location was entered)
     # TODO: Have to add then a combobox/list (?) with selection of previous locations or replace entry box with combobox.
 
-    def __init__(self):
+    def __init__(self, controller):
         """Initialize Report class.
+        
+        Args:
+            controller (Controller) -- controller object which will store all the data required by each segment
+                of the application.
         
         Attributes:
             w_d_cur (Dict) -- Dictionary containing current weather report.
             w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
             w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
         """
+        self.controller = controller
         self.w_d_cur = {}
         self.w_d_short = {}
         self.w_d_long = {}

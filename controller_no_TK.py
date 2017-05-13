@@ -1,7 +1,7 @@
-import tkinter as tk
+# import tkinter as tk
 
 
-class Controller(tk.Tk):
+class Controller(object):
     """Controller(Adapter) class which will help passing data between objects.
 
     Inherits from tk.TK object (main window). 
@@ -32,10 +32,10 @@ class Controller(tk.Tk):
 
         """
 
-        super().__init__()
-        self.app_data = {"var_units": tk.StringVar(value="metric"),
-                         "var_status": tk.StringVar(value=""),
-                         "var_loc": tk.StringVar(),
+        # super().__init__()
+        self.app_data = {"var_units": "metric",
+                         "var_status": "",
+                         "var_loc": "",
                          "error_message": "",
                          "error_status": 0,
                          "w_d_cur": {},
