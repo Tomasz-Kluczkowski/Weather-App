@@ -30,7 +30,7 @@ class WeatherApp(tk.Tk):
     
     """
 
-    def __init__(self, controller):
+    def __init__(self):
         """Initializes WeatherApp class.
         
         Args:
@@ -71,7 +71,11 @@ class WeatherApp(tk.Tk):
         overcast = "#9099A2"
         paper = "#D5D5D5"
         # Add controller to the class instance.
+        controller = Controller()
         self.controller = controller
+        # Add report to the class instance.
+        report = Report(self.controller)
+        self.report = report
 
         # Configure main window.
         self.title("The Weather App")
@@ -200,7 +204,7 @@ class WeatherApp(tk.Tk):
         # Do nothing if no location is entered.
         if self.controller.app_data["var_loc"].get() == "":
             return
-        data = report.get_report(self.controller.app_data["var_loc"].get(),
+        data = self.report.get_report(self.controller.app_data["var_loc"].get(),
                                  self.controller.app_data["var_units"].get())
         # Error handling.
         # We expect a tuple returning from get_report. Item 0 contains error status.
@@ -269,7 +273,5 @@ class HoverButton(tk.Button):
 
 # Launch application.
 if __name__ == "__main__":
-    controller_1 = Controller()
-    app = WeatherApp(controller_1)
-    report = Report(controller_1)
+    app = WeatherApp()
     app.mainloop()
