@@ -23,26 +23,29 @@ class WeatherApp(tk.Tk):
     Inherits from tk.TK object (main window).    
     We will apply Model-View-Controller(Adapter) architecture to the project to
     decouple each segment from the other. The View has no direct contact with the Model and vice versa.
-    All communication is done via the Controller.
+    All communication is done via the Controller. 
+    Due to the nature of tkinter library we have to initialise a root Tk object to which StringVar type variables
+    and all the GUI elements are connected. Since there can be only one Tk object we have to create the WeaterApp class 
+    object first (it inherits from Tk object) and then inside the class call Controller and Report classes. 
+    Controller class will have access then to the same Tk object as the WeatherApp class. 
+    Therefore a complete 100% separation of Model / View / Controller is not possible (but we are very close :)).
     
     Args:
-        tk.TK  -- base class for the WeatherApp class. Tkinter main window object.
+        tk.TK  -- base class for the WeatherApp class. Tkinter main window (root) object.
     
     """
 
     def __init__(self):
         """Initializes WeatherApp class.
         
-        Args:
-            controller (Controller) -- controller object which will store all the data required by each segment
-                of the application.
-        
         Attributes:
+            controller (Controller) -- Controller class object used for passing data between 
+                the View (weather_gui) and the Model (weather_backend).
+            report (Report) -- Report class object (the Model) for our application. Carries out all
+                the operations at the backend.
             title (str) -- Main window title displayed when using application.
             loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
             loc_label (tk.Label) -- Location label.
-            var_loc (tk.StringVar) -- Tkinter text variable assigned to the 
-                location entry object.
             loc_entry (tk.Entry) -- Location entry object. Here user can input 
                 data which will be passed to var_loc.
             clear_loc_button (tk.Button) -- Clear location entry button. When 
@@ -59,20 +62,17 @@ class WeatherApp(tk.Tk):
         """
 
         super().__init__()
+
         # Color palettes used:
-        # morning_sky = "#CAE4D8"
-        # honey = "#DCAE1D"
-        # cerulean = "#00303F"
-        # mist = "#7A9D96"
-        #
-        # pale_gold = "#C0B283"
         dusty = "#96858F"
         lavender = "#6D7993"
         overcast = "#9099A2"
         paper = "#D5D5D5"
+
         # Add controller to the class instance.
         controller = Controller()
         self.controller = controller
+
         # Add report to the class instance.
         report = Report(self.controller)
         self.report = report
