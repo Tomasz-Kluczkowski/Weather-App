@@ -5,7 +5,10 @@ import datetime
 
 class Report(object):
     """This class will be used to call Open Weather API and gather data for displaying in the GUI.
-        It has no base class and therefore inherits from Python base object.
+       
+    Inherits from Python base object. This is our Model. 
+    Model is allowed to directly communicate only with the Controller. 
+    All the backend (business logic) will be carried out here.
     
     Args:
         object (object) -- The class inherits from Python base object.
@@ -21,18 +24,10 @@ class Report(object):
         Args:
             controller (Controller) -- controller object which will store all the data required by each segment
                 of the application.
-        
-        Attributes:
-            w_d_cur (Dict) -- Dictionary containing current weather report.
-            w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
-            w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
         """
         self.controller = controller
-        self.w_d_cur = {}
-        self.w_d_short = {}
-        self.w_d_long = {}
 
-    def get_report(self, location, units):
+    def finish_get_report(self, location, units):
         """Obtain data in json format from Open Weather and store it in appropriate dictionaries.
         
         Args:
@@ -42,10 +37,10 @@ class Report(object):
             status (Tuple) -- First item is the error status (-1 means error / 0 means all ok).
                 Second item is an error message in case of an exception or 
                 weather_dicts - list of dictionaries with all weather reports.
-            
         """
 
         # Key obtained from Open Weather. Required to make any calls to their API.
+        # Please register at: https://home.openweathermap.org/users/sign_up
         api_key = "fa730d41d41ae83226a227a150d927ac"
 
         # Base URL used to get weather reports. Notice formatting placeholders for report type, location and units.
@@ -65,7 +60,7 @@ class Report(object):
         # List of report types accepted by the API.
         report_types = ["weather", "forecast", "forecast/daily"]
         # List of dictionaries which will store all the data returned from API call.
-        weather_dicts = [self.w_d_cur, self.w_d_short, self.w_d_long]
+        weather_dicts = [{}, {}, {}]
 
         for report_type, weather_dict in zip(report_types, weather_dicts):
             try:
@@ -82,27 +77,3 @@ class Report(object):
             else:
                 status = (0, weather_dicts)
                 return status
-
-# def display_report(self, *args):
-    #     # TODO: REMOVE DIRECT CALL TO THE REPORT CLASS FOR DATA.
-    #     # TODO: THE CALL SHOULD BE TO THE CONTROLLER WHICH WILL THEN GET THE DATA AND GIVE IT TO THE GUI.
-    #     """Obtains data from the report object and displays it in the main_canvas.
-    #     *args contains event object passed automatically from loc_entry."""
-    #
-    #     # Do nothing if no location is entered.
-    #     if self.controller.app_data["var_loc"].get() == "":
-    #         return
-    #     data = self.report.get_report(self.controller.app_data["var_loc"].get(),
-    #                              self.controller.app_data["var_units"].get())
-    #     # Error handling.
-    #     # We expect a tuple returning from get_report. Item 0 contains error status.
-    #     self.controller.app_data["error_status"] = data[0]
-    #     if self.controller.app_data["error_status"] == -1:
-    #         self.controller.app_data["error_message"] = data[1]
-    #         self.controller.app_data["var_status"].set(data[1])
-    #     else:
-    #         # Clear any error status and message upon successful response from API.
-    #         self.controller.app_data["var_status"].set("")
-    #         self.controller.app_data["error_message"] = ""
-    #         # Unpack dictionaries from data
-    #         # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]

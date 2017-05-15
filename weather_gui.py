@@ -26,10 +26,9 @@ class WeatherApp(tk.Tk):
     decouple each segment from the other. The View has no direct contact with the Model and vice versa.
     All communication is done via the Controller. 
     Due to the nature of tkinter library we have to initialise a root Tk object to which StringVar type variables
-    and all the GUI elements are connected. Since there can be only one Tk object we have to create the WeaterApp class 
+    and all the GUI elements are connected. Since there can be only one Tk object we have to create the WeatherApp class 
     object first (it inherits from Tk object) and then inside the class call Controller and Report classes. 
     Controller class will have access then to the same Tk object as the WeatherApp class. 
-    Therefore a complete 100% separation of Model / View / Controller is not possible (but we are very close :)).
     
     Args:
         tk.TK  -- base class for the WeatherApp class. Tkinter main window (root) object.
@@ -73,6 +72,13 @@ class WeatherApp(tk.Tk):
         # Add it as a Model to the Controller class object.
         self.controller.add_model(report)
 
+        # Color palette used:
+        dusty = "#96858F"
+        lavender = "#6D7993"
+        overcast = "#9099A2"
+        paper = "#D5D5D5"
+        font = "Georgia 12"
+
         # Configure main window.
         self.title("The Weather App")
         self.config(bg=paper, bd=2, relief="groove")
@@ -80,13 +86,6 @@ class WeatherApp(tk.Tk):
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
         # GUI style definitions.
-
-        # Color palette used:
-        dusty = "#96858F"
-        lavender = "#6D7993"
-        overcast = "#9099A2"
-        paper = "#D5D5D5"
-        font = "Georgia 12"
 
         # Widget styles.
         frame_cnf = {"bg": overcast, "bd": 2, "relief": "groove"}
@@ -130,7 +129,7 @@ class WeatherApp(tk.Tk):
         self.loc_entry.focus()
         self.loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                             sticky=tk.NSEW)
-        self.loc_entry.bind("<Return>", self.display_report)
+        self.loc_entry.bind("<Return>", self.begin_get_report)
         # If there is an error message and user starts to correct location name, remove error.
         self.loc_entry.bind("<Key>", self.clear_error_message)
 
@@ -138,10 +137,10 @@ class WeatherApp(tk.Tk):
         self.search_img = tk.PhotoImage(file=r"Resources\Buttons\magnifier-tool.png")
         self.search_button = HoverButton(self.loc_frame, controller, "Press to get a weather report.",
                                          clear_cnf, image=self.search_img,
-                                         command=self.display_report)
+                                         command=self.begin_get_report)
         self.search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4), pady=(4, 5))
         # Press Enter to get report.
-        self.search_button.bind("<Return>", self.display_report)
+        self.search_button.bind("<Return>", self.begin_get_report)
 
         # Metric units button.
         self.metric_button = HoverButton(self.loc_frame, controller, "Press to change units to metric.",
@@ -197,30 +196,22 @@ class WeatherApp(tk.Tk):
             self.controller.app_data["var_status"].set("")
             self.controller.app_data["error_status"] = 0
 
-    def display_report(self, *args):
-        # TODO: REMOVE DIRECT CALL TO THE REPORT CLASS FOR DATA.
-        # TODO: THE CALL SHOULD BE TO THE CONTROLLER WHICH WILL THEN GET THE DATA AND GIVE IT TO THE GUI.
-        """Obtains data from the report object and displays it in the main_canvas.
+    def begin_get_report(self, *args):
+        """Begin getting data for the weather report to display it on the main_canvas.
+        The call goes to the Controller first. Then to the Model.
         *args contains event object passed automatically from loc_entry."""
 
         # Do nothing if no location is entered.
         if self.controller.app_data["var_loc"].get() == "":
             return
-        # Request a report using a mediating controller.
-        self.controller.request_report(self.controller.app_data["var_loc"].get(),
-                                       self.controller.app_data["var_units"].get())
-        # # Error handling.
-        # # We expect a tuple returning from get_report. Item 0 contains error status.
-        # self.controller.app_data["error_status"] = data[0]
-        # if self.controller.app_data["error_status"] == -1:
-        #     self.controller.app_data["error_message"] = data[1]
-        #     self.controller.app_data["var_status"].set(data[1])
-        # else:
-        #     # Clear any error status and message upon successful response from API.
-        #     self.controller.app_data["var_status"].set("")
-        #     self.controller.app_data["error_message"] = ""
-        #     # Unpack dictionaries from data
-        #     # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
+        # Request a report using a Mediating Controller.
+        self.controller.get_report()
+        # Upon successful contact with the API display the result in the GUI.
+        if self.controller.app_data["error_status"] == 0:
+            self.display_report()
+
+    def display_report(self):
+        pass
 
 
 class HoverButton(tk.Button):
@@ -248,7 +239,7 @@ class HoverButton(tk.Button):
         Attributes:
             tip (Str) -- Text to display in the status_bar_label of the app.
             controller (Controller) -- controller object which will store all the data required by each segment
-                of the application.
+                of the application. This has to be the same Controller as for the WeatherApp.
         
         """
         super().__init__(master, cnf, **args)
