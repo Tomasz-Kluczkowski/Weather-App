@@ -1,12 +1,13 @@
-#Title: Weather App
-#Author: Tomasz Kluczkowski
-#email: tomaszk1@hotmail.co.uk
+# Title: Weather App
+# Author: Tomasz Kluczkowski
+# email: tomaszk1@hotmail.co.uk
 
 
 import tkinter as tk
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
+
 
 # TODO: Have to add then a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
@@ -41,18 +42,15 @@ class WeatherApp(tk.Tk):
         Attributes:
             controller (Controller) -- Controller class object used for passing data between 
                 the View (weather_gui) and the Model (weather_backend).
-            report (Report) -- Report class object (the Model) for our application. Carries out all
-                the operations at the backend.
             title (str) -- Main window title displayed when using application.
             loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
             loc_label (tk.Label) -- Location label.
             loc_entry (tk.Entry) -- Location entry object. Here user can input 
                 data which will be passed to var_loc.
-            clear_loc_button (tk.Button) -- Clear location entry button. When 
-                pressed deletes text entered into the loc_entry box.
-            metric_button (tk.Button)   -- Metric units (degC, m/s) selection
+            search_button (HoverButton) -- Search for weather report button.
+            metric_button (HoverButton)   -- Metric units (degC, m/s) selection
                 button.
-            imperial_button (tk.Button)   -- Imperial units (degF / mile/hr) 
+            imperial_button (HoverButton)   -- Imperial units (degF / mile/hr) 
                 selection button.
             main_canvas (tk.Canvas) -- Main canvas on which all of the weather 
                 report will be visualised.
@@ -63,32 +61,34 @@ class WeatherApp(tk.Tk):
 
         super().__init__()
 
-        # Color palettes used:
-        dusty = "#96858F"
-        lavender = "#6D7993"
-        overcast = "#9099A2"
-        paper = "#D5D5D5"
-
-        # Add controller to the class instance.
+        # Add controller to the WeatherApp class instance.
         controller = Controller()
         self.controller = controller
 
-        # Add report to the class instance.
+        # Add main application instance as a view to the controller.
+        self.controller.add_view(self)
+
+        # Create a report object for backend operations.
         report = Report(self.controller)
-        self.report = report
+        # Add it as a model to the controller class object.
+        self.controller.add_model(report)
 
         # Configure main window.
         self.title("The Weather App")
         self.config(bg=paper, bd=2, relief="groove")
         # self.geometry("1000x800")
         self.resizable(width=tk.FALSE, height=tk.FALSE)
-        # Set main variables.
-        # self.w_d_cur = {}
-        # self.w_d_short = {}
-        # self.w_d_long = {}
 
         # GUI style definitions.
+
+        # Color palette used:
+        dusty = "#96858F"
+        lavender = "#6D7993"
+        overcast = "#9099A2"
+        paper = "#D5D5D5"
         font = "Georgia 12"
+
+        # Widget styles.
         frame_cnf = {"bg": overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": font, "relief": "groove"}
@@ -198,34 +198,35 @@ class WeatherApp(tk.Tk):
             self.controller.app_data["error_status"] = 0
 
     def display_report(self, *args):
+        # TODO: REMOVE DIRECT CALL TO THE REPORT CLASS FOR DATA.
+        # TODO: THE CALL SHOULD BE TO THE CONTROLLER WHICH WILL THEN GET THE DATA AND GIVE IT TO THE GUI.
         """Obtains data from the report object and displays it in the main_canvas.
         *args contains event object passed automatically from loc_entry."""
 
         # Do nothing if no location is entered.
         if self.controller.app_data["var_loc"].get() == "":
             return
-        data = self.report.get_report(self.controller.app_data["var_loc"].get(),
-                                 self.controller.app_data["var_units"].get())
-        # Error handling.
-        # We expect a tuple returning from get_report. Item 0 contains error status.
-        self.controller.app_data["error_status"] = data[0]
-        if self.controller.app_data["error_status"] == -1:
-            self.controller.app_data["error_message"] = data[1]
-            self.controller.app_data["var_status"].set(data[1])
-        else:
-            # Clear any error status and message upon successful response from API.
-            self.controller.app_data["var_status"].set("")
-            self.controller.app_data["error_message"] = ""
-            # Unpack dictionaries from data
-            # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
+        # Request a report using a mediating controller.
+        self.controller.request_report(self.controller.app_data["var_loc"].get(),
+                                       self.controller.app_data["var_units"].get())
+        # # Error handling.
+        # # We expect a tuple returning from get_report. Item 0 contains error status.
+        # self.controller.app_data["error_status"] = data[0]
+        # if self.controller.app_data["error_status"] == -1:
+        #     self.controller.app_data["error_message"] = data[1]
+        #     self.controller.app_data["var_status"].set(data[1])
+        # else:
+        #     # Clear any error status and message upon successful response from API.
+        #     self.controller.app_data["var_status"].set("")
+        #     self.controller.app_data["error_message"] = ""
+        #     # Unpack dictionaries from data
+        #     # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
 
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
     
     We can use the same configuration dictionary as for the  standard tk.Button.
-    The Weather App class object contains variable which will be used to display info in the status_bar_label.
-    Therefore we have to communicate with it and the WeatherApp instance name is needed as one of the parameters.
 
     Args:
         tk.Button (tk.Button) -- Standard tkinter Button object which we inherit from.
@@ -270,6 +271,7 @@ class HoverButton(tk.Button):
             self.controller.app_data["var_status"].set(self.controller.app_data["error_message"])
         else:
             self.controller.app_data["var_status"].set("")
+
 
 # Launch application.
 if __name__ == "__main__":

@@ -82,3 +82,27 @@ class Report(object):
             else:
                 status = (0, weather_dicts)
                 return status
+
+# def display_report(self, *args):
+    #     # TODO: REMOVE DIRECT CALL TO THE REPORT CLASS FOR DATA.
+    #     # TODO: THE CALL SHOULD BE TO THE CONTROLLER WHICH WILL THEN GET THE DATA AND GIVE IT TO THE GUI.
+    #     """Obtains data from the report object and displays it in the main_canvas.
+    #     *args contains event object passed automatically from loc_entry."""
+    #
+    #     # Do nothing if no location is entered.
+    #     if self.controller.app_data["var_loc"].get() == "":
+    #         return
+    #     data = self.report.get_report(self.controller.app_data["var_loc"].get(),
+    #                              self.controller.app_data["var_units"].get())
+    #     # Error handling.
+    #     # We expect a tuple returning from get_report. Item 0 contains error status.
+    #     self.controller.app_data["error_status"] = data[0]
+    #     if self.controller.app_data["error_status"] == -1:
+    #         self.controller.app_data["error_message"] = data[1]
+    #         self.controller.app_data["var_status"].set(data[1])
+    #     else:
+    #         # Clear any error status and message upon successful response from API.
+    #         self.controller.app_data["var_status"].set("")
+    #         self.controller.app_data["error_message"] = ""
+    #         # Unpack dictionaries from data
+    #         # self.w_d_cur, self.w_d_short, self.w_d_long = data[1]
