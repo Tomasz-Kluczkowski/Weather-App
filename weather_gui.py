@@ -41,6 +41,11 @@ class WeatherApp(tk.Tk):
         Attributes:
             controller (Controller) -- Controller class object used for passing data between 
                 the View (weather_gui) and the Model (weather_backend).
+            dusty (Str) -- color definition in hex number.
+            lavender (Str) -- color definition in hex number.
+            overcast (Str) -- color definition in hex number.
+            paper (Str) -- color definition in hex number.
+            font (Str) -- font definition.
             title (str) -- Main window title displayed when using application.
             loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
             loc_label (tk.Label) -- Location label.
@@ -73,43 +78,43 @@ class WeatherApp(tk.Tk):
         self.controller.add_model(report)
 
         # Color palette used:
-        dusty = "#96858F"
-        lavender = "#6D7993"
-        overcast = "#9099A2"
-        paper = "#D5D5D5"
-        font = "Georgia 12"
+        self.dusty = "#96858F"
+        self.lavender = "#6D7993"
+        self.overcast = "#9099A2"
+        self.paper = "#D5D5D5"
+        self.font = "Georgia 12"
 
         # Configure main window.
         self.title("The Weather App")
-        self.config(bg=paper, bd=2, relief="groove")
+        self.config(bg=self.paper, bd=2, relief="groove")
         # self.geometry("1000x800")
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
         # GUI style definitions.
 
         # Widget styles.
-        frame_cnf = {"bg": overcast, "bd": 2, "relief": "groove"}
-        label_cnf = {"fg": "black", "bg": dusty, "bd": 2, "padx": 4,
-                     "pady": 9, "font": font, "relief": "groove"}
-        entry_cnf = {"fg": "black", "bg": paper, "width": 40, "bd": 2,
-                     "font": font, "relief": "sunken"}
-        clear_cnf = {"bg": lavender, "fg": "black", "activebackground": dusty,
-                     "activeforeground": paper, "padx": 2, "pady": 2,
-                     "anchor": tk.CENTER, "font": font, "relief": "groove"}
-        self.button_released_cnf = {"fg": "black", "bg": lavender,
-                                    "activebackground": dusty,
-                                    "activeforeground": paper, "bd": 2,
+        frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
+        label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
+                     "pady": 9, "font": self.font, "relief": "groove"}
+        entry_cnf = {"fg": "black", "bg": self.paper, "width": 40, "bd": 2,
+                     "font": self.font, "relief": "sunken"}
+        clear_cnf = {"bg": self.lavender, "fg": "black", "activebackground": self.dusty,
+                     "activeforeground": self.paper, "padx": 2, "pady": 2,
+                     "anchor": tk.CENTER, "font": self.font, "relief": "groove"}
+        self.button_released_cnf = {"fg": "black", "bg": self.lavender,
+                                    "activebackground": self.dusty,
+                                    "activeforeground": self.paper, "bd": 2,
                                     "padx": 2, "pady": 2, "anchor": tk.CENTER,
-                                    "width": 2, "font": font, "relief": "raised"}
+                                    "width": 2, "font": self.font, "relief": "raised"}
 
-        self.button_pushed_cnf = {"fg": paper, "bg": dusty,
-                                  "activebackground": lavender,
+        self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
+                                  "activebackground": self.lavender,
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
-                                  "font": font, "relief": "sunken"}
-        canvas_cnf = {"bg": paper, "bd": 2, "height": 500,
-                      "highlightbackground": paper,
-                      "highlightcolor": paper, "relief": "groove"}
+                                  "font": self.font, "relief": "sunken"}
+        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 500,
+                      "highlightbackground": self.paper,
+                      "highlightcolor": self.paper, "relief": "groove"}
 
         # LAYOUT DESIGN.
 
@@ -166,7 +171,6 @@ class WeatherApp(tk.Tk):
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
-        canvas_text = self.main_canvas.create_text(100, 100, text="test text", font=font, fill=paper, anchor=tk.NW)
 
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
@@ -176,6 +180,7 @@ class WeatherApp(tk.Tk):
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
         *args contains event object passed automatically from metric_button."""
+
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
         self.controller.app_data["var_units"].set("metric")
@@ -183,12 +188,14 @@ class WeatherApp(tk.Tk):
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
         *args contains event object passed automatically from imperial_button."""
+
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
         self.controller.app_data["var_units"].set("imperial")
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
+        
         Args:
             event (event) -- tkinter.event object sent when a keyboard was pressed. 
         """
@@ -206,12 +213,20 @@ class WeatherApp(tk.Tk):
             return
         # Request a report using a Mediating Controller.
         self.controller.get_report()
-        # Upon successful contact with the API display the result in the GUI.
+        # Upon a successful contact with the API display the result in the GUI.
         if self.controller.app_data["error_status"] == 0:
             self.display_report()
 
     def display_report(self):
-        pass
+        """Display results of the API call in the main_canvas."""
+
+        # Display location.
+        text = "Weather report for: {0}, {1}, lon: {2}, lat: {3}\n". \
+            format(self.controller.app_data["w_d_cur"]["name"],
+                   self.controller.app_data["w_d_cur"]["sys"]["country"],
+                   self.controller.app_data["w_d_cur"]["coord"]["lon"],
+                   self.controller.app_data["w_d_cur"]["coord"]["lat"])
+        self.main_canvas.create_text(100, 100, text=text, font=self.font, fill=self.paper, anchor=tk.NW)
 
 
 class HoverButton(tk.Button):

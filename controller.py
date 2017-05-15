@@ -65,7 +65,6 @@ class Controller(object):
         data = self.model.finish_get_report(self.app_data["var_loc"].get(),
                                             self.app_data["var_units"].get())
 
-
         # We expect a tuple returning from get_report. Item 0 contains error status.
         self.app_data["error_status"] = data[0]
 

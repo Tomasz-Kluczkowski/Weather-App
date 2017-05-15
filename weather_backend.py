@@ -60,9 +60,9 @@ class Report(object):
         # List of report types accepted by the API.
         report_types = ["weather", "forecast", "forecast/daily"]
         # List of dictionaries which will store all the data returned from API call.
-        weather_dicts = [{}, {}, {}]
+        weather_dicts = []
 
-        for report_type, weather_dict in zip(report_types, weather_dicts):
+        for report_type in report_types:
             try:
                 response = requests.get(base_url.format(report_type, location,
                                                         units_prefix + units) + api_key)
@@ -75,5 +75,7 @@ class Report(object):
                 status = (-1, "Error: {0}, {1}".format(weather_dict["cod"], weather_dict["message"]))
                 return status
             else:
-                status = (0, weather_dicts)
-                return status
+                weather_dicts.append(weather_dict)
+                continue
+        status = (0, weather_dicts)
+        return status
