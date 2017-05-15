@@ -61,16 +61,16 @@ class WeatherApp(tk.Tk):
 
         super().__init__()
 
-        # Add controller to the WeatherApp class instance.
+        # Add Controller to the WeatherApp class instance.
         controller = Controller()
         self.controller = controller
 
-        # Add main application instance as a view to the controller.
+        # Add main application instance as a View to the Controller.
         self.controller.add_view(self)
 
-        # Create a report object for backend operations.
+        # Create a Report object for backend operations.
         report = Report(self.controller)
-        # Add it as a model to the controller class object.
+        # Add it as a Model to the Controller class object.
         self.controller.add_model(report)
 
         # Configure main window.

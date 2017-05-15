@@ -42,12 +42,14 @@ class Controller(object):
                          "w_d_short": {},
                          "w_d_long": {}
                          }
+
     def add_model(self, model):
         """Adds a model (business logic) to the controller
         
         Args:
             model (Report) -- report class object which will handle all the backend operations.
         """
+        # noinspection PyAttributeOutsideInit
         self.model = model
 
     def add_view(self, view):
@@ -56,6 +58,7 @@ class Controller(object):
         Args:
             view (WeatherApp) -- WeatherApp class object which will deal with displaying GUI.
         """
+        # noinspection PyAttributeOutsideInit
         self.view = view
 
     def request_report(self, location, units):
