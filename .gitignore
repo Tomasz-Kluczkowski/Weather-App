@@ -5,6 +5,7 @@ desktop.ini
 __pycache__/
 *.py[cod]
 *$py.class
+Thumbs.db
 
 # C extensions
 *.so

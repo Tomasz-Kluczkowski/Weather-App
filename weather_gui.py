@@ -224,20 +224,48 @@ class WeatherApp(tk.Tk):
         # Display location information.
         time = datetime.datetime.now()
 
-        title_text = "{0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
-                                       self.controller.app_data["w_d_cur"]["sys"]["country"])
-        id = self.main_canvas.create_text(10, 10, text=title_text, font="Georgia 16", fill=self.paper, anchor=tk.NW)
+        # Start coordinates in pixels of the report title.
+        x1 = 10
+        y1 = 10
 
-        coords_text = "lon: {0}, lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
+        title_text = "Report for: {0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
+                                                   self.controller.app_data["w_d_cur"]["sys"]["country"])
+        title_id = self.main_canvas.create_text(x1, y1, text=title_text, font="Georgia 18",
+                                                fill=self.paper, anchor=tk.NW)
+        # Bot-Right coordinates that the title_text box occupies.
+        x2, y2 = self.main_canvas.bbox(title_id)[2:]
+
+        date_text = "Received at: {0}".format(time.strftime("%H:%M %Y/%m/%d"))
+        date_id = self.main_canvas.create_text(x1, y2 + 5, text=date_text, font="Georgia 12",
+                                               fill=self.paper, anchor=tk.NW)
+        # Bot-Right coordinates that the date_text occupies.
+        x2, y2 = self.main_canvas.bbox(date_id)[2:]
+
+        coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
                                                   self.controller.app_data["w_d_cur"]["coord"]["lat"])
-        self.main_canvas.create_text(10, 30, text=coords_text, font="Georgia 10", fill=self.paper, anchor=tk.NW)
+        coords_id = self.main_canvas.create_text(x1, y2 + 5, text=coords_text, font="Georgia 12",
+                                                 fill=self.paper, anchor=tk.NW)
 
-        #     format(self.controller.app_data["w_d_cur"]["name"],
-        #            self.controller.app_data["w_d_cur"]["sys"]["country"],
-        #            self.controller.app_data["w_d_cur"]["coord"]["lon"],
-        #            self.controller.app_data["w_d_cur"]["coord"]["lat"],
-        #            time.strftime("%H:%M %Y/%m/%d"))
-        # self.main_canvas.create_text(100, 100, text=text, font=self.font, fill=self.paper, anchor=tk.NW)
+        # Bot-Right coordinates that the coords_text occupies.
+        x2, y2 = self.main_canvas.bbox(coords_id)[2:]
+
+        # Draw a current weather icon.
+        icon_path = "Resources\Icons\Weather\\" + self.controller.app_data["w_d_cur"]["weather"][0]["icon"] + ".png"
+        img = Image.open(icon_path)
+        self.cur_icon = ImageTk.PhotoImage(img)
+        cur_icon_id = self.main_canvas.create_image(x1, y2 + 10, image=self.cur_icon,
+                                                    anchor=tk.NW)
+        # Coordinates that the cur_icon occupies.
+        x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
+
+        # Current temperature.
+        if self.controller.app_data["var_units"].get() == "metric":
+            sign = "C"
+        else:
+            sign = "F"
+        cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
+        self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20",
+                                     fill=self.paper, anchor=tk.NW)
 
 
 class HoverButton(tk.Button):
