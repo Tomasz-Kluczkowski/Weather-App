@@ -7,6 +7,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
+import datetime
 
 
 # TODO: Have to add then a combobox with selection of previous locations.
@@ -220,13 +221,23 @@ class WeatherApp(tk.Tk):
     def display_report(self):
         """Display results of the API call in the main_canvas."""
 
-        # Display location.
-        text = "Weather report for: {0}, {1}, lon: {2}, lat: {3}\n". \
-            format(self.controller.app_data["w_d_cur"]["name"],
-                   self.controller.app_data["w_d_cur"]["sys"]["country"],
-                   self.controller.app_data["w_d_cur"]["coord"]["lon"],
-                   self.controller.app_data["w_d_cur"]["coord"]["lat"])
-        self.main_canvas.create_text(100, 100, text=text, font=self.font, fill=self.paper, anchor=tk.NW)
+        # Display location information.
+        time = datetime.datetime.now()
+
+        title_text = "{0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
+                                       self.controller.app_data["w_d_cur"]["sys"]["country"])
+        id = self.main_canvas.create_text(10, 10, text=title_text, font="Georgia 16", fill=self.paper, anchor=tk.NW)
+
+        coords_text = "lon: {0}, lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
+                                                  self.controller.app_data["w_d_cur"]["coord"]["lat"])
+        self.main_canvas.create_text(10, 30, text=coords_text, font="Georgia 10", fill=self.paper, anchor=tk.NW)
+
+        #     format(self.controller.app_data["w_d_cur"]["name"],
+        #            self.controller.app_data["w_d_cur"]["sys"]["country"],
+        #            self.controller.app_data["w_d_cur"]["coord"]["lon"],
+        #            self.controller.app_data["w_d_cur"]["coord"]["lat"],
+        #            time.strftime("%H:%M %Y/%m/%d"))
+        # self.main_canvas.create_text(100, 100, text=text, font=self.font, fill=self.paper, anchor=tk.NW)
 
 
 class HoverButton(tk.Button):
