@@ -281,7 +281,6 @@ class WeatherApp(tk.Tk):
 
         # Coordinates that the cur_temp occupies.
         x1, y1, x2, y2 = self.main_canvas.bbox(cur_temp_id)
-        # TODO: add min and max temps next to current one.
 
         max_temp = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_max'], sign)
         max_temp_id = self.main_canvas.create_text(x2 + 15, y1, text=max_temp, font="Georgia 10", tags="main",
@@ -290,13 +289,8 @@ class WeatherApp(tk.Tk):
         min_temp = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
         min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10", tags="main",
                                                    fill=self.paper, anchor=tk.NW)
-        # self.t1.insert(END, "Current minimum temperature: {0} {1}\n".format(self.w_d["main"]['temp_min'],
-        #                                                                     self.temp_unit))
-        # self.t1.insert(END, "Current maximum temperature: {0} {1}\n".format(self.w_d["main"]['temp_max'],
-        #                                                                     self.temp_unit))
 
         # Weather description.
-
         w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
         w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc, font="Georgia 12", tags="main",
                                                  fill=self.paper, anchor=tk.NW)
