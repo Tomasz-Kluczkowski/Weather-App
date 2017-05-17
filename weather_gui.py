@@ -88,7 +88,12 @@ class WeatherApp(tk.Tk):
         # Configure main window.
         self.title("The Weather App")
         self.config(bg=self.paper, bd=2, relief="groove")
-        # self.geometry("1000x800")
+        # Get screen size.
+        s_width = self.winfo_screenwidth()
+        s_height= self.winfo_screenheight()
+        # Center application window.
+        self.geometry("783x625+{0}+0".format(int(s_width / 2) - 300))
+        # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
         # GUI style definitions.
@@ -219,7 +224,14 @@ class WeatherApp(tk.Tk):
             self.display_report()
 
     def display_report(self):
-        """Display results of the API call in the main_canvas."""
+        """Display results of the API call in the main_canvas.
+        
+        Tags:
+            main -- used for current weather parameters
+        """
+
+        # Delete a previous report if existing on canvas.
+        self.main_canvas.delete("main")
 
         # Display location information.
         time = datetime.datetime.now()
@@ -230,20 +242,20 @@ class WeatherApp(tk.Tk):
 
         title_text = "Report for: {0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
                                                    self.controller.app_data["w_d_cur"]["sys"]["country"])
-        title_id = self.main_canvas.create_text(x1, y1, text=title_text, font="Georgia 18",
+        title_id = self.main_canvas.create_text(x1, y1, text=title_text, font="Georgia 18", tags="main",
                                                 fill=self.paper, anchor=tk.NW)
         # Bot-Right coordinates that the title_text box occupies.
         x2, y2 = self.main_canvas.bbox(title_id)[2:]
 
         date_text = "Received at: {0}".format(time.strftime("%H:%M %Y/%m/%d"))
-        date_id = self.main_canvas.create_text(x1, y2 + 5, text=date_text, font="Georgia 12",
+        date_id = self.main_canvas.create_text(x1, y2 + 5, text=date_text, font="Georgia 12", tags="main",
                                                fill=self.paper, anchor=tk.NW)
         # Bot-Right coordinates that the date_text occupies.
         x2, y2 = self.main_canvas.bbox(date_id)[2:]
 
         coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
                                                   self.controller.app_data["w_d_cur"]["coord"]["lat"])
-        coords_id = self.main_canvas.create_text(x1, y2 + 5, text=coords_text, font="Georgia 12",
+        coords_id = self.main_canvas.create_text(x1, y2 + 5, text=coords_text, font="Georgia 12", tags="main",
                                                  fill=self.paper, anchor=tk.NW)
 
         # Bot-Right coordinates that the coords_text occupies.
@@ -253,7 +265,7 @@ class WeatherApp(tk.Tk):
         icon_path = "Resources\Icons\Weather\\" + self.controller.app_data["w_d_cur"]["weather"][0]["icon"] + ".png"
         img = Image.open(icon_path)
         self.cur_icon = ImageTk.PhotoImage(img)
-        cur_icon_id = self.main_canvas.create_image(x1, y2 + 10, image=self.cur_icon,
+        cur_icon_id = self.main_canvas.create_image(x1, y2 + 50, image=self.cur_icon, tags="main",
                                                     anchor=tk.NW)
         # Coordinates that the cur_icon occupies.
         x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
@@ -264,8 +276,30 @@ class WeatherApp(tk.Tk):
         else:
             sign = "F"
         cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
-        self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20",
-                                     fill=self.paper, anchor=tk.NW)
+        cur_temp_id = self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20", tags="main",
+                                                   fill=self.paper, anchor=tk.NW)
+
+        # Coordinates that the cur_temp occupies.
+        x1, y1, x2, y2 = self.main_canvas.bbox(cur_temp_id)
+        # TODO: add min and max temps next to current one.
+
+        max_temp = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_max'], sign)
+        max_temp_id = self.main_canvas.create_text(x2 + 15, y1, text=max_temp, font="Georgia 10", tags="main",
+                                                 fill=self.paper, anchor=tk.NW)
+
+        min_temp = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
+        min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10", tags="main",
+                                                   fill=self.paper, anchor=tk.NW)
+        # self.t1.insert(END, "Current minimum temperature: {0} {1}\n".format(self.w_d["main"]['temp_min'],
+        #                                                                     self.temp_unit))
+        # self.t1.insert(END, "Current maximum temperature: {0} {1}\n".format(self.w_d["main"]['temp_max'],
+        #                                                                     self.temp_unit))
+
+        # Weather description.
+
+        w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
+        w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc, font="Georgia 12", tags="main",
+                                                 fill=self.paper, anchor=tk.NW)
 
 
 class HoverButton(tk.Button):
