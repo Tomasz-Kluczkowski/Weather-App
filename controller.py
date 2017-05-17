@@ -31,6 +31,8 @@ class Controller(object):
                     w_d_cur (Dict) -- Dictionary containing current weather report.
                     w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
                     w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
+            c_data (Dict) -- Dictionary which will store id-s, positions etc. of canvas items to ease
+                in their relative placement.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -42,6 +44,7 @@ class Controller(object):
                          "w_d_short": {},
                          "w_d_long": {}
                          }
+        self.c_data = {}
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.

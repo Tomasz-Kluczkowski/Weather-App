@@ -357,9 +357,10 @@ class CanvasText(object):
         object (object) -- Base Python object we inherit from.
     """
 
-    def __init__(self, canvas, controller, coordinates=None, rel_obj_id=None,
+    def __init__(self, name, canvas, controller, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
-        """Initialise class. Allow positioning in relation to the related object.
+        """Initialise class. Create a new key using parameter "name" in the canvas objects dictionary. 
+        Allow positioning in relation to the related object.
         Relative position allows positioning to the left/right/top/bot etc.
         We can give absolute position for the text or a relative one.
         In case of absolute position given we will ignore the relative parameter.
@@ -367,11 +368,12 @@ class CanvasText(object):
         In **args we place all the normal create_text method parameters.
 
         Args:
+            name (Str) -- Name of object we want to store as a key in the controller.c_data dictionary for later use.
             canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
             controller (Controller) -- Controller object required to pass data between classes.
             coordinates (Tuple) -- X, y coordinates where to place text in canvas. Overrides any parameters given in 
                 relative parameters section.
-            rel_obj_id (int) -- Id number of the object in canvas which will be used as a relative one next to 
+            rel_obj (canvas object) -- Object in canvas which will be used as a relative one next to 
                 which our text is meant to be written.
             rel_pos (Str) -- String determining position of newly created text in relation to the relative object.
                 Similar concept to anchor.
@@ -381,7 +383,10 @@ class CanvasText(object):
             **args -- All the arguments we need to pass to create_text method.
         """
         self.controller = controller
-        id = canvas.create_text(**args)
+        id_num = canvas.create_text(**args)
+        # Add a key "name" to the canvas objects dictionary of value being canvas text object's id.
+        self.controller.c_data[name] = id_num
+
 
 
 
