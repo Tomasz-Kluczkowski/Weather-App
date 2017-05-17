@@ -92,7 +92,7 @@ class WeatherApp(tk.Tk):
         s_width = self.winfo_screenwidth()
         s_height= self.winfo_screenheight()
         # Center application window.
-        self.geometry("783x625+{0}+0".format(int(s_width / 2) - 300))
+        self.geometry("+{0}+0".format(int(s_width / 2) - 300))
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
@@ -287,8 +287,8 @@ class WeatherApp(tk.Tk):
                                                  fill=self.paper, anchor=tk.NW)
 
         min_temp = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
-        min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10", tags="main",
-                                                   fill=self.paper, anchor=tk.NW)
+        min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10",
+                                                   tags="main", fill=self.paper, anchor=tk.NW)
 
         # Weather description.
         w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
@@ -344,6 +344,58 @@ class HoverButton(tk.Button):
             self.controller.app_data["var_status"].set(self.controller.app_data["error_message"])
         else:
             self.controller.app_data["var_status"].set("")
+
+
+class CanvasText(object):
+    """Creates text object on canvas.
+
+    Adds text object's coordinates, its rectangle parameters and object Id to a dictionary in the controller
+    which later can be accessed to allow easier placement of other objects on the canvas 
+    in relation to other objects.
+
+    Args:
+        object (object) -- Base Python object we inherit from.
+    """
+
+    def __init__(self, canvas, controller, coordinates=None, rel_obj_id=None,
+                 rel_pos=None, offset=None, **args):
+        """Initialise class. Allow positioning in relation to the related object.
+        Relative position allows positioning to the left/right/top/bot etc.
+        We can give absolute position for the text or a relative one.
+        In case of absolute position given we will ignore the relative parameter.
+        The offset allows us to move the text away from the border of the relative object.
+        In **args we place all the normal create_text method parameters.
+
+        Args:
+            canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
+            controller (Controller) -- Controller object required to pass data between classes.
+            coordinates (Tuple) -- X, y coordinates where to place text in canvas. Overrides any parameters given in 
+                relative parameters section.
+            rel_obj_id (int) -- Id number of the object in canvas which will be used as a relative one next to 
+                which our text is meant to be written.
+            rel_pos (Str) -- String determining position of newly created text in relation to the relative object.
+                Similar concept to anchor.
+                TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center, 
+                CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
+            offset (Tuple) -- Offset given as a tuple to move the newly created text away from the relative object.
+            **args -- All the arguments we need to pass to create_text method.
+        """
+        self.controller = controller
+        id = canvas.create_text(**args)
+
+
+
+        # # Coordinates that the cur_icon occupies.
+        # x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
+        #
+        # # Current temperature.
+        # if self.controller.app_data["var_units"].get() == "metric":
+        #     sign = "C"
+        # else:
+        #     sign = "F"
+        # cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
+        # cur_temp_id = self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20", tags="main",
+        #                                            fill=self.paper, anchor=tk.NW)
 
 
 # Launch application.
