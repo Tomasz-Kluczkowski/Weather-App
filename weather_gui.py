@@ -91,7 +91,7 @@ class WeatherApp(tk.Tk):
         self.config(bg=self.paper, bd=2, relief="groove")
         # Get screen size.
         s_width = self.winfo_screenwidth()
-        s_height= self.winfo_screenheight()
+        s_height = self.winfo_screenheight()
         # Center application window.
         self.geometry("+{0}+0".format(int(s_width / 2) - 300))
         # Prevent resizing.
@@ -240,64 +240,70 @@ class WeatherApp(tk.Tk):
         # Start coordinates in pixels of the report title.
         x1 = 10
         y1 = 10
+        # Common config parameters for main section (current weather).
+        main_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.NW}
 
+        # Title placement.
         title_text = "Report for: {0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
                                                    self.controller.app_data["w_d_cur"]["sys"]["country"])
-        title_id = self.main_canvas.create_text(x1, y1, text=title_text, font="Georgia 18", tags="main",
-                                                fill=self.paper, anchor=tk.NW)
-        # Bot-Right coordinates that the title_text box occupies.
-        x2, y2 = self.main_canvas.bbox(title_id)[2:]
+        title = CanvasText(self.main_canvas, (x1, y1), text=title_text, font="Georgia 18", **main_cnf)
 
+        # Date placement.
         date_text = "Received at: {0}".format(time.strftime("%H:%M %Y/%m/%d"))
-        date_id = self.main_canvas.create_text(x1, y2 + 5, text=date_text, font="Georgia 12", tags="main",
-                                               fill=self.paper, anchor=tk.NW)
-        # Bot-Right coordinates that the date_text occupies.
-        x2, y2 = self.main_canvas.bbox(date_id)[2:]
+        date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL", offset=(1, 5),
+                          text=date_text, font="Georgia 12", **main_cnf)
 
+        # Geo-coords placement.
         coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
                                                   self.controller.app_data["w_d_cur"]["coord"]["lat"])
-        coords_id = self.main_canvas.create_text(x1, y2 + 5, text=coords_text, font="Georgia 12", tags="main",
-                                                 fill=self.paper, anchor=tk.NW)
+        # coords_id = self.main_canvas.create_text(x1, y2 + 5, text=coords_text, font="Georgia 12", tags="main",
+        #                                          fill=self.paper, anchor=tk.NW)
 
-        # Bot-Right coordinates that the coords_text occupies.
-        x2, y2 = self.main_canvas.bbox(coords_id)[2:]
+        coords = CanvasText(self.main_canvas, rel_obj=date, rel_pos="BL", offset=(1, 5),
+                            text=coords_text, font="Georgia 12", **main_cnf)
+      
+        # # Draw a current weather icon.
+        # icon_path = "Resources\Icons\Weather\\" + self.controller.app_data["w_d_cur"]["weather"][0]["icon"] + ".png"
+        # img = Image.open(icon_path)
+        # self.cur_icon = ImageTk.PhotoImage(img)
+        # cur_icon_id = self.main_canvas.create_image(x1, y2 + 50, image=self.cur_icon, tags="main",
+        #                                             anchor=tk.NW)
+        # # Coordinates that the cur_icon occupies.
+        # x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
+        #
+        # # Current temperature.
+        # if self.controller.app_data["var_units"].get() == "metric":
+        #     sign = "C"
+        # else:
+        #     sign = "F"
+        # cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
+        # cur_temp_id = self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20", tags="main",
+        #                                            fill=self.paper, anchor=tk.NW)
+        #
+        # # Coordinates that the cur_temp occupies.
+        # x1, y1, x2, y2 = self.main_canvas.bbox(cur_temp_id)
+        #
+        # max_temp = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_max'], sign)
+        # max_temp_id = self.main_canvas.create_text(x2 + 15, y1, text=max_temp, font="Georgia 10", tags="main",
+        #                                            fill=self.paper, anchor=tk.NW)
+        #
+        # min_temp = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
+        # min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10",
+        #                                            tags="main", fill=self.paper, anchor=tk.NW)
+        #
+        # # Weather description.
+        # w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
+        # w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc, font="Georgia 12", tags="main",
+        #                                          fill=self.paper, anchor=tk.NW)
+        # # test text using new class
+        # test = CanvasText("test", self.main_canvas, self.controller, (300, 300), text=w_desc, font="Georgia 12",
+        #                   tags="main",
+        #                   fill=self.paper, anchor=tk.NW)
+        # test_rel = CanvasText("relative", self.main_canvas, self.controller, rel_obj=test, rel_pos="TR", offset=(0, 0),
+        #                       text=w_desc, font="Georgia 12", tags="main",
+        #                       fill=self.paper, anchor=tk.NW
+        #                       )
 
-        # Draw a current weather icon.
-        icon_path = "Resources\Icons\Weather\\" + self.controller.app_data["w_d_cur"]["weather"][0]["icon"] + ".png"
-        img = Image.open(icon_path)
-        self.cur_icon = ImageTk.PhotoImage(img)
-        cur_icon_id = self.main_canvas.create_image(x1, y2 + 50, image=self.cur_icon, tags="main",
-                                                    anchor=tk.NW)
-        # Coordinates that the cur_icon occupies.
-        x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
-
-        # Current temperature.
-        if self.controller.app_data["var_units"].get() == "metric":
-            sign = "C"
-        else:
-            sign = "F"
-        cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
-        cur_temp_id = self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20", tags="main",
-                                                   fill=self.paper, anchor=tk.NW)
-
-        # Coordinates that the cur_temp occupies.
-        x1, y1, x2, y2 = self.main_canvas.bbox(cur_temp_id)
-
-        max_temp = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_max'], sign)
-        max_temp_id = self.main_canvas.create_text(x2 + 15, y1, text=max_temp, font="Georgia 10", tags="main",
-                                                 fill=self.paper, anchor=tk.NW)
-
-        min_temp = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
-        min_temp_id = self.main_canvas.create_text(x2 + 15, y1 + 20, text=min_temp, font="Georgia 10",
-                                                   tags="main", fill=self.paper, anchor=tk.NW)
-
-        # Weather description.
-        w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
-        w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc, font="Georgia 12", tags="main",
-                                                 fill=self.paper, anchor=tk.NW)
-        # test text using new class
-        test = CanvasText("test", self.main_canvas, self.controller, (200, 200), text=w_desc, font="Georgia 12", tags="main",
-                                                 fill=self.paper, anchor=tk.NW)
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
@@ -360,19 +366,16 @@ class CanvasText(object):
         object (object) -- Base Python object we inherit from.
     """
 
-    def __init__(self, name, canvas, controller, coordinates=None, rel_obj=None,
+    def __init__(self, canvas, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
-        """Initialise class. Create a new key "name" in the canvas objects dictionary. 
-        Allow positioning in relation to the relative object.
+        """Initialise class. Allow positioning in relation to the relative object (other CanvasText or CanvasImg object).
         We can give absolute position for the text or a relative one.
         In case of absolute position given we will ignore the relative parameter.
         The offset allows us to move the text away from the border of the relative object.
         In **args we place all the normal canvas.create_text method parameters.
 
         Args:
-            name (Str) -- Key in the controller.c_data dictionary which will store CanvasText object's data.
             canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
-            controller (Controller) -- Controller object required to pass data between classes.
             coordinates (Tuple) -- Absolute x, y coordinates where to place text in canvas. Overrides any parameters
                 given in relative parameters section.
             rel_obj (CanvasText / CanvasPicture) -- CanvasText / CanvasPicture object which will be used
@@ -386,11 +389,8 @@ class CanvasText(object):
             **args -- All the other arguments we need to pass to create_text method.
         
         Attributes:
-            controller (Controller) -- Controller object which will store necessary data.
-            name (Str) -- Key in the c_data dictionary under which we will store CanvasText object's data. 
+            id_num (int) -- Unique Id number returned by create_text method which will help us identify objects.
         """
-        self.controller = controller
-        self.name = name
         # Create text on canvas.
         # If absolute position is given relative parameters are ignored.
         if offset:
@@ -403,9 +403,8 @@ class CanvasText(object):
             pos_x = coordinates[0]
             pos_y = coordinates[1]
         elif rel_obj is not None and rel_pos is not None:
-            # Get bounding points of the relative object.
-            rel_obj_id = rel_obj.id_num
-            r_x1, r_y1, r_x2, r_y2 = canvas.bbox(rel_obj_id)
+            # Get Top-Left and Bottom-Right bounding points of the relative object.
+            r_x1, r_y1, r_x2, r_y2 = canvas.bbox(rel_obj.id_num)
             # TL - top - left, TM - top - middle, TR - top - right, CL - center - left, CC - center - center,
             # CR - center - right, BL - bottom - left, BC - bottom - center, BR - bottom - right
 
@@ -414,33 +413,33 @@ class CanvasText(object):
                 pos_x = r_x1
                 pos_y = r_y1
             elif rel_pos == "TM":
-                pass
+                pos_x = r_x2 - (r_x2 - r_x1) / 2
+                pos_y = r_y1
+            elif rel_pos == "TR":
+                pos_x = r_x2
+                pos_y = r_y1
+            elif rel_pos == "CL":
+                pos_x = r_x1
+                pos_y = r_y2 - (r_y2 - r_y1) / 2
+            elif rel_pos == "CC":
+                pos_x = r_x2 - (r_x2 - r_x1) / 2
+                pos_y = r_y2 - (r_y2 - r_y1) / 2
+            elif rel_pos == "CR":
+                pos_x = r_x2
+                pos_y = r_y2 - (r_y2 - r_y1) / 2
+            elif rel_pos == "BL":
+                pos_x = r_x1
+                pos_y = r_y2
+            elif rel_pos == "BC":
+                pos_x = r_x2 - (r_x2 - r_x1) / 2
+                pos_y = r_y2
+            elif rel_pos == "BR":
+                pos_x = r_x2
+                pos_y = r_y2
 
-
-
-        # Stick code to create text based on relative object and position here.
         id_num = canvas.create_text(pos_x + offset_x, pos_y + offset_y, **args)
+        # Store unique Id number returned from using canvas.create_text method as an instance attribute.
         self.id_num = id_num
-
-        # # Add a key "name" of value {} to the canvas objects dictionary c_data.
-        # self.controller.c_data[name] = {}
-        # # Calculate set of relative position points and add them as keys to the key "name" .
-        # x1, y1, x2, y2 = canvas.bbox(id_num)
-
-
-
-
-        # # Coordinates that the cur_icon occupies.
-        # x1, y1, x2, y2 = self.main_canvas.bbox(cur_icon_id)
-        #
-        # # Current temperature.
-        # if self.controller.app_data["var_units"].get() == "metric":
-        #     sign = "C"
-        # else:
-        #     sign = "F"
-        # cur_temp = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
-        # cur_temp_id = self.main_canvas.create_text(x2 + 10, y1, text=cur_temp, font="Georgia 20", tags="main",
-        #                                            fill=self.paper, anchor=tk.NW)
 
 
 # Launch application.
