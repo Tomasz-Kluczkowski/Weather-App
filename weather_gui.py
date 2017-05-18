@@ -17,6 +17,7 @@ import datetime
 # TODO: Add a frame around the location name label and entry and search
 # TODO: button in dusty color to visualise that they belong together better.
 # TODO: implement a controller to pass variables between classes.
+# TODO: Add changing to other unit system when report already on screen without needing to press search button.
 
 
 class WeatherApp(tk.Tk):
@@ -294,7 +295,9 @@ class WeatherApp(tk.Tk):
         w_desc = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
         w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc, font="Georgia 12", tags="main",
                                                  fill=self.paper, anchor=tk.NW)
-
+        # test text using new class
+        test = CanvasText("test", self.main_canvas, self.controller, (200, 200), text=w_desc, font="Georgia 12", tags="main",
+                                                 fill=self.paper, anchor=tk.NW)
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
@@ -359,33 +362,69 @@ class CanvasText(object):
 
     def __init__(self, name, canvas, controller, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
-        """Initialise class. Create a new key using parameter "name" in the canvas objects dictionary. 
-        Allow positioning in relation to the related object.
-        Relative position allows positioning to the left/right/top/bot etc.
+        """Initialise class. Create a new key "name" in the canvas objects dictionary. 
+        Allow positioning in relation to the relative object.
         We can give absolute position for the text or a relative one.
         In case of absolute position given we will ignore the relative parameter.
         The offset allows us to move the text away from the border of the relative object.
-        In **args we place all the normal create_text method parameters.
+        In **args we place all the normal canvas.create_text method parameters.
 
         Args:
-            name (Str) -- Name of object we want to store as a key in the controller.c_data dictionary for later use.
+            name (Str) -- Key in the controller.c_data dictionary which will store CanvasText object's data.
             canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
             controller (Controller) -- Controller object required to pass data between classes.
-            coordinates (Tuple) -- X, y coordinates where to place text in canvas. Overrides any parameters given in 
-                relative parameters section.
-            rel_obj (canvas object) -- Object in canvas which will be used as a relative one next to 
-                which our text is meant to be written.
+            coordinates (Tuple) -- Absolute x, y coordinates where to place text in canvas. Overrides any parameters
+                given in relative parameters section.
+            rel_obj (CanvasText / CanvasPicture) -- CanvasText / CanvasPicture object which will be used
+                as a relative one next to which text is meant to be written.
             rel_pos (Str) -- String determining position of newly created text in relation to the relative object.
                 Similar concept to anchor.
                 TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center, 
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
-            offset (Tuple) -- Offset given as a tuple to move the newly created text away from the relative object.
-            **args -- All the arguments we need to pass to create_text method.
+            offset (Tuple) -- Offset given as a pair of values to move the newly created text
+                away from the relative object.
+            **args -- All the other arguments we need to pass to create_text method.
+        
+        Attributes:
+            controller (Controller) -- Controller object which will store necessary data.
+            name (Str) -- Key in the c_data dictionary under which we will store CanvasText object's data. 
         """
         self.controller = controller
-        id_num = canvas.create_text(**args)
-        # Add a key "name" to the canvas objects dictionary of value being canvas text object's id.
-        self.controller.c_data[name] = id_num
+        self.name = name
+        # Create text on canvas.
+        # If absolute position is given relative parameters are ignored.
+        if offset:
+            offset_x = offset[0]
+            offset_y = offset[1]
+        else:
+            offset_x = 0
+            offset_y = 0
+        if coordinates:
+            pos_x = coordinates[0]
+            pos_y = coordinates[1]
+        elif rel_obj is not None and rel_pos is not None:
+            # Get bounding points of the relative object.
+            rel_obj_id = rel_obj.id_num
+            r_x1, r_y1, r_x2, r_y2 = canvas.bbox(rel_obj_id)
+            # TL - top - left, TM - top - middle, TR - top - right, CL - center - left, CC - center - center,
+            # CR - center - right, BL - bottom - left, BC - bottom - center, BR - bottom - right
+
+            # Determine position of CanvasText on canvas in relation to the rel_obj.
+            if rel_pos == "TL":
+                pos_x = r_x1
+                pos_y = r_y1
+            elif rel_pos == "TM":
+                
+
+
+        # Stick code to create text based on relative object and position here.
+        id_num = canvas.create_text(pos_x + offset_x, pos_y + offset_y, **args)
+        self.id_num = id_num
+
+        # # Add a key "name" of value {} to the canvas objects dictionary c_data.
+        # self.controller.c_data[name] = {}
+        # # Calculate set of relative position points and add them as keys to the key "name" .
+        # x1, y1, x2, y2 = canvas.bbox(id_num)
 
 
 
