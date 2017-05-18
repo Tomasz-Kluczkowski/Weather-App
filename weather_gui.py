@@ -414,7 +414,8 @@ class CanvasText(object):
                 pos_x = r_x1
                 pos_y = r_y1
             elif rel_pos == "TM":
-                
+                pass
+
 
 
         # Stick code to create text based on relative object and position here.
