@@ -16,7 +16,6 @@ import datetime
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add a frame around the location name label and entry and search
 # TODO: button in dusty color to visualise that they belong together better.
-# TODO: implement a controller to pass variables between classes.
 # TODO: Add changing to other unit system when report already on screen without needing to press search button.
 
 
@@ -190,7 +189,16 @@ class WeatherApp(tk.Tk):
 
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
-        self.controller.app_data["var_units"].set("metric")
+        # If button is pushed when there is a report already on the screen get a new report with changed units.
+        if self.controller.app_data["var_units"].get() == "imperial":
+            self.controller.app_data["var_units"].set("metric")
+
+        if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"]\
+                and self.controller.app_data["w_d_long"]:
+            self.begin_get_report
+
+
+
 
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
@@ -288,8 +296,6 @@ class WeatherApp(tk.Tk):
         w_desc_text = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
         w_desc = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BL", offset=(1, 5),
                             text=w_desc_text, font="Georgia 12", **main_cnf)
-        # w_desc_id = self.main_canvas.create_text(x1, y2 + 5, text=w_desc_text, font="Georgia 12", tags="main",
-        #                                          fill=self.paper, anchor=tk.NW)
 
 
 class HoverButton(tk.Button):
@@ -354,7 +360,7 @@ class CanvasText(object):
     def __init__(self, canvas, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
         """Initialise class. 
-        Allow positioning in relation to the relative object (other CanvasText or CanvasImg object).
+        Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
         We can give absolute position for the text or a relative one.
         In case of absolute position given we will ignore the relative parameter.
         The offset allows us to move the text away from the border of the relative object.
@@ -441,7 +447,7 @@ class CanvasImg(object):
     def __init__(self, canvas, image, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
         """Initialise class. 
-        Allow positioning in relation to the relative object (other CanvasText or CanvasImg object).
+        Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
         We can give absolute position for the image or a relative one.
         In case of absolute position given we will ignore the relative parameter.
         The offset allows us to move the image away from the border of the relative object.

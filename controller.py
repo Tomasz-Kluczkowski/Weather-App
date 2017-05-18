@@ -15,11 +15,9 @@ class Controller(object):
     """
 
     def __init__(self):
-        """Initialise the Controller. Give it link to the model and the view.
+        """Initialise the Controller.
 
         Attributes:
-            model (Report) -- Report type object. Will carry out all the business logic.
-            view (WeatherApp) -- WeatherApp type object. This is our GUI.
             app_data (Dict) -- Dictionary of data necessary for running each segment of the application.
                 Keys:
                     var_units (tk.StringVar) -- Value of selection of units (metric / imperial).
@@ -31,8 +29,6 @@ class Controller(object):
                     w_d_cur (Dict) -- Dictionary containing current weather report.
                     w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
                     w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
-            c_data (Dict) -- Dictionary which will store id-s, positions etc. of canvas items to ease
-                in their relative placement.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -44,7 +40,6 @@ class Controller(object):
                          "w_d_short": {},
                          "w_d_long": {}
                          }
-        self.c_data = {}
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.
