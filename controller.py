@@ -75,6 +75,7 @@ class Controller(object):
             # Clear any error status and message upon successful response from API.
             self.app_data["var_status"].set("")
             self.app_data["error_message"] = ""
+
             # Unpack dictionaries from data
             self.app_data["w_d_cur"], self.app_data["w_d_short"], self.app_data["w_d_long"] = data[1]
             # Now we are ready do display the report.

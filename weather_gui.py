@@ -193,12 +193,9 @@ class WeatherApp(tk.Tk):
         if self.controller.app_data["var_units"].get() == "imperial":
             self.controller.app_data["var_units"].set("metric")
 
-        if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"]\
-                and self.controller.app_data["w_d_long"]:
-            self.begin_get_report
-
-
-
+            if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"]\
+                    and self.controller.app_data["w_d_long"]:
+                self.begin_get_report()
 
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
@@ -206,7 +203,13 @@ class WeatherApp(tk.Tk):
 
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
-        self.controller.app_data["var_units"].set("imperial")
+        # If button is pushed when there is a report already on the screen get a new report with changed units.
+        if self.controller.app_data["var_units"].get() == "metric":
+            self.controller.app_data["var_units"].set("imperial")
+
+            if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"] \
+                    and self.controller.app_data["w_d_long"]:
+                self.begin_get_report()
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
