@@ -27,7 +27,7 @@ class Report(object):
         """
         self.controller = controller
 
-    def finish_get_report(self, location, units):
+    def finish_get_report(self, location):
         """Obtain data in json format from Open Weather and store it in appropriate dictionaries.
         
         Args:
@@ -58,24 +58,26 @@ class Report(object):
         units_prefix = "&units="
 
         # List of report types accepted by the API.
-        report_types = ["weather", "forecast", "forecast/daily"]
         # List of dictionaries which will store all the data returned from API call.
-        weather_dicts = []
+        unit_dicts = [{"metric":{}}, {"imperial":{}}]
+        unit_types = ["metric", "imperial"]
+        report_types = ["weather", "forecast", "forecast/daily"]
+        keys = ["w_d_cur", "w_d_short", "w_d_long"]
 
-        for report_type in report_types:
-            try:
-                response = requests.get(base_url.format(report_type, location,
-                                                        units_prefix + units) + api_key)
-            except requests.exceptions.ConnectionError:
-                status = (-1, "Unable to establish internet connection. Please connect to the internet.")
-                return status
-            weather_dict = response.json()
-            # Had to add int(w_d["cod"]) as the output from API is int (for current) / string (for longer forecasts).
-            if int(weather_dict["cod"]) != 200:
-                status = (-1, "Error: {0}, {1}".format(weather_dict["cod"], weather_dict["message"]))
-                return status
-            else:
-                weather_dicts.append(weather_dict)
-                continue
-        status = (0, weather_dicts)
+        for unit_dict, unit_type in zip(unit_dicts, unit_types):
+            for report_type, key in zip(report_types, keys):
+                try:
+                    response = requests.get(base_url.format(report_type, location,
+                                                            units_prefix + unit_type) + api_key)
+                except requests.exceptions.ConnectionError:
+                    status = (-1, "Unable to establish internet connection. Please connect to the internet.")
+                    return status
+                weather_dict = response.json()
+                # Had to add int(w_d["cod"]) as the output from API is int (for current) / string (for longer forecasts).
+                if int(weather_dict["cod"]) != 200:
+                    status = (-1, "Error: {0}, {1}".format(weather_dict["cod"], weather_dict["message"]))
+                    return status
+                else:
+                    unit_dict[unit_type][key] = weather_dict
+        status = (0, unit_dicts)
         return status

@@ -1,4 +1,5 @@
 import tkinter as tk
+import datetime
 
 
 class Controller(object):
@@ -26,9 +27,14 @@ class Controller(object):
                     var_loc (tk.StringVar) -- Current text entered into loc_entry field by the user. 
                     error_message (Str) -- Last error message.
                     error_status (Int) -- Value -1 means an error occurred and was not cleared. 0 means all ok.
-                    w_d_cur (Dict) -- Dictionary containing current weather report.
-                    w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
-                    w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
+                    time (Str) -- String with date / time when call to the API was made.
+                    last_call (List) -- Contains parameters of last successful call to the API - location and units.
+                    metric (Dict) -- Contains dictionaries with weather data in metric system.
+                    imperial (Dict) -- Contains dictionaries with weather data in imperial system.
+                        The following keys are the same in both metric and imperial dictionaries.
+                        w_d_cur (Dict) -- Dictionary containing current weather report.
+                        w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
+                        w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -36,9 +42,10 @@ class Controller(object):
                          "var_loc": tk.StringVar(),
                          "error_message": "",
                          "error_status": 0,
-                         "w_d_cur": {},
-                         "w_d_short": {},
-                         "w_d_long": {}
+                         "time": "",
+                         "last_call": [],
+                         "metric": {},
+                         "imperial": {},
                          }
 
     def add_model(self, model):
@@ -60,8 +67,10 @@ class Controller(object):
     def get_report(self):
         """Obtains data for the View to display the report."""
 
-        data = self.model.finish_get_report(self.app_data["var_loc"].get(),
-                                            self.app_data["var_units"].get())
+        # Current date & time.
+        self.app_data["time"] = datetime.datetime.now().strftime("%H:%M  %d/%m/%Y")
+        # Get dictionaries.
+        data = self.model.finish_get_report(self.app_data["var_loc"].get())
 
         # We expect a tuple returning from get_report. Item 0 contains error status.
         self.app_data["error_status"] = data[0]
@@ -76,6 +85,8 @@ class Controller(object):
             self.app_data["var_status"].set("")
             self.app_data["error_message"] = ""
 
-            # Unpack dictionaries from data
-            self.app_data["w_d_cur"], self.app_data["w_d_short"], self.app_data["w_d_long"] = data[1]
+            # Copy dictionaries from data into metric and imperial dictionary.
+            self.app_data["metric"] = data[1][0]["metric"]
+            self.app_data["imperial"] = data[1][1]["imperial"]
+            self.app_data["last_call"].append(self.app_data["var_loc"])
             # Now we are ready do display the report.

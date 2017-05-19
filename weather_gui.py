@@ -189,13 +189,15 @@ class WeatherApp(tk.Tk):
 
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
-        # If button is pushed when there is a report already on the screen get a new report with changed units.
+        # If button is pushed when there is a report already on the screen and location entry was not changed
+        # get a new report with changed units.
         if self.controller.app_data["var_units"].get() == "imperial":
             self.controller.app_data["var_units"].set("metric")
 
-            if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"]\
-                    and self.controller.app_data["w_d_long"]:
-                self.begin_get_report()
+            # If there is data already stored change units displayed.
+            if self.controller.app_data["metric"]["w_d_cur"] and self.controller.app_data["metric"]["w_d_short"] \
+                    and self.controller.app_data["metric"]["w_d_long"]:
+                self.display_report()
 
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
@@ -207,9 +209,9 @@ class WeatherApp(tk.Tk):
         if self.controller.app_data["var_units"].get() == "metric":
             self.controller.app_data["var_units"].set("imperial")
 
-            if self.controller.app_data["w_d_cur"] and self.controller.app_data["w_d_short"] \
-                    and self.controller.app_data["w_d_long"]:
-                self.begin_get_report()
+            if self.controller.app_data["imperial"]["w_d_cur"] and self.controller.app_data["imperial"]["w_d_short"] \
+                    and self.controller.app_data["imperial"]["w_d_long"]:
+                self.display_report()
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
@@ -245,34 +247,36 @@ class WeatherApp(tk.Tk):
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main")
 
-        # Display location information.
-        time = datetime.datetime.now()
+        # Units system to display report in.
+        units = self.controller.app_data["var_units"].get()
 
-        # Start coordinates in pixels of the report title.
-        x1 = 10
-        y1 = 10
         # Common config parameters for main section (current weather).
         main_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.NW}
         img_cnf = {"tags": "main", "anchor": tk.NW}
 
+        # Display location information.
+        # Start coordinates in pixels of the report title.
+        x1 = 10
+        y1 = 10
+
         # Title placement.
-        title_text = "Report for: {0}, {1}".format(self.controller.app_data["w_d_cur"]["name"],
-                                                   self.controller.app_data["w_d_cur"]["sys"]["country"])
+        title_text = "Report for: {0}, {1}".format(self.controller.app_data[units]["w_d_cur"]["name"],
+                                                   self.controller.app_data[units]["w_d_cur"]["sys"]["country"])
         title = CanvasText(self.main_canvas, (x1, y1), text=title_text, font="Georgia 18", **main_cnf)
 
         # Date placement.
-        date_text = "Received at: {0}".format(time.strftime("%H:%M %Y/%m/%d"))
+        date_text = "Received at: {0}".format(self.controller.app_data["time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL", offset=(1, 5),
                           text=date_text, font="Georgia 12", **main_cnf)
 
         # Geo-coords placement.
-        coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data["w_d_cur"]["coord"]["lon"],
-                                                  self.controller.app_data["w_d_cur"]["coord"]["lat"])
+        coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data[units]["w_d_cur"]["coord"]["lon"],
+                                                  self.controller.app_data[units]["w_d_cur"]["coord"]["lat"])
         coords = CanvasText(self.main_canvas, rel_obj=date, rel_pos="BL", offset=(1, 5),
                             text=coords_text, font="Georgia 12", **main_cnf)
 
         # Draw a current weather icon.
-        icon_path = "Resources\Icons\Weather\\" + self.controller.app_data["w_d_cur"]["weather"][0]["icon"] + ".png"
+        icon_path = "Resources\Icons\Weather\\" + self.controller.app_data[units]["w_d_cur"]["weather"][0]["icon"] + ".png"
         # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
         self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords, rel_pos="BL", offset=(0, 50), **img_cnf)
 
@@ -281,22 +285,22 @@ class WeatherApp(tk.Tk):
             sign = "C"
         else:
             sign = "F"
-        cur_temp_text = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]["temp"], sign)
+        cur_temp_text = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]["temp"], sign)
 
         cur_temp = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="TR", offset=(20, 5),
                               text=cur_temp_text, font="Georgia 20", **main_cnf)
 
         # Max temperature.
-        max_temp_text = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_max'], sign)
+        max_temp_text = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_max'], sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR", offset=(15, 0),
                               text=max_temp_text, font="Georgia 10", **main_cnf)
         # Min temperature.
-        min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data["w_d_cur"]["main"]['temp_min'], sign)
+        min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
         min_temp = CanvasText(self.main_canvas, rel_obj=max_temp, rel_pos="BL", offset=(1, 0),
                               text=min_temp_text, font="Georgia 10", **main_cnf)
 
         # Weather description.
-        w_desc_text = "{0}".format(self.controller.app_data["w_d_cur"]["weather"][0]["description"].title())
+        w_desc_text = "{0}".format(self.controller.app_data[units]["w_d_cur"]["weather"][0]["description"].capitalize())
         w_desc = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BL", offset=(1, 5),
                             text=w_desc_text, font="Georgia 12", **main_cnf)
 
