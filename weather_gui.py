@@ -308,8 +308,10 @@ class WeatherApp(tk.Tk):
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
         print(max_temp_bounds)
         pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
-        pressure = CanvasText(self.main_canvas, coordinates=(370, max_temp_bounds[1]), offset=(0, 0),
+        pressure = CanvasText(self.main_canvas, coordinates=(370, max_temp_bounds[1]-3), offset=(0, 0),
                               text=pressure_text, font="Georgia 12", **main_cnf)
+
+        self.main_canvas.create_line(195, 175, 600, 175)
 
         # Cloud coverage.
         clouds_text = "Cloud coverage: {0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
