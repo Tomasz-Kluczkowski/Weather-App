@@ -91,7 +91,7 @@ class WeatherApp(tk.Tk):
         s_width = self.winfo_screenwidth()
         s_height = self.winfo_screenheight()
         # Center application window.
-        self.geometry("+{0}+0".format(int(s_width / 2) - 300))
+        self.geometry("+{0}+0".format(int(s_width / 2) - 400))
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
@@ -101,7 +101,7 @@ class WeatherApp(tk.Tk):
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
-        entry_cnf = {"fg": "black", "bg": self.paper, "width": 40, "bd": 2,
+        entry_cnf = {"fg": "black", "bg": self.paper, "width": 60, "bd": 2,
                      "font": self.font, "relief": "sunken"}
         clear_cnf = {"bg": self.lavender, "fg": "black", "activebackground": self.dusty,
                      "activeforeground": self.paper, "padx": 2, "pady": 2,
@@ -305,7 +305,7 @@ class WeatherApp(tk.Tk):
 
         # Pressure.
         pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
-        pressure = CanvasText(self.main_canvas, coordinates=(329, 155), offset=(0, 1),
+        pressure = CanvasText(self.main_canvas, coordinates=(370, 154), offset=(0, 0),
                               text=pressure_text, font="Georgia 12", **main_cnf)
 
         # Cloud coverage.
@@ -326,6 +326,11 @@ class WeatherApp(tk.Tk):
         wind_text = "Wind speed: {0} {1}".format(self.controller.app_data[units]["w_d_cur"]["wind"]["speed"], speed_unit)
         wind = CanvasText(self.main_canvas, rel_obj=humidity, rel_pos="BL", offset=(1, 0),
                           text=wind_text, font="Georgia 12", **main_cnf)
+
+        # Wind direction.
+        wind_dir_text = "Wind direction: {0} deg".format(self.controller.app_data[units]["w_d_cur"]["wind"]["deg"])
+        wind_dir = CanvasText(self.main_canvas, rel_obj=wind, rel_pos="BL", offset=(1, 0),
+                          text=wind_dir_text, font="Georgia 12", **main_cnf)
 
 
 class HoverButton(tk.Button):
@@ -459,6 +464,10 @@ class CanvasText(object):
             elif rel_pos == "BR":
                 pos_x = r_x2
                 pos_y = r_y2
+            else:
+                # If incorrect string is used for relative position we place object at (0, 0) coordinates.
+                pos_x = 0
+                pos_y = 0
 
         id_num = canvas.create_text(pos_x + offset_x, pos_y + offset_y, **args)
         # Store unique Id number returned from using canvas.create_text method as an instance attribute.
