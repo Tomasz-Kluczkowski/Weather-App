@@ -82,6 +82,7 @@ class WeatherApp(tk.Tk):
         self.lavender = "#6D7993"
         self.overcast = "#9099A2"
         self.paper = "#D5D5D5"
+        # Icon color: #a0cff1 (light blue)
         self.font = "Georgia 12"
 
         # Configure main window.
@@ -308,7 +309,7 @@ class WeatherApp(tk.Tk):
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
         print(max_temp_bounds)
 
-        icon_path = "Resources/Icons/Parameters/Atmospheric-Pressure-26-paper.png"
+        icon_path = "Resources/Icons/Parameters/Atmospheric-Pressure-26-blue-small.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
                                       coordinates=(370, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
 
