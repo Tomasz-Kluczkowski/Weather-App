@@ -280,6 +280,9 @@ class WeatherApp(tk.Tk):
         # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
         self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords, rel_pos="BL", offset=(0, 50), **img_cnf)
 
+        self.main_canvas.create_line(0, 140, 1000, 140)
+
+
         # Current temperature.
         if self.controller.app_data["var_units"].get() == "metric":
             sign = "C"
@@ -311,9 +314,9 @@ class WeatherApp(tk.Tk):
 
         icon_path = "Resources/Icons/Parameters/Atmospheric-Pressure-26-blue-small.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
-                                      coordinates=(370, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
+                                      coordinates=(370, max_temp_bounds[1]-4), offset=(0, 0), **img_cnf)
 
-        pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
+        pressure_text = "{0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, coordinates=(400, max_temp_bounds[1]), offset=(0, 0),
                               text=pressure_text, font="Georgia 12", **main_cnf)
 
