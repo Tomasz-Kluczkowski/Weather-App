@@ -307,15 +307,24 @@ class WeatherApp(tk.Tk):
         # Pressure.
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
         print(max_temp_bounds)
+
+        icon_path = "Resources/Icons/Parameters/Atmospheric-Pressure-26-paper.png"
+        self.pressure_img = CanvasImg(self.main_canvas, icon_path,
+                                      coordinates=(370, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
+
         pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
-        pressure = CanvasText(self.main_canvas, coordinates=(370, max_temp_bounds[1]), offset=(0, 0),
+        pressure = CanvasText(self.main_canvas, coordinates=(400, max_temp_bounds[1]), offset=(0, 0),
                               text=pressure_text, font="Georgia 12", **main_cnf)
 
         self.main_canvas.create_line(0, max_temp_bounds[3], 1000, max_temp_bounds[3])
 
         # Cloud coverage.
-        clouds_text = "Cloud coverage: {0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
-        clouds = CanvasText(self.main_canvas, rel_obj=w_desc, rel_pos="BL", offset=(1, 0),
+        icon_path = "Resources\Icons\Parameters\Cloud-26.png"
+        self.clouds_img = CanvasImg(self.main_canvas, icon_path, rel_obj=w_desc,
+                                    rel_pos="BL", offset=(0, 0), **img_cnf)
+
+        clouds_text = "{0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
+        clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img, rel_pos="TR", offset=(2, 2),
                             text=clouds_text, font="Georgia 12", **main_cnf)
 
         clouds_bounds = self.main_canvas.bbox(clouds.id_num)
