@@ -4,10 +4,10 @@
 
 
 import tkinter as tk
+from tkinter import ttk
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
-import datetime
 
 
 # TODO: Have to add then a combobox with selection of previous locations.
@@ -16,7 +16,6 @@ import datetime
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add a frame around the location name label and entry and search
 # TODO: button in dusty color to visualise that they belong together better.
-# TODO: Add changing to other unit system when report already on screen without needing to press search button.
 
 
 class WeatherApp(tk.Tk):
@@ -304,6 +303,30 @@ class WeatherApp(tk.Tk):
         w_desc = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BL", offset=(1, 5),
                             text=w_desc_text, font="Georgia 12", **main_cnf)
 
+        # Pressure.
+        pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
+        pressure = CanvasText(self.main_canvas, coordinates=(329, 155), offset=(0, 1),
+                              text=pressure_text, font="Georgia 12", **main_cnf)
+
+        # Cloud coverage.
+        clouds_text = "Cloud coverage: {0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
+        clouds = CanvasText(self.main_canvas, rel_obj=w_desc, rel_pos="BL", offset=(1, 0),
+                            text=clouds_text, font="Georgia 12", **main_cnf)
+
+        # Humidity.
+        humidity_text = "Humidity: {0}%".format(self.controller.app_data[units]["w_d_cur"]["main"]["humidity"])
+        humidity = CanvasText(self.main_canvas, rel_obj=pressure, rel_pos="BL", offset=(0, 0),
+                              text=humidity_text, font="Georgia 12", **main_cnf)
+
+        # Wind speed.
+        if self.controller.app_data["var_units"].get() == "metric":
+            speed_unit = "m/s"
+        else:
+            speed_unit = "mile/hr"
+        wind_text = "Wind speed: {0} {1}".format(self.controller.app_data[units]["w_d_cur"]["wind"]["speed"], speed_unit)
+        wind = CanvasText(self.main_canvas, rel_obj=humidity, rel_pos="BL", offset=(1, 0),
+                          text=wind_text, font="Georgia 12", **main_cnf)
+
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
@@ -524,6 +547,10 @@ class CanvasImg(object):
             elif rel_pos == "BR":
                 pos_x = r_x2
                 pos_y = r_y2
+            else:
+                # If incorrect string is used for relative position we place object at (0, 0) coordinates.
+                pos_x = 0
+                pos_y = 0
 
         # Prepare image for insertion. Should work with most image file formats.
         img = Image.open(image)

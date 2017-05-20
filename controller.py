@@ -28,7 +28,7 @@ class Controller(object):
                     error_message (Str) -- Last error message.
                     error_status (Int) -- Value -1 means an error occurred and was not cleared. 0 means all ok.
                     time (Str) -- String with date / time when call to the API was made.
-                    last_call (List) -- Contains parameters of last successful call to the API - location and units.
+                    last_call (List) -- Contains location parameter of last successful call to the API.
                     metric (Dict) -- Contains dictionaries with weather data in metric system.
                     imperial (Dict) -- Contains dictionaries with weather data in imperial system.
                         The following keys are the same in both metric and imperial dictionaries.

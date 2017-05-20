@@ -57,10 +57,10 @@ class Report(object):
         # Prefix required to let API know what units are requested by the user.
         units_prefix = "&units="
 
-        # List of report types accepted by the API.
         # List of dictionaries which will store all the data returned from API call.
         unit_dicts = [{"metric":{}}, {"imperial":{}}]
         unit_types = ["metric", "imperial"]
+        # List of report types accepted by the API.
         report_types = ["weather", "forecast", "forecast/daily"]
         keys = ["w_d_cur", "w_d_short", "w_d_long"]
 
@@ -73,7 +73,8 @@ class Report(object):
                     status = (-1, "Unable to establish internet connection. Please connect to the internet.")
                     return status
                 weather_dict = response.json()
-                # Had to add int(w_d["cod"]) as the output from API is int (for current) / string (for longer forecasts).
+                # Had to add int(weather_dict["cod"]) as the output from API is int (for current) /
+                #  string (for longer forecasts).
                 if int(weather_dict["cod"]) != 200:
                     status = (-1, "Error: {0}, {1}".format(weather_dict["cod"], weather_dict["message"]))
                     return status
