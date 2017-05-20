@@ -293,8 +293,6 @@ class WeatherApp(tk.Tk):
         max_temp_text = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_max'], sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR", offset=(15, 0),
                               text=max_temp_text, font="Georgia 10", **main_cnf)
-        bounds = self.main_canvas.bbox(max_temp.id_num)
-        print(bounds)
 
         # Min temperature.
         min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
@@ -307,8 +305,10 @@ class WeatherApp(tk.Tk):
                             text=w_desc_text, font="Georgia 12", **main_cnf)
 
         # Pressure.
+        max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
+        print(max_temp_bounds)
         pressure_text = "Pressure: {0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
-        pressure = CanvasText(self.main_canvas, coordinates=(370, 154), offset=(0, 0),
+        pressure = CanvasText(self.main_canvas, coordinates=(370, max_temp_bounds[1]), offset=(0, 0),
                               text=pressure_text, font="Georgia 12", **main_cnf)
 
         # Cloud coverage.
