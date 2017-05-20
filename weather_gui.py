@@ -293,6 +293,9 @@ class WeatherApp(tk.Tk):
         max_temp_text = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_max'], sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR", offset=(15, 0),
                               text=max_temp_text, font="Georgia 10", **main_cnf)
+        bounds = self.main_canvas.bbox(max_temp.id_num)
+        print(bounds)
+
         # Min temperature.
         min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
         min_temp = CanvasText(self.main_canvas, rel_obj=max_temp, rel_pos="BL", offset=(1, 0),
