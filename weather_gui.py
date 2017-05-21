@@ -118,7 +118,7 @@ class WeatherApp(tk.Tk):
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
                                   "font": self.font, "relief": "sunken"}
-        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 500,
+        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 500, "width": 600,
                       "highlightbackground": self.paper,
                       "highlightcolor": self.paper, "relief": "groove"}
 
@@ -179,7 +179,9 @@ class WeatherApp(tk.Tk):
                                       anchor=tk.NW)
 
         self.update_idletasks()
-        print(self.main_canvas.winfo_geometry())
+        print("main window size:", self.winfo_geometry())
+        print("canvas size:", self.main_canvas.winfo_geometry())
+
 
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
