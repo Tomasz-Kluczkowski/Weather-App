@@ -187,6 +187,8 @@ class WeatherApp(tk.Tk):
         print("top decoration canvas:", self.main_canvas.winfo_rooty())
         print("left edge canvas:", self.main_canvas.winfo_rootx())
 
+        print("main window required size:", self.winfo_reqwidth())
+
 
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
@@ -268,7 +270,7 @@ class WeatherApp(tk.Tk):
         # Display location information.
         # Start coordinates in pixels of the report title.
         x1 = 10
-        y1 = 10
+        y1 = 13
 
         # Draw coordinate lines to help in item placement.
         # Vertical lines.
@@ -323,7 +325,7 @@ class WeatherApp(tk.Tk):
 
         # Min temperature.
         min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
-        min_temp = CanvasText(self.main_canvas, rel_obj=max_temp, rel_pos="BL", offset=(1, 11),
+        min_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BR", offset=(15, -22),
                               text=min_temp_text, font="Arial 10", **main_cnf)
 
         # Weather description.
