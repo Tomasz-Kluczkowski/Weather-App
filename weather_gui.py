@@ -181,6 +181,8 @@ class WeatherApp(tk.Tk):
         self.update_idletasks()
         print("main window size:", self.winfo_geometry())
         print("canvas size:", self.main_canvas.winfo_geometry())
+        print("top decoration:", self.winfo_rooty())
+        print("left edge:", self.winfo_rootx())
 
 
         # Error/Status Bar.
