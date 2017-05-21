@@ -257,8 +257,8 @@ class WeatherApp(tk.Tk):
 
         # Display location information.
         # Start coordinates in pixels of the report title.
-        x1 = 10
-        y1 = 12
+        x1 = 0
+        y1 = 0
 
         # Draw coordinate lines to help in item placement.
         # Vertical lines.
