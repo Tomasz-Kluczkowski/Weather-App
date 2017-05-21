@@ -83,7 +83,7 @@ class WeatherApp(tk.Tk):
         self.overcast = "#9099A2"
         self.paper = "#D5D5D5"
         # Icon color: #a0cff1 (light blue)
-        self.font = "Arial 12"
+        self.font = ("Arial", -12)
 
         # Configure main window.
         self.title("The Weather App")
@@ -283,18 +283,18 @@ class WeatherApp(tk.Tk):
         # Title placement.
         title_text = "Report for: {0}, {1}".format(self.controller.app_data[units]["w_d_cur"]["name"],
                                                    self.controller.app_data[units]["w_d_cur"]["sys"]["country"])
-        title = CanvasText(self.main_canvas, (x1, y1), text=title_text, font="Arial 18", **main_cnf)
+        title = CanvasText(self.main_canvas, (x1, y1), text=title_text, font=("Arial", -18), **main_cnf)
 
         # Date placement.
         date_text = "Received at: {0}".format(self.controller.app_data["time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL", offset=(1, 4),
-                          text=date_text, font="Arial 12", **main_cnf)
+                          text=date_text, font=("Arial", -12), **main_cnf)
 
         # Geo-coords placement.
         coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data[units]["w_d_cur"]["coord"]["lon"],
                                                   self.controller.app_data[units]["w_d_cur"]["coord"]["lat"])
         coords = CanvasText(self.main_canvas, rel_obj=date, rel_pos="BL", offset=(1, 7),
-                            text=coords_text, font="Arial 12", **main_cnf)
+                            text=coords_text, font=("Arial", -12), **main_cnf)
 
         # Draw a current weather icon.
         icon_path = "Resources\Icons\Weather\\" + self.controller.app_data[units]["w_d_cur"]["weather"][0]["icon"] + ".png"
@@ -316,7 +316,7 @@ class WeatherApp(tk.Tk):
         cur_temp_text = "{0:.1f} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]["temp"], sign)
 
         cur_temp = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="CR", offset=(0, 0),
-                              text=cur_temp_text, font="Arial 31", **cent_cnf)
+                              text=cur_temp_text, font=("Arial", -31), **cent_cnf)
 
         x1, y1, x2, y2 = self.main_canvas.bbox(cur_temp.id_num)
         print("cur_temp size:", x2 - x1, y2 - y1)
@@ -324,17 +324,19 @@ class WeatherApp(tk.Tk):
         # Max temperature.
         max_temp_text = "max: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_max'], sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR", offset=(15, 4),
-                              text=max_temp_text, font="Arial 10", **main_cnf)
+                              text=max_temp_text, font=("Arial", -10), **main_cnf)
 
         # Min temperature.
         min_temp_text = "min: {0} \N{DEGREE SIGN}{1}".format(self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
         min_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BR", offset=(15, -22),
-                              text=min_temp_text, font="Arial 10", **main_cnf)
+                              text=min_temp_text, font=("Arial", -10), **main_cnf)
+
+        #('Times', -20, 'bold').
 
         # Weather description.
         w_desc_text = "{0}".format(self.controller.app_data[units]["w_d_cur"]["weather"][0]["description"].capitalize())
         w_desc = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BL", offset=(1, 10),
-                            text=w_desc_text, font="Arial 12", **main_cnf)
+                            text=w_desc_text, font=("Arial", -12), **main_cnf)
 
         # Pressure.
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
@@ -346,7 +348,7 @@ class WeatherApp(tk.Tk):
 
         pressure_text = "{0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img, rel_pos="CR", offset=(0, 0),
-                              text=pressure_text, font="Arial 12", **cent_cnf)
+                              text=pressure_text, font=("Arial", -12), **cent_cnf)
 
         # self.main_canvas.create_line(0, max_temp_bounds[3], 1000, max_temp_bounds[3])
 
@@ -358,7 +360,7 @@ class WeatherApp(tk.Tk):
         clouds_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.W}
         clouds_text = "{0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
         clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img, rel_pos="CR", offset=(0, 0),
-                            text=clouds_text, font="Arial 12", **clouds_cnf)
+                            text=clouds_text, font=("Arial", -12), **clouds_cnf)
 
         # clouds_bounds = self.main_canvas.bbox(clouds.id_num)
         # self.main_canvas.create_line(0, clouds_bounds[3], 1000, clouds_bounds[3])
@@ -371,7 +373,7 @@ class WeatherApp(tk.Tk):
 
         humidity_text = "{0}%".format(self.controller.app_data[units]["w_d_cur"]["main"]["humidity"])
         humidity = CanvasText(self.main_canvas, rel_obj=self.humidity_img, rel_pos="CR", offset=(0, 0),
-                              text=humidity_text, font="Arial 12", **cent_cnf)
+                              text=humidity_text, font=("Arial", -12), **cent_cnf)
 
         # Wind speed.
         if self.controller.app_data["var_units"].get() == "metric":
@@ -380,12 +382,12 @@ class WeatherApp(tk.Tk):
             speed_unit = "mile/hr"
         wind_text = "Wind speed: {0} {1}".format(self.controller.app_data[units]["w_d_cur"]["wind"]["speed"], speed_unit)
         wind = CanvasText(self.main_canvas, rel_obj=humidity, rel_pos="BL", offset=(1, 0),
-                          text=wind_text, font="Arial 12", **main_cnf)
+                          text=wind_text, font=("Arial", -12), **main_cnf)
 
         # Wind direction.
         wind_dir_text = "Wind direction: {0} deg".format(self.controller.app_data[units]["w_d_cur"]["wind"]["deg"])
         wind_dir = CanvasText(self.main_canvas, rel_obj=wind, rel_pos="BL", offset=(1, 0),
-                          text=wind_dir_text, font="Arial 12", **main_cnf)
+                          text=wind_dir_text, font=("Arial", -12), **main_cnf)
 
 
 class HoverButton(tk.Button):
