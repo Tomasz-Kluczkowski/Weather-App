@@ -92,7 +92,7 @@ class WeatherApp(tk.Tk):
         s_width = self.winfo_screenwidth()
         s_height = self.winfo_screenheight()
         # Center application window.
-        self.geometry("800x613+{0}+0".format(int(s_width / 2) - 400))
+        self.geometry("+{0}+0".format(int(s_width / 2) - 400))
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
@@ -118,7 +118,7 @@ class WeatherApp(tk.Tk):
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
                                   "font": self.font, "relief": "sunken"}
-        canvas_cnf = {"bg": self.paper, "bd": 2,
+        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 500, "width": 600,
                       "highlightbackground": self.paper,
                       "highlightcolor": self.paper, "relief": "groove"}
 
