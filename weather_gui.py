@@ -184,6 +184,9 @@ class WeatherApp(tk.Tk):
         print("top decoration:", self.winfo_rooty())
         print("left edge:", self.winfo_rootx())
 
+        print("top decoration canvas:", self.main_canvas.winfo_rooty())
+        print("left edge canvas:", self.main_canvas.winfo_rootx())
+
 
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
