@@ -92,7 +92,7 @@ class WeatherApp(tk.Tk):
         s_width = self.winfo_screenwidth()
         s_height = self.winfo_screenheight()
         # Center application window.
-        self.geometry("+{0}+0".format(int(s_width / 2) - 400))
+        self.geometry("800x613+{0}+0".format(int(s_width / 2) - 400))
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
@@ -178,6 +178,9 @@ class WeatherApp(tk.Tk):
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
 
+        self.update_idletasks()
+        print(self.main_canvas.winfo_geometry())
+
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
@@ -258,7 +261,7 @@ class WeatherApp(tk.Tk):
         # Display location information.
         # Start coordinates in pixels of the report title.
         x1 = 10
-        y1 = 12
+        y1 = 10
 
         # Draw coordinate lines to help in item placement.
         # Vertical lines.
