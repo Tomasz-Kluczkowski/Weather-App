@@ -118,7 +118,7 @@ class WeatherApp(tk.Tk):
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
                                   "font": self.font, "relief": "sunken"}
-        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 500, "width": 600,
+        canvas_cnf = {"bg": self.paper, "bd": 2,
                       "highlightbackground": self.paper,
                       "highlightcolor": self.paper, "relief": "groove"}
 
