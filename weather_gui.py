@@ -327,13 +327,13 @@ class WeatherApp(tk.Tk):
                               text=cur_temp_text, font=h0, **cent_cnf)
 
         # Max temperature.
-        max_temp_text = "max: {0}\N{DEGREE SIGN}{1}".format(
+        max_temp_text = "max: {0:.1f}\N{DEGREE SIGN}{1}".format(
             self.controller.app_data[units]["w_d_cur"]["main"]['temp_max'], sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR", offset=(15, 5),
                               text=max_temp_text, font=h3, **main_cnf)
 
         # Min temperature.
-        min_temp_text = "min: {0}\N{DEGREE SIGN}{1}".format(
+        min_temp_text = "min: {0:.1f}\N{DEGREE SIGN}{1}".format(
             self.controller.app_data[units]["w_d_cur"]["main"]['temp_min'], sign)
         min_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BR", offset=(15, -27),
                               text=min_temp_text, font=h3, **main_cnf)
@@ -345,22 +345,16 @@ class WeatherApp(tk.Tk):
 
         # Pressure.
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
-        icon_path = icon_prefix + "Atmospheric Pressure.png"
+        icon_path = icon_prefix + "atmospheric_pressure.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
                                       coordinates=(370, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
 
-        pressure_text = "{0} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
+        pressure_text = "{0:.1f} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img, rel_pos="CR", offset=(5, 0),
                               text=pressure_text, font=h2, **cent_cnf)
 
-        # Rain and snow.
-
-
-
-
-
         # Cloud coverage.
-        icon_path = icon_prefix + "Cloud_3.png"
+        icon_path = icon_prefix + "cloud.png"
         self.clouds_img = CanvasImg(self.main_canvas, icon_path, rel_obj=w_desc,
                                     rel_pos="BL", offset=(0, 3), **img_cnf)
 
@@ -369,8 +363,21 @@ class WeatherApp(tk.Tk):
         clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img, rel_pos="CR", offset=(5, 0),
                             text=clouds_text, font=h2, **clouds_cnf)
 
+        # Rain and snow.
+        # Assumption is that it never rains and snows at the same time.
+        for name in ["rain", "snow"]:
+            try:
+                rain_snow_text = "{0:.4} mm/3h".format(self.controller.app_data[units]["w_d_cur"][name]["3h"])
+                icon_path = icon_prefix + name + ".png"
+                self.rain_snow_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.clouds_img,
+                                               rel_pos="BL", offset=(0, 4), **img_cnf)
+                rain_snow = CanvasText(self.main_canvas, rel_obj=self.rain_snow_img, rel_pos="CR", offset=(5, 0),
+                                       text=rain_snow_text, font=h2, **cent_cnf)
+            except KeyError:
+                pass
+
         # Humidity.
-        icon_path = icon_prefix + "Humidity.png"
+        icon_path = icon_prefix + "humidity.png"
         self.humidity_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.pressure_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
 
@@ -379,22 +386,22 @@ class WeatherApp(tk.Tk):
                               text=humidity_text, font=h2, **cent_cnf)
 
         # Wind speed.
-        icon_path = icon_prefix + "Windsock Filled.png"
+        icon_path = icon_prefix + "windsock_filled.png"
         self.wind_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.humidity_img,
                                   rel_pos="BL", offset=(0, 4), **img_cnf)
         if self.controller.app_data["var_units"].get() == "metric":
             speed_unit = "m/s"
         else:
             speed_unit = "mile/hr"
-        wind_text = "{0} {1}".format(self.controller.app_data[units]["w_d_cur"]["wind"]["speed"], speed_unit)
+        wind_text = "{0:.1f} {1}".format(self.controller.app_data[units]["w_d_cur"]["wind"]["speed"], speed_unit)
         wind = CanvasText(self.main_canvas, rel_obj=self.wind_img, rel_pos="CR", offset=(5, 0),
                           text=wind_text, font=h2, **cent_cnf)
 
         # Wind direction.
-        icon_path = icon_prefix + "Wind Rose.png"
+        icon_path = icon_prefix + "wind_rose.png"
         self.wind_dir_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
-        wind_dir_text = "{0} deg".format(self.controller.app_data[units]["w_d_cur"]["wind"]["deg"])
+        wind_dir_text = "{0:.1f} deg".format(self.controller.app_data[units]["w_d_cur"]["wind"]["deg"])
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img, rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
 
