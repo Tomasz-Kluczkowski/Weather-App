@@ -5,6 +5,7 @@
 
 import tkinter as tk
 import datetime
+import calendar
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
@@ -16,6 +17,8 @@ from controller import Controller
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add a frame around the location name label and entry and search
 # TODO: button in dusty color to visualise that they belong together better.
+# TODO: Add abstract base class for canvas objects.
+# TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
 
 
 class WeatherApp(tk.Tk):
@@ -240,15 +243,28 @@ class WeatherApp(tk.Tk):
         """Coverts time from unix format to a human readable one.
         
         Args:
-            unix_time (datetime) -- Time given in seconds from beginning of the epoch as on unix machines.
+            unix_time (int) -- Time given in seconds from beginning of the epoch as on unix machines.
             
         Returns:
             time (Str) -- Time in Hour:Minute format.
         """
+
         time = datetime.datetime.fromtimestamp(unix_time).strftime("%H:%M")
         return time
 
+    def date_conv(self, unix_time):
+        """Converts date from unix time to String.
+        
+        Args:
+            unix_time (int) -- Time given in seconds from beginning of the epoch as on unix machines.
+            
+        Returns:
+            date_str (Tuple) -- Tuple containing date as string and day of the week on that date.
+        """
 
+        date = datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+        day = calendar.day_name[date.weekday()]
+        return (day, date)
 
     def begin_get_report(self, *args):
         """Begin getting data for the weather report to display it on the main_canvas.
