@@ -65,7 +65,7 @@ class Report(object):
         report_types = ["weather", "forecast", "forecast/daily"]
         keys = ["w_d_cur", "w_d_short", "w_d_long"]
         # Switch debug to 1 to load a set of data for a city without contacting the API via internet.
-        debug = 0
+        debug = 1
 
         for unit_dict, unit_type in zip(unit_dicts, unit_types):
             for report_type, key in zip(report_types, keys):

@@ -434,24 +434,24 @@ class WeatherApp(tk.Tk):
         # Sunrise.
         icon_path = icon_prefix + "sunrise.png"
         self.sunrise_img = CanvasImg(self.main_canvas, icon_path,
-                                      coordinates=(670, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
+                                     coordinates=(670, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
         sunrise_text = "{0}".format(self.time_conv(self.controller.app_data[units]["w_d_cur"]["sys"]["sunrise"]))
         sunrise = CanvasText(self.main_canvas, rel_obj=self.sunrise_img, rel_pos="CR", offset=(5, 0),
-                              text=sunrise_text, font=h2, **cent_cnf)
+                             text=sunrise_text, font=h2, **cent_cnf)
 
         # Sunset.
         icon_path = icon_prefix + "sunset.png"
         self.sunset_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.sunrise_img, rel_pos="BL",
-                                      offset=(0, 4), **img_cnf)
+                                    offset=(0, 4), **img_cnf)
         sunset_text = "{0}".format(self.time_conv(self.controller.app_data[units]["w_d_cur"]["sys"]["sunset"]))
         sunset = CanvasText(self.main_canvas, rel_obj=self.sunset_img, rel_pos="CR", offset=(5, 0),
+                            text=sunset_text, font=h2, **cent_cnf)
+
+        # Display hourly info.
+        for index, item in enumerate(self.controller.app_data[units]["w_d_short"]["list"]):
+            day_text = "{0}".format(self.date_conv(item["dt"]))
+            day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL", offset=(0, index * 20),
                              text=sunset_text, font=h2, **cent_cnf)
-
-
-
-
-
-
 
 
 class HoverButton(tk.Button):
