@@ -259,12 +259,13 @@ class WeatherApp(tk.Tk):
             unix_time (int) -- Time given in seconds from beginning of the epoch as on unix machines.
             
         Returns:
-            date_str (Tuple) -- Tuple containing date as string and day of the week on that date.
+            name_of_day (Str) -- Name of the day on date.
+            date_str (Str) -- Date in string representation.
         """
-
-        date = datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
-        day = calendar.day_name[date.weekday()]
-        return (day, date)
+        date = datetime.datetime.fromtimestamp(unix_time)
+        date_str = datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+        name_of_day = calendar.day_name[date.weekday()]
+        return name_of_day, date_str
 
     def begin_get_report(self, *args):
         """Begin getting data for the weather report to display it on the main_canvas.
@@ -451,7 +452,7 @@ class WeatherApp(tk.Tk):
         for index, item in enumerate(self.controller.app_data[units]["w_d_short"]["list"]):
             day_text = "{0}".format(self.date_conv(item["dt"]))
             day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL", offset=(0, index * 20),
-                             text=sunset_text, font=h2, **cent_cnf)
+                             text=day_text, font=h2, **cent_cnf)
 
 
 class HoverButton(tk.Button):
