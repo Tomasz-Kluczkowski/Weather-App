@@ -191,7 +191,6 @@ class WeatherApp(tk.Tk):
         #
         # print("main window required size:", self.winfo_reqwidth())
 
-
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
@@ -293,17 +292,17 @@ class WeatherApp(tk.Tk):
         for i in range(1, 250):
             self.main_canvas.create_line(0, i * 10, 1000, i * 10, dash=(2, 15, 1, 10))
 
-        # Title placement.
+        # Title.
         title_text = "Report for: {0}, {1}".format(self.controller.app_data[units]["w_d_cur"]["name"],
                                                    self.controller.app_data[units]["w_d_cur"]["sys"]["country"])
         title = CanvasText(self.main_canvas, (x1, y1), text=title_text, font=h1, **main_cnf)
 
-        # Date placement.
+        # Date.
         date_text = "Received at: {0}".format(self.controller.app_data["time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL", offset=(1, -1),
                           text=date_text, font=h2, **main_cnf)
 
-        # Geo-coords placement.
+        # Geo-coords.
         coords_text = "Lon: {0}, Lat: {1}".format(self.controller.app_data[units]["w_d_cur"]["coord"]["lon"],
                                                   self.controller.app_data[units]["w_d_cur"]["coord"]["lat"])
         coords = CanvasText(self.main_canvas, rel_obj=date, rel_pos="BL", offset=(1, 2),
@@ -348,7 +347,6 @@ class WeatherApp(tk.Tk):
         icon_path = icon_prefix + "atmospheric_pressure.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
                                       coordinates=(370, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
-
         pressure_text = "{0:.1f} hPa".format(self.controller.app_data[units]["w_d_cur"]["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img, rel_pos="CR", offset=(5, 0),
                               text=pressure_text, font=h2, **cent_cnf)
@@ -357,7 +355,6 @@ class WeatherApp(tk.Tk):
         icon_path = icon_prefix + "cloud.png"
         self.clouds_img = CanvasImg(self.main_canvas, icon_path, rel_obj=w_desc,
                                     rel_pos="BL", offset=(0, 3), **img_cnf)
-
         clouds_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.W}
         clouds_text = "{0}%".format(self.controller.app_data[units]["w_d_cur"]["clouds"]["all"])
         clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img, rel_pos="CR", offset=(5, 0),
@@ -380,7 +377,6 @@ class WeatherApp(tk.Tk):
         icon_path = icon_prefix + "humidity.png"
         self.humidity_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.pressure_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
-
         humidity_text = "{0}%".format(self.controller.app_data[units]["w_d_cur"]["main"]["humidity"])
         humidity = CanvasText(self.main_canvas, rel_obj=self.humidity_img, rel_pos="CR", offset=(5, 0),
                               text=humidity_text, font=h2, **cent_cnf)
@@ -404,6 +400,14 @@ class WeatherApp(tk.Tk):
         wind_dir_text = "{0:.1f} deg".format(self.controller.app_data[units]["w_d_cur"]["wind"]["deg"])
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img, rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
+
+        # Sunrise.
+        icon_path = icon_prefix + "wind_rose.png"
+
+
+
+
+
 
 
 class HoverButton(tk.Button):
