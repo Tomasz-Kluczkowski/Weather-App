@@ -4,7 +4,7 @@
 
 
 import tkinter as tk
-from tkinter import ttk
+import datetime
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
@@ -236,6 +236,20 @@ class WeatherApp(tk.Tk):
             self.controller.app_data["var_status"].set("")
             self.controller.app_data["error_status"] = 0
 
+    def time_conv(self, unix_time):
+        """Coverts time from unix format to a human readable one.
+        
+        Args:
+            unix_time (datetime) -- Time given in seconds from beginning of the epoch as on unix machines.
+            
+        Returns:
+            time (Str) -- Time in Hour:Minute format.
+        """
+        time = datetime.datetime.fromtimestamp(unix_time).strftime("%H:%M")
+        return time
+
+
+
     def begin_get_report(self, *args):
         """Begin getting data for the weather report to display it on the main_canvas.
         The call goes to the Controller first. Then to the Model.
@@ -402,7 +416,21 @@ class WeatherApp(tk.Tk):
                               text=wind_dir_text, font=h2, **cent_cnf)
 
         # Sunrise.
-        icon_path = icon_prefix + "wind_rose.png"
+        icon_path = icon_prefix + "sunrise.png"
+        self.sunrise_img = CanvasImg(self.main_canvas, icon_path,
+                                      coordinates=(670, max_temp_bounds[1]), offset=(0, 0), **img_cnf)
+        sunrise_text = "{0}".format(self.time_conv(self.controller.app_data[units]["w_d_cur"]["sys"]["sunrise"]))
+        sunrise = CanvasText(self.main_canvas, rel_obj=self.sunrise_img, rel_pos="CR", offset=(5, 0),
+                              text=sunrise_text, font=h2, **cent_cnf)
+
+        # Sunset.
+        icon_path = icon_prefix + "sunset.png"
+        self.sunset_img = CanvasImg(self.main_canvas, icon_path, rel_obj=self.sunrise_img, rel_pos="BL",
+                                      offset=(0, 4), **img_cnf)
+        sunset_text = "{0}".format(self.time_conv(self.controller.app_data[units]["w_d_cur"]["sys"]["sunset"]))
+        sunset = CanvasText(self.main_canvas, rel_obj=self.sunset_img, rel_pos="CR", offset=(5, 0),
+                             text=sunset_text, font=h2, **cent_cnf)
+
 
 
 
