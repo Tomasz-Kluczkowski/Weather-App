@@ -453,21 +453,36 @@ class WeatherApp(tk.Tk):
 
         # Date and day of the week and hours report was taken.
         previous_day = ""
-        for index, item in enumerate(self.controller.app_data[units]["w_d_short"]["list"]):  # Hour.
+        date_index = 0
+        hour_index = 0
+        self.weather_icons = []
+        for item in self.controller.app_data[units]["w_d_short"]["list"]:
 
+            day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
+            if previous_day != day_text and previous_day != "":
+                hour_index += 1
+            # Hour.
             hour_txt = self.time_conv(item["dt"])
             position_modifier = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                              offset=(position_modifier * 50, 95 + index * 50),
+                              offset=(100 + position_modifier * 50, 95 + hour_index * 50),
                               text=hour_txt, justify=tk.CENTER, font=h4, **cent_cnf)
 
-            day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
+            # Hourly Weather icon.
+
+            icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
+            # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
+            self.weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour, rel_pos="BL", offset=(-10, 0),
+                                                **img_cnf))
+
             if previous_day == day_text:
                 pass
             else:
                 # Display date and day of the week.
-                day = CanvasText(self.main_canvas, rel_obj=hour, rel_pos="BL", offset=(0, 95 + index * 50),
+                day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
+                                 offset=(0, 95 + date_index * 50),
                                  text=day_text, justify=tk.CENTER, font=h4, **cent_cnf)
+                date_index += 1
                 previous_day = day_text
 
 
@@ -607,7 +622,7 @@ class CanvasText(object):
                 pos_x = 0
                 pos_y = 0
 
-        id_num = canvas.create_text(pos_x + offset_x, pos_y + offset_y, **args)
+        id_num = canvas.create_text(int(pos_x) + offset_x, int(pos_y) + offset_y, **args)
         # Store unique Id number returned from using canvas.create_text method as an instance attribute.
         self.id_num = id_num
 
@@ -702,7 +717,7 @@ class CanvasImg(object):
         # Prepare image for insertion. Should work with most image file formats.
         img = Image.open(image)
         self.img = ImageTk.PhotoImage(img)
-        id_num = canvas.create_image(pos_x + offset_x, pos_y + offset_y, image=self.img, **args)
+        id_num = canvas.create_image(int(pos_x) + offset_x, int(pos_y) + offset_y, image=self.img, **args)
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
