@@ -249,7 +249,7 @@ class WeatherApp(tk.Tk):
             time (Str) -- Time in Hour:Minute format.
         """
 
-        time = datetime.datetime.fromtimestamp(unix_time).strftime("%H:%M")
+        time = datetime.datetime.utcfromtimestamp(unix_time).strftime("%H:%M")
         return time
 
     def date_conv(self, unix_time):
@@ -262,8 +262,8 @@ class WeatherApp(tk.Tk):
             name_of_day (Str) -- Name of the day on date.
             date_str (Str) -- Date in string representation.
         """
-        date = datetime.datetime.fromtimestamp(unix_time)
-        date_str = datetime.datetime.fromtimestamp(unix_time).strftime("%d/%m/%Y")
+        date = datetime.datetime.utcfromtimestamp(unix_time)
+        date_str = datetime.datetime.utcfromtimestamp(unix_time).strftime("%d/%m/%Y")
         name_of_day = calendar.day_name[date.weekday()]
         return name_of_day, date_str
 
@@ -304,6 +304,7 @@ class WeatherApp(tk.Tk):
         h1 = ("Arial", -40)
         h2 = ("Arial", -25)
         h3 = ("Arial", -18)
+        h4 = ("Arial", -12)
 
         # Icon size and color.
         icon_color = "true-blue"
@@ -448,11 +449,26 @@ class WeatherApp(tk.Tk):
         sunset = CanvasText(self.main_canvas, rel_obj=self.sunset_img, rel_pos="CR", offset=(5, 0),
                             text=sunset_text, font=h2, **cent_cnf)
 
-        # Display hourly info.
-        for index, item in enumerate(self.controller.app_data[units]["w_d_short"]["list"]):
-            day_text = "{0}".format(self.date_conv(item["dt"]))
-            day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL", offset=(0, index * 20),
-                             text=day_text, font=h2, **cent_cnf)
+        # DISPLAY HOURLY INFO.
+
+        # Date and day of the week and hours report was taken.
+        previous_day = ""
+        for index, item in enumerate(self.controller.app_data[units]["w_d_short"]["list"]):  # Hour.
+
+            hour_txt = self.time_conv(item["dt"])
+            position_modifier = int(hour_txt.split(":")[0]) // 3
+            hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
+                              offset=(position_modifier * 50, 95 + index * 50),
+                              text=hour_txt, justify=tk.CENTER, font=h4, **cent_cnf)
+
+            day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
+            if previous_day == day_text:
+                pass
+            else:
+                # Display date and day of the week.
+                day = CanvasText(self.main_canvas, rel_obj=hour, rel_pos="BL", offset=(0, 95 + index * 50),
+                                 text=day_text, justify=tk.CENTER, font=h4, **cent_cnf)
+                previous_day = day_text
 
 
 class HoverButton(tk.Button):
