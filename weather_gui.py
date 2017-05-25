@@ -465,12 +465,11 @@ class WeatherApp(tk.Tk):
             hour_txt = self.time_conv(item["dt"])
             position_modifier = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                              offset=(100 + position_modifier * 50, 95 + hour_index * 50),
+                              offset=(100 + position_modifier * 50, 98 + hour_index * 50),
                               text=hour_txt, justify=tk.CENTER, font=h4, **cent_cnf)
 
             # Hourly Weather icon.
             icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
-            # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
             self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
                                                    rel_pos="BL", offset=(-10, 0), **img_cnf))
 
@@ -479,7 +478,7 @@ class WeatherApp(tk.Tk):
             else:
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                                 offset=(0, 95 + date_index * 50),
+                                 offset=(0, 105 + date_index * 50),
                                  text=day_text, justify=tk.CENTER, font=h4, **cent_cnf)
                 date_index += 1
                 previous_day = day_text
