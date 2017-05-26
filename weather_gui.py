@@ -301,8 +301,8 @@ class WeatherApp(tk.Tk):
 
         # Config parameters for hourly section.
         hr_main_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
-        hr_cent_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
-        hr_img_cnf = {"tags": "hourly", "anchor": tk.NW}
+        hr_cent_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
+        hr_img_cnf = {"tags": "hourly", "anchor": tk.N}
 
 
         # Font sizes
@@ -350,7 +350,7 @@ class WeatherApp(tk.Tk):
         icon_path = "Resources\Icons\Weather\\" + self.controller.app_data[units]["w_d_cur"]["weather"][0][
             "icon"] + ".png"
         # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
-        self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords, rel_pos="BL", offset=(0, 42), **img_cnf)
+        self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords, rel_pos="BL", offset=(5, 42), **img_cnf)
 
         # Current temperature.
         if self.controller.app_data["var_units"].get() == "metric":
@@ -462,6 +462,7 @@ class WeatherApp(tk.Tk):
         date_index = 0
         hour_index = 0
         self.hr_weather_icons = []
+        self.hr_rain_snow_imgs = []
         hr_y_offset = 0
         for item in self.controller.app_data[units]["w_d_short"]["list"]:
 
@@ -475,38 +476,43 @@ class WeatherApp(tk.Tk):
                     hr_y_offset = y2 - y1
                     print(hr_y_offset)
                 # Display date and day of the week.
-                day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                                 offset=(0, 95 + date_index * hr_y_offset),
+                day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
+                                 offset=(0, 81 + date_index * hr_y_offset),
                                  text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
                 date_index += 1
 
             if previous_day != day_text and date_index > 1:
                 hour_index += 1
-            # Hour.
-            # # self.main_canvas.update_idletasks()
-            # canvas_width = self.main_canvas.winfo_geometry()
-            # print(type(canvas_width))
-            # print(canvas_width)
-            #
-            # x1, y1, x2, y2 = self.main_canvas.bbox(day.id_num)
-            # print(x1, y1, x2, y2)
 
+            # Hour.
             hour_txt = self.time_conv(item["dt"])
             position_modifier = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                              offset=(100 + position_modifier * 50, 87 + hour_index * 50),
+                              offset=(100 + position_modifier * 50, 81 + hour_index * hr_y_offset),
                               text=hour_txt, justify=tk.CENTER, font=h4, **hr_cent_cnf)
 
             # Hourly Weather icon.
             icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
-                                                   rel_pos="BL", offset=(-10, 0), **hr_img_cnf))
+                                                   rel_pos="BC", offset=(0, 0), **hr_img_cnf))
 
             # Temperature.
             hourly_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
-
-            hourly_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BL", offset=(0, -2),
+            hourly_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC", offset=(0, 0),
                                      text=hourly_temp_text, font=h4, **hr_cent_cnf)
+
+            # Rain / Snow.
+            for name in ["rain", "snow"]:
+                try:
+                    rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
+                    icon_path = icon_prefix + name + ".png"
+                    self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hourly_temp,
+                                                   rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+                    rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="CR", offset=(5, 0),
+                                           text=rain_snow_text, font=h4, **hr_cent_cnf)
+                except KeyError:
+                    pass
+
 
             previous_day = day_text
 
