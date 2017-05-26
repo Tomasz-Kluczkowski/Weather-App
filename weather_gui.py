@@ -289,15 +289,21 @@ class WeatherApp(tk.Tk):
         """
 
         # Delete a previous report if existing on canvas.
-        self.main_canvas.delete("main")
+        self.main_canvas.delete("main", "hourly")
 
         # Units system to display report in.
         units = self.controller.app_data["var_units"].get()
 
-        # Common config parameters for main section (current weather).
+        # Config parameters for main section (current weather).
         main_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.NW}
         cent_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.W}
         img_cnf = {"tags": "main", "anchor": tk.NW}
+
+        # Config parameters for hourly section.
+        hr_main_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
+        hr_cent_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
+        hr_img_cnf = {"tags": "hourly", "anchor": tk.NW}
+
 
         # Font sizes
         h0 = ("Arial", -50)
@@ -456,33 +462,53 @@ class WeatherApp(tk.Tk):
         date_index = 0
         hour_index = 0
         self.hr_weather_icons = []
+        hr_y_offset = 0
         for item in self.controller.app_data[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
-            if previous_day != day_text and previous_day != "":
-                hour_index += 1
-            # Hour.
-            hour_txt = self.time_conv(item["dt"])
-            position_modifier = int(hour_txt.split(":")[0]) // 3
-            hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                              offset=(100 + position_modifier * 50, 95 + hour_index * 50),
-                              text=hour_txt, justify=tk.CENTER, font=h4, **cent_cnf)
-
-            # Hourly Weather icon.
-            icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
-            # Images have to be added as attributes or otherwise they get garbage collected and will not display at all.
-            self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
-                                                   rel_pos="BL", offset=(-10, 0), **img_cnf))
-
             if previous_day == day_text:
                 pass
             else:
+                # Calculate y offset for the next day.
+                if date_index == 1:
+                    x1, y1, x2, y2 = self.main_canvas.bbox("hourly")
+                    hr_y_offset = y2 - y1
+                    print(hr_y_offset)
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
-                                 offset=(0, 95 + date_index * 50),
-                                 text=day_text, justify=tk.CENTER, font=h4, **cent_cnf)
+                                 offset=(0, 95 + date_index * hr_y_offset),
+                                 text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
                 date_index += 1
-                previous_day = day_text
+
+            if previous_day != day_text and date_index > 1:
+                hour_index += 1
+            # Hour.
+            # # self.main_canvas.update_idletasks()
+            # canvas_width = self.main_canvas.winfo_geometry()
+            # print(type(canvas_width))
+            # print(canvas_width)
+            #
+            # x1, y1, x2, y2 = self.main_canvas.bbox(day.id_num)
+            # print(x1, y1, x2, y2)
+
+            hour_txt = self.time_conv(item["dt"])
+            position_modifier = int(hour_txt.split(":")[0]) // 3
+            hour = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BL",
+                              offset=(100 + position_modifier * 50, 87 + hour_index * 50),
+                              text=hour_txt, justify=tk.CENTER, font=h4, **hr_cent_cnf)
+
+            # Hourly Weather icon.
+            icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
+            self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
+                                                   rel_pos="BL", offset=(-10, 0), **hr_img_cnf))
+
+            # Temperature.
+            hourly_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
+
+            hourly_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BL", offset=(0, -2),
+                                     text=hourly_temp_text, font=h4, **hr_cent_cnf)
+
+            previous_day = day_text
 
 
 class HoverButton(tk.Button):
