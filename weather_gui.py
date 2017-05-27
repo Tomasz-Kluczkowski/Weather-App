@@ -526,19 +526,19 @@ class WeatherApp(tk.Tk):
                                          text=hourly_pressure_text, font=h4, **hr_cent_cnf)
 
             # Rain / Snow.
-            for name in ["rain", "snow"]:
-                try:
-                    rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
-                    icon_path = icon_prefix + name + ".png"
-                    self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hourly_pressure,
-                                                            rel_pos="BC", offset=(0, 0), **hr_img_cnf))
-                    rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
-                                           offset=(0, 0),
-                                           text=rain_snow_text, font=h4, **hr_cent_cnf)
-                    rain_snow_present = 1
-
-                except KeyError:
-                    pass
+            # # for name in ["rain", "snow"]:
+            # #     try:
+            # #         rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
+            # #         icon_path = icon_prefix + name + ".png"
+            # #         self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hourly_pressure,
+            # #                                                 rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+            # #         rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
+            # #                                offset=(0, 0),
+            # #                                text=rain_snow_text, font=h4, **hr_cent_cnf)
+            # #         rain_snow_present = 1
+            #
+            #     except KeyError:
+            #         pass
 
             if rain_snow_present:
                 cur_y = self.main_canvas.bbox(rain_snow.id_num)[3]
