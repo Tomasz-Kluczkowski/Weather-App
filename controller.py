@@ -35,6 +35,9 @@ class Controller(object):
                         w_d_cur (Dict) -- Dictionary containing current weather report.
                         w_d_short (Dict) -- Dictionary containing short forecast (5 days / every 3 hours).
                         w_d_long (Dict) -- Dictionary containing long forecast (16 days max / daily).
+            debug (Int) -- If set to 1 switches debug functions in the whole app on. Set to 0 to turn them off.
+                They include displaying alignment lines to position widgets on canvas and displaying report from 
+                saved files instead of contacting API. 
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -47,6 +50,7 @@ class Controller(object):
                          "metric": {},
                          "imperial": {},
                          }
+        self.debug = 1
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.

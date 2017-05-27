@@ -6,6 +6,7 @@
 import tkinter as tk
 import datetime
 import calendar
+import PIL
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
@@ -122,7 +123,7 @@ class WeatherApp(tk.Tk):
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
                                   "font": self.font, "relief": "sunken"}
-        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 550,
+        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 550, "background": "darkblue",
                       "highlightbackground": self.paper,
                       "highlightcolor": self.paper, "relief": "groove"}
 
@@ -173,14 +174,25 @@ class WeatherApp(tk.Tk):
         self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
                                   sticky=tk.NSEW)
 
+        # Scrollbar.
+        self.yscrollbar = tk.Scrollbar(self)
+        self.yscrollbar.grid(row=1, column=5, sticky=tk.NS)
+
         # Main display area canvas.
         self.main_canvas = tk.Canvas(self, **canvas_cnf)
-        self.main_canvas.grid(row=1, column=0, columnspan=5, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+        self.main_canvas.grid(row=1, column=0, columnspan=4, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+        self.yscrollbar.config(command=self.main_canvas.yview)
+        self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
+        # TODO: dynamically adjust scroll region.
+        # TODO: provide proper background
+        # self.main_canvas.config(scrollregion=(0, 0, 1000, 3000))
         image = Image.open(r"Resources\Images\paradise-08.jpg")
+        image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
+
 
         # Some window application dimensions info below.
         # self.update_idletasks()
@@ -321,13 +333,14 @@ class WeatherApp(tk.Tk):
         x1 = 10
         y1 = 13
 
-        # Draw coordinate lines to help in item placement.
-        # Vertical lines.
-        # for i in range(1, 250):
-        #     self.main_canvas.create_line(i * 10, 0, i * 10, 1000, dash=(2, 15))
-        # Horizontal lines.
-        for i in range(1, 250):
-            self.main_canvas.create_line(0, i * 10, 1000, i * 10, dash=(2, 15, 1, 10))
+        if self.controller.debug == 1:
+            # Draw coordinate lines to help in item placement.
+            # Vertical lines.
+            # for i in range(1, 250):
+            #     self.main_canvas.create_line(i * 10, 0, i * 10, 1000, dash=(2, 15))
+            # Horizontal lines.
+            for i in range(1, 250):
+                self.main_canvas.create_line(0, i * 10, 1000, i * 10, dash=(2, 15, 1, 10))
 
         # Title.
         title_text = "Report for: {0}, {1}".format(self.controller.app_data[units]["w_d_cur"]["name"],
@@ -465,6 +478,7 @@ class WeatherApp(tk.Tk):
         hr_y_offset = 0
         position_modifier = 0
         max_y = 0
+        rain_snow_present = 0
         for item in self.controller.app_data[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
@@ -483,6 +497,7 @@ class WeatherApp(tk.Tk):
                                  text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
                 date_index += 1
                 max_y = 0
+                rain_snow_present = 0
 
             if previous_day_text != day_text and date_index > 1:
                 hour_index += 1
@@ -499,12 +514,12 @@ class WeatherApp(tk.Tk):
             self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
                                                    rel_pos="BC", offset=(0, 0), **hr_img_cnf))
 
-            # Temperature.
+            # Hourly temperature.
             hourly_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
             hourly_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC", offset=(0, 0),
                                      text=hourly_temp_text, font=h4, **hr_cent_cnf)
 
-            # Pressure.
+            # Hourly pressure.
             hourly_pressure_text = "{0:.1f} hPa\n".format(item["main"]["pressure"])
             hourly_pressure = CanvasText(self.main_canvas, rel_obj=hourly_temp, rel_pos="BC",
                                          offset=(0, 0),
@@ -520,18 +535,21 @@ class WeatherApp(tk.Tk):
                     rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
                                            offset=(0, 0),
                                            text=rain_snow_text, font=h4, **hr_cent_cnf)
+                    rain_snow_present = 1
 
                 except KeyError:
                     pass
 
-            if "rain" in item or "snow" in item:
+            if rain_snow_present:
                 cur_y = self.main_canvas.bbox(rain_snow.id_num)[3]
             else:
                 cur_y = self.main_canvas.bbox(hourly_pressure.id_num)[3]
             if cur_y > max_y:
                 max_y = cur_y
-            previous_day_text = day_text
 
+            previous_day_text = day_text
+        self.update()
+        self.main_canvas.config(scrollregion=self.main_canvas.bbox("all"))
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
