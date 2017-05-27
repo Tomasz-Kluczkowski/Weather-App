@@ -304,7 +304,6 @@ class WeatherApp(tk.Tk):
         hr_cent_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
         hr_img_cnf = {"tags": "hourly", "anchor": tk.N}
 
-
         # Font sizes
         h0 = ("Arial", -50)
         h1 = ("Arial", -40)
@@ -458,7 +457,7 @@ class WeatherApp(tk.Tk):
         # DISPLAY HOURLY INFO.
 
         # Date and day of the week and hours report was taken.
-        previous_day = ""
+        previous_day_text = ""
         date_index = 0
         hour_index = 0
         self.hr_weather_icons = []
@@ -467,21 +466,24 @@ class WeatherApp(tk.Tk):
         for item in self.controller.app_data[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0], self.date_conv(item["dt"])[1])
-            if previous_day == day_text:
+            if previous_day_text == day_text:
                 pass
             else:
-                # Calculate y offset for the next day.
-                if date_index > 0:
-                    x1, y1, x2, y2 = self.main_canvas.bbox("hourly")
-                    hr_y_offset = y2 - y1 - hr_y_offset
-                    print(hr_y_offset)
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
                                  offset=(0, 81 + date_index * hr_y_offset),
                                  text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
+
+                # Calculate y offset for the next day.
+                if date_index > 0:
+                    x1_day, y1_day, x2_day, y2_day = self.main_canvas.bbox(day.id_num)
+                    x1, y1, x2, y2 = self.main_canvas.bbox("hourly")
+                    hr_y_offset = y2 - y1_day
+                    print(hr_y_offset)
+
                 date_index += 1
 
-            if previous_day != day_text and date_index > 1:
+            if previous_day_text != day_text and date_index > 1:
                 hour_index += 1
 
             # Hour.
@@ -507,15 +509,14 @@ class WeatherApp(tk.Tk):
                     rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
                     icon_path = icon_prefix + name + ".png"
                     self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hourly_temp,
-                                                   rel_pos="BC", offset=(0, 0), **hr_img_cnf))
-                    rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC", offset=(0, 0),
+                                                            rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+                    rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
+                                           offset=(0, 0),
                                            text=rain_snow_text, font=h4, **hr_cent_cnf)
                 except KeyError:
                     pass
 
-
-
-            previous_day = day_text
+            previous_day_text = day_text
 
 
 class HoverButton(tk.Button):
