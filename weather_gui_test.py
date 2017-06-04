@@ -173,14 +173,24 @@ class WeatherApp(tk.Tk):
         self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
                                   sticky=tk.NSEW)
 
-        # Scrollbar.
-        self.yscrollbar = tk.Scrollbar(self)
-        self.yscrollbar.grid(row=1, column=5, sticky=tk.NS)
+        # Test frame to put canvas and scrollbar into.
+
+        self.test_frame = tk.Frame(self, **frame_cnf)
+        self.test_frame.grid(row=1, column=0, columnspan=5, padx=(2, 2), pady=(2, 2),
+                            sticky=tk.EW)
+        self.test_frame.columnconfigure(0, weight=4)
+
 
         # Main display area canvas.
-        self.main_canvas = tk.Canvas(self, **canvas_cnf)
-        self.main_canvas.grid(row=1, column=0, columnspan=4, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+
+        self.main_canvas = tk.Canvas(self.test_frame, **canvas_cnf)
+        self.main_canvas.grid(row=0, column=0, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+
+        # Scrollbar.
+        self.yscrollbar = tk.Scrollbar(self.test_frame)
+        self.yscrollbar.grid(row=0, column=1, sticky=tk.NS)
         self.yscrollbar.config(command=self.main_canvas.yview)
+
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
         image = Image.open(r"Resources\Images\paradise-08.jpg")
         image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
