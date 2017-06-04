@@ -35,36 +35,35 @@ class WeatherApp(tk.Tk):
     Controller class will have access then to the same Tk object as the WeatherApp class. 
     
     Args:
-        tk.TK  -- base class for the WeatherApp class. Tkinter main window (root) object.
+        tk.TK (tk.TK): base class for the WeatherApp class. Tkinter main window (root) object.
     
     """
 
     def __init__(self):
         """Initializes WeatherApp class.
         
-        Attributes:
-            controller (Controller) -- Controller class object used for passing data between 
-                the View (weather_gui) and the Model (weather_backend).
-            dusty (Str) -- color definition in hex number.
-            lavender (Str) -- color definition in hex number.
-            overcast (Str) -- color definition in hex number.
-            paper (Str) -- color definition in hex number.
-            font (Str) -- font definition.
-            title (str) -- Main window title displayed when using application.
-            loc_frame (tk.Frame) -- Location frame, parent of all top bar objects.
-            loc_label (tk.Label) -- Location label.
-            loc_entry (tk.Entry) -- Location entry object. Here user can input 
-                data which will be passed to var_loc.
-            search_button (HoverButton) -- Search for weather report button.
-            metric_button (HoverButton)   -- Metric units (degC, m/s) selection
-                button.
-            imperial_button (HoverButton)   -- Imperial units (degF / mile/hr) 
-                selection button.
-            main_canvas (tk.Canvas) -- Main canvas on which all of the weather 
-                report will be visualised.
-            canvas_bg_img (PIL.ImageTk.PhotoImage) -- Main canvas background 
-                image. It is a conversion of a .jpg image using PIL module.
-                
+        :Attributes:
+        :controller (Controller): Controller class object used for passing data between 
+            the View (weather_gui) and the Model (weather_backend).
+        :dusty (str): color definition in hex number.
+        :lavender (str): color definition in hex number.
+        :overcast (str): color definition in hex number.
+        :paper (str): color definition in hex number.
+        :font (str): font definition.
+        :title (str): Main window title displayed when using application.
+        :loc_frame (tk.Frame): Location frame, parent of all top bar objects.
+        :loc_label (tk.Label): Location label.
+        :loc_entry (tk.Entry): Location entry object. Here user can input 
+            data which will be passed to var_loc.
+        :search_button (HoverButton): Search for weather report button.
+        :metric_button (HoverButton): Metric units (degC, m/s) selection
+            button.
+        :imperial_button (HoverButton): Imperial units (degF / mile/hr) 
+            selection button.
+        :main_canvas (tk.Canvas): Main canvas on which all of the weather 
+            report will be visualised.
+        :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
+            image. It is a conversion of a .jpg image using PIL module.
         """
 
         super().__init__()
@@ -183,9 +182,6 @@ class WeatherApp(tk.Tk):
         self.main_canvas.grid(row=1, column=0, columnspan=4, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
         self.yscrollbar.config(command=self.main_canvas.yview)
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        # TODO: dynamically adjust scroll region.
-        # TODO: provide proper background
-        # self.main_canvas.config(scrollregion=(0, 0, 1000, 3000))
         image = Image.open(r"Resources\Images\paradise-08.jpg")
         image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
@@ -213,7 +209,14 @@ class WeatherApp(tk.Tk):
 
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
-        *args contains event object passed automatically from metric_button."""
+
+        Args:
+            *args (): *args contains event object passed automatically from metric_button.
+
+        Returns:
+            None
+
+        """
 
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
@@ -229,7 +232,14 @@ class WeatherApp(tk.Tk):
 
     def imperial_pushed(self, *args):
         """Activates imperial units and changes the look of the units buttons.
-        *args contains event object passed automatically from imperial_button."""
+
+        Args:
+            *args (): Contains event object passed automatically from imperial_button.
+
+        Returns:
+            None
+
+        """
 
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
@@ -243,47 +253,62 @@ class WeatherApp(tk.Tk):
 
     def clear_error_message(self, event):
         """Clears error messages from status_bar_label after user starts to correct an invalid location name.
-        
+
         Args:
-            event (event) -- tkinter.event object sent when a keyboard was pressed. 
+            event (tk.event): tkinter.event object sent when a keyboard was pressed.
+
+        Returns:
+            None
+
         """
+
         if self.controller.app_data["error_status"] == -1:
             self.controller.app_data["var_status"].set("")
             self.controller.app_data["error_status"] = 0
 
     def time_conv(self, unix_time):
-        """Coverts time from unix format to a human readable one.
-        
+        """Converts time from unix format to a human readable one.
+
         Args:
-            unix_time (int) -- Time given in seconds from beginning of the epoch as on unix machines.
-            
+            unix_time (int): Time given in seconds from beginning of the epoch as on unix machines.
+
         Returns:
-            time (Str) -- Time in Hour:Minute format.
+            time (str): Time in Hour:Minute format.
+
         """
 
         time = datetime.datetime.utcfromtimestamp(unix_time).strftime("%H:%M")
         return time
 
     def date_conv(self, unix_time):
-        """Converts date from unix time to String.
-        
+        """Converts date from unix time to string.
+
         Args:
-            unix_time (int) -- Time given in seconds from beginning of the epoch as on unix machines.
-            
+            unix_time (int): Time given in seconds from beginning of the epoch as on unix machines.
+
         Returns:
-            name_of_day (Str) -- Name of the day on date.
-            date_str (Str) -- Date in string representation.
+            name_of_day (str): Name of the day on date.
+            date_str (str): Date in string representation.
         """
+
         date = datetime.datetime.utcfromtimestamp(unix_time)
         date_str = datetime.datetime.utcfromtimestamp(unix_time).strftime("%d/%m/%Y")
         name_of_day = calendar.day_name[date.weekday()]
+
         return name_of_day, date_str
 
     def begin_get_report(self, *args):
         """Begin getting data for the weather report to display it on the main_canvas.
         The call goes to the Controller first. Then to the Model.
-        *args contains event object passed automatically from loc_entry."""
+        
+        Args:
+            *args (): Contains event object passed automatically from loc_entry.
 
+
+        Returns:
+            None
+        """
+        
         # Do nothing if no location is entered.
         if self.controller.app_data["var_loc"].get() == "":
             return
@@ -295,9 +320,9 @@ class WeatherApp(tk.Tk):
 
     def display_report(self):
         """Display results of the API call in the main_canvas.
-        
-        Tags:
-            main -- used for current weather parameters
+
+        Returns:
+            None
         """
 
         # Delete a previous report if existing on canvas.
@@ -472,11 +497,10 @@ class WeatherApp(tk.Tk):
         # Date and day of the week and hours report was taken.
         previous_day_text = ""
         date_index = 0
-        # hour_index = 0
         self.hr_weather_icons = []
         self.hr_rain_snow_imgs = []
-        hr_y_offset = 0
-        position_modifier = 0
+        day_y_offset = 0
+        hr_x_offset = 0
         max_y = 0
         rain_snow_present = 0
         for item in self.controller.app_data[units]["w_d_short"]["list"]:
@@ -486,30 +510,24 @@ class WeatherApp(tk.Tk):
                 pass
             else:
                 # Calculate y offset for the next day.
-                if date_index > 0 and position_modifier == 7:
+                if date_index > 0 and hr_x_offset == 7:
                     y1_day = self.main_canvas.bbox(day.id_num)[1]
-                    print("max_y:", max_y, "\ny1_day:", y1_day)
-                    hr_y_offset += max_y - y1_day
-                    print(hr_y_offset)
+                    day_y_offset += max_y - y1_day
 
                 # Display date and day of the week.
-                # TODO: the y-offset should move the date away from the last one not move it away from the first one
-                # TODO: as we can have different line sizes ! we should be adding offsets to each other
-                # and the new one just builds on top of the previous one !.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
-                                 offset=(0, 81 + hr_y_offset),
+                                 offset=(0, 81 + day_y_offset),
                                  text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
+
+                previous_day_text = day_text
                 date_index += 1
                 max_y = 0
 
-            # if previous_day_text != day_text and date_index > 1:
-                # hour_index += 1
-
             # Hour.
             hour_txt = self.time_conv(item["dt"])
-            position_modifier = int(hour_txt.split(":")[0]) // 3
+            hr_x_offset = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
-                              offset=(100 + position_modifier * 100, -8),
+                              offset=(100 + hr_x_offset * 100, -8),
                               text=hour_txt, justify=tk.CENTER, font=h4, **hr_main_cnf)
 
             # Hourly Weather icon.
@@ -518,22 +536,22 @@ class WeatherApp(tk.Tk):
                                                    rel_pos="BC", offset=(0, 0), **hr_img_cnf))
 
             # Hourly temperature.
-            hourly_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
-            hourly_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC", offset=(0, 0),
-                                     text=hourly_temp_text, font=h4, **hr_cent_cnf)
+            hr_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
+            hr_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC", offset=(0, 0),
+                                     text=hr_temp_text, font=h4, **hr_cent_cnf)
 
             # Hourly pressure.
-            hourly_pressure_text = "{0:.1f} hPa\n".format(item["main"]["pressure"])
-            hourly_pressure = CanvasText(self.main_canvas, rel_obj=hourly_temp, rel_pos="BC",
+            hr_pressure_text = "{0:.1f} hPa\n".format(item["main"]["pressure"])
+            hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp, rel_pos="BC",
                                          offset=(0, 0),
-                                         text=hourly_pressure_text, font=h4, **hr_cent_cnf)
+                                         text=hr_pressure_text, font=h4, **hr_cent_cnf)
 
             # Rain / Snow.
             for name in ["rain", "snow"]:
                 try:
                     rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
                     icon_path = icon_prefix + name + ".png"
-                    self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hourly_pressure,
+                    self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hr_pressure,
                                                             rel_pos="BC", offset=(0, 0), **hr_img_cnf))
                     rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
                                            offset=(0, 0),
@@ -543,25 +561,27 @@ class WeatherApp(tk.Tk):
                 except KeyError:
                     pass
 
+            # Get the maximum y coordinate present on the canvas.
             if rain_snow_present:
                 cur_y = self.main_canvas.bbox(rain_snow.id_num)[3]
             else:
-                cur_y = self.main_canvas.bbox(hourly_pressure.id_num)[3]
+                cur_y = self.main_canvas.bbox(hr_pressure.id_num)[3]
             if cur_y > max_y:
                 max_y = cur_y
 
-            previous_day_text = day_text
             rain_snow_present = 0
+
         self.update()
         self.main_canvas.config(scrollregion=self.main_canvas.bbox("all"))
+
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display option.
     
-    We can use the same configuration dictionary as for the  standard tk.Button.
+    We can use the same configuration dictionary as for the standard tk.Button.
 
     Args:
-        tk.Button (tk.Button) -- Standard tkinter Button object which we inherit from.
+        tk.Button (tk.Button): Standard tkinter Button object which we inherit from.
            
     """
 
@@ -569,21 +589,23 @@ class HoverButton(tk.Button):
         """Initialise MyButton.
         
         Args:
-            master (tk.widget) -- Master widget to which MyButton (slave) instance will belong.
+            master (tk.widget): Master widget to which MyButton (slave) instance will belong.
                 The master widget is part of the WeatherApp object.
-            controller (Controller) -- controller object which will store all the data required by each segment
+            controller (Controller): controller object which will store all the data required by each segment
                 of the application.
-            tip (Str) -- Tooltip text to display in the status_bar_label.
-            cnf (Dict) -- Dictionary with the configuration for MyButton.
-            **args -- Keyword arguments to further initialise the button.
+            tip (str): Tooltip text to display in the status_bar_label.
+            cnf (dict): Dictionary with the configuration for MyButton.
+            **args: Keyword arguments to further initialise the button.
             
-        Attributes:
-            tip (Str) -- Text to display in the status_bar_label of the app.
-            controller (Controller) -- controller object which will store all the data required by each segment
-                of the application. This has to be the same Controller as for the WeatherApp.
+        :Attributes:
+        :tip (str): Text to display in the status_bar_label of the app.
+        :controller (Controller): controller object which will store all the data required by each segment
+            of the application. This has to be the same Controller as for the WeatherApp.
         
         """
+
         super().__init__(master, cnf, **args)
+
         self.controller = controller
         self.tip = tip
         # Action on entering the button with mouse.
@@ -593,12 +615,26 @@ class HoverButton(tk.Button):
 
     def enter_button(self, *args):
         """Displays information on button function to the user in the status_bar_label.
-         *args contains event object passed automatically from the button."""
+
+        Args:
+            *args (): Contains event object passed automatically from the button.
+
+        Returns:
+            None
+        """
+
         self.controller.app_data["var_status"].set(self.tip)
 
     def leave_button(self, *args):
         """Clears status_bar_label after mouse leaves the button area.
-        *args contains event object passed automatically from the button."""
+
+        Args:
+            *args (): *args contains event object passed automatically from the button.
+
+        Returns:
+            None
+        """
+
         if self.controller.app_data["error_status"] == -1:
             self.controller.app_data["var_status"].set(self.controller.app_data["error_message"])
         else:
@@ -612,11 +648,13 @@ class CanvasText(object):
 
     Args:
         object (object) -- Base Python object we inherit from.
+
     """
 
     def __init__(self, canvas, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
-        """Initialise class. 
+        """Initialise class.
+
         Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
         We can give absolute position for the text or a relative one.
         In case of absolute position given we will ignore the relative parameter.
@@ -624,22 +662,24 @@ class CanvasText(object):
         In **args we place all the normal canvas.create_text method parameters.
 
         Args:
-            canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
-            coordinates (Tuple) -- Absolute x, y coordinates where to place text in canvas. Overrides any parameters
+            canvas (tk.Canvas): Canvas object to which the text will be attached to.
+            image (str): String with a path to the image.
+            coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
                 given in relative parameters section.
-            rel_obj (CanvasText / CanvasImg) -- CanvasText / CanvasImg object which will be used
+            rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
                 as a relative one next to which text is meant to be written.
-            rel_pos (Str) -- String determining position of newly created text in relation to the relative object.
+            rel_pos (str): String determining position of newly created text in relation to the relative object.
                 Similar concept to anchor.
-                TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center, 
+                TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center,
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
-            offset (Tuple) -- Offset given as a pair of values to move the newly created text
+            offset (tuple): Offset given as a pair of values to move the newly created text
                 away from the relative object.
-            **args -- All the other arguments we need to pass to create_text method.
-        
-        Attributes:
-            id_num (int) -- Unique Id number returned by create_text method which will help us identify objects
-                and obtain their bounding boxes.
+            **args: All the other arguments we need to pass to create_text method.
+
+        :Attributes:
+        :id_num (int): Unique Id number returned by create_image method which will help us identify objects
+            and obtain their bounding boxes.
+
         """
         # Create text on canvas.
         # If absolute position is given relative parameters are ignored.
@@ -687,9 +727,10 @@ class CanvasText(object):
                 pos_x = r_x2
                 pos_y = r_y2
             else:
-                # If incorrect string is used for relative position we place object at (0, 0) coordinates.
-                pos_x = 0
-                pos_y = 0
+                raise ValueError("Please use the following strings for rel_pos: TL - top - left, "
+                                 "TM - top - middle, TR - top - right, CL - center - left,"
+                                 " CC - center - center, CR - center - right, BL - bottom - left, "
+                                 "BC - bottom - center, BR - bottom - right")
 
         id_num = canvas.create_text(int(pos_x) + offset_x, int(pos_y) + offset_y, **args)
         # Store unique Id number returned from using canvas.create_text method as an instance attribute.
@@ -702,12 +743,14 @@ class CanvasImg(object):
     Allows easier placement of image objects on canvas in relation to other objects.
 
     Args:
-        object (object) -- Base Python object we inherit from.
+        object (object): Base Python object we inherit from.
+        
     """
 
     def __init__(self, canvas, image, coordinates=None, rel_obj=None,
                  rel_pos=None, offset=None, **args):
-        """Initialise class. 
+        """Initialise class.
+         
         Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
         We can give absolute position for the image or a relative one.
         In case of absolute position given we will ignore the relative parameter.
@@ -715,24 +758,26 @@ class CanvasImg(object):
         In **args we place all the normal canvas.create_image method parameters.
 
         Args:
-            canvas (tk.Canvas) -- Canvas object to which the text will be attached to.
-            image (Str) -- String with a path to the image.
-            coordinates (Tuple) -- Absolute x, y coordinates where to place text in canvas. Overrides any parameters
+            canvas (tk.Canvas): Canvas object to which the text will be attached to.
+            image (str): String with a path to the image.
+            coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
                 given in relative parameters section.
-            rel_obj (CanvasText / CanvasImg) -- CanvasText / CanvasImg object which will be used
+            rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
                 as a relative one next to which text is meant to be written.
-            rel_pos (Str) -- String determining position of newly created text in relation to the relative object.
+            rel_pos (str): String determining position of newly created text in relation to the relative object.
                 Similar concept to anchor.
                 TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center, 
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
-            offset (Tuple) -- Offset given as a pair of values to move the newly created text
+            offset (tuple): Offset given as a pair of values to move the newly created text
                 away from the relative object.
-            **args -- All the other arguments we need to pass to create_text method.
+            **args: All the other arguments we need to pass to create_text method.
 
-        Attributes:
-            id_num (int) -- Unique Id number returned by create_image method which will help us identify objects
+        :Attributes:
+            :id_num (int): Unique Id number returned by create_image method which will help us identify objects
                 and obtain their bounding boxes.
+
         """
+
         # Create text on canvas.
         # If absolute position is given relative parameters are ignored.
         if offset:
@@ -779,9 +824,10 @@ class CanvasImg(object):
                 pos_x = r_x2
                 pos_y = r_y2
             else:
-                # If incorrect string is used for relative position we place object at (0, 0) coordinates.
-                pos_x = 0
-                pos_y = 0
+                raise ValueError("Please use the following strings for rel_pos: TL - top - left, "
+                                 "TM - top - middle, TR - top - right, CL - center - left,"
+                                 " CC - center - center, CR - center - right, BL - bottom - left, "
+                                 "BC - bottom - center, BR - bottom - right")
 
         # Prepare image for insertion. Should work with most image file formats.
         img = Image.open(image)
