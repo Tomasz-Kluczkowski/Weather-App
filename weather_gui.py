@@ -106,7 +106,7 @@ class WeatherApp(tk.Tk):
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
-        entry_cnf = {"fg": "black", "bg": self.paper, "width": 60, "bd": 2,
+        entry_cnf = {"fg": "black", "bg": self.paper, "width": 70, "bd": 2,
                      "font": self.font, "relief": "sunken"}
         clear_cnf = {"bg": self.lavender, "fg": "black", "activebackground": self.dusty,
                      "activeforeground": self.paper, "padx": 2, "pady": 2,
@@ -122,7 +122,7 @@ class WeatherApp(tk.Tk):
                                   "activeforeground": "black", "bd": 2, "padx": 2,
                                   "pady": 2, "anchor": tk.CENTER, "width": 2,
                                   "font": self.font, "relief": "sunken"}
-        canvas_cnf = {"bg": self.paper, "bd": 2, "height": 550, "background": "darkblue",
+        canvas_cnf = {"bg": self.paper, "bd": 2, "width": 900, "height": 550, "background": "darkblue",
                       "highlightbackground": self.paper,
                       "highlightcolor": self.paper, "relief": "groove"}
 
@@ -173,14 +173,21 @@ class WeatherApp(tk.Tk):
         self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
                                   sticky=tk.NSEW)
 
-        # Scrollbar.
-        self.yscrollbar = tk.Scrollbar(self)
-        self.yscrollbar.grid(row=1, column=5, sticky=tk.NS)
+        # Canvas frame to put canvas and scrollbar into.
+        self.canvas_frame = tk.Frame(self, **frame_cnf)
+        self.canvas_frame.grid(row=1, column=0, columnspan=5, padx=(2, 2), pady=(2, 2),
+                               sticky=tk.EW)
+        self.canvas_frame.columnconfigure(0, weight=4)
 
         # Main display area canvas.
-        self.main_canvas = tk.Canvas(self, **canvas_cnf)
-        self.main_canvas.grid(row=1, column=0, columnspan=4, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+        self.main_canvas = tk.Canvas(self.canvas_frame, **canvas_cnf)
+        self.main_canvas.grid(row=0, column=0, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+
+        # Scrollbar.
+        self.yscrollbar = tk.Scrollbar(self.canvas_frame)
+        self.yscrollbar.grid(row=0, column=1, padx=(2, 0), pady=(0, 0), sticky=tk.NS)
         self.yscrollbar.config(command=self.main_canvas.yview)
+
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
         image = Image.open(r"Resources\Images\paradise-08.jpg")
         image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
@@ -346,6 +353,7 @@ class WeatherApp(tk.Tk):
         h2 = ("Arial", -25)
         h3 = ("Arial", -18)
         h4 = ("Arial", -12)
+        h4_bold = ("Arial", -12, "bold")
 
         # Icon size and color.
         icon_color = "true-blue"
@@ -497,6 +505,7 @@ class WeatherApp(tk.Tk):
         previous_day_text = ""
         date_index = 0
         self.hr_weather_icons = []
+        self.hr_pressure_icons = []
         self.hr_rain_snow_imgs = []
         day_y_offset = 0
         hr_x_offset = 0
@@ -516,7 +525,7 @@ class WeatherApp(tk.Tk):
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
                                  offset=(0, 81 + day_y_offset),
-                                 text=day_text, justify=tk.CENTER, font=h4, **hr_cent_cnf)
+                                 text=day_text, justify=tk.CENTER, font=h4_bold, **hr_cent_cnf)
 
                 previous_day_text = day_text
                 date_index += 1
@@ -527,7 +536,7 @@ class WeatherApp(tk.Tk):
             hr_x_offset = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(100 + hr_x_offset * 100, -8),
-                              text=hour_txt, justify=tk.CENTER, font=h4, **hr_main_cnf)
+                              text=hour_txt, justify=tk.CENTER, font=h4_bold, **hr_main_cnf)
 
             # Hourly Weather icon.
             icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
@@ -540,8 +549,11 @@ class WeatherApp(tk.Tk):
                                  text=hr_temp_text, font=h4, **hr_cent_cnf)
 
             # Hourly pressure.
-            hr_pressure_text = "{0:.1f} hPa\n".format(item["main"]["pressure"])
-            hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp, rel_pos="BC",
+            icon_path = icon_prefix + "atmospheric_pressure.png"
+            self.hr_pressure_icons.append(CanvasImg(self.main_canvas, icon_path,
+                                          rel_obj=hr_temp, rel_pos="BC", offset=(0, 0), **img_cnf))
+            hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
+            hr_pressure = CanvasText(self.main_canvas, rel_obj=self.hr_pressure_icons[-1], rel_pos="BC",
                                      offset=(0, 0),
                                      text=hr_pressure_text, font=h4, **hr_cent_cnf)
 
