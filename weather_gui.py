@@ -16,8 +16,6 @@ from controller import Controller
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add a small button to open a selection list of previous locations.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Add a frame around the location name label and entry and search
-# TODO: button in dusty color to visualise that they belong together better.
 # TODO: Add abstract base class for canvas objects.
 # TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
 
@@ -324,6 +322,12 @@ class WeatherApp(tk.Tk):
         if self.controller.app_data["error_status"] == 0:
             self.display_report()
 
+    def mouse_wheel(self, event):
+        self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def up(self, event):
+        self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
     def display_report(self):
         """Display results of the API call in the main_canvas.
 
@@ -333,6 +337,8 @@ class WeatherApp(tk.Tk):
 
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
+
+        self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
 
         # Units system to display report in.
         units = self.controller.app_data["var_units"].get()
@@ -574,9 +580,9 @@ class WeatherApp(tk.Tk):
                     rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
                     icon_path = icon_prefix + name + ".png"
                     self.hr_rain_snow_imgs.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hr_pressure,
-                                                            rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+                                                            rel_pos="BC", offset=(0, 7), **hr_img_cnf))
                     rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
-                                           offset=(0, 0),
+                                           offset=(0, 2),
                                            text=rain_snow_text, font=h4, **hr_top_cnf)
                     rain_snow_present = 1
 
