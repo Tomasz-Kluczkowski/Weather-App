@@ -344,8 +344,7 @@ class WeatherApp(tk.Tk):
 
         # Config parameters for hourly section.
         hr_left_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
-        hr_top_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
-        hr_center_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.CENTER}
+        hr_cent_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
         hr_img_cnf = {"tags": "hourly", "anchor": tk.N}
 
         # Font sizes
@@ -506,7 +505,6 @@ class WeatherApp(tk.Tk):
         previous_day_text = ""
         date_index = 0
         self.hr_weather_icons = []
-        self.hr_temp_icons = []
         self.hr_pressure_icons = []
         self.hr_rain_snow_imgs = []
         day_y_offset = 0
@@ -522,23 +520,12 @@ class WeatherApp(tk.Tk):
                 # Calculate y offset for the next day.
                 if date_index > 0 and hr_x_offset == 7:
                     y1_day = self.main_canvas.bbox(day.id_num)[1]
-                    day_y_offset += 5 + max_y - y1_day
+                    day_y_offset += max_y - y1_day
 
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
                                  offset=(0, 81 + day_y_offset),
-                                 text=day_text, justify=tk.CENTER, font=h4_bold, **hr_top_cnf)
-
-                # # Draw temperature icon.
-                # icon_path = icon_prefix + "temperature.png"
-                # self.hr_temp_icons.append(CanvasImg(self.main_canvas, icon_path,
-                #                                     rel_obj=day, rel_pos="BC", offset=(0, 30), **hr_img_cnf))
-                #
-                # # Draw pressure icon.
-                # icon_path = icon_prefix + "atmospheric_pressure.png"
-                # self.hr_pressure_icons.append(CanvasImg(self.main_canvas, icon_path,
-                #                                         rel_obj=self.hr_temp_icons[-1], rel_pos="BC",
-                #                                         offset=(0, 0), **hr_img_cnf))
+                                 text=day_text, justify=tk.CENTER, font=h4_bold, **hr_cent_cnf)
 
                 previous_day_text = day_text
                 date_index += 1
@@ -554,19 +541,21 @@ class WeatherApp(tk.Tk):
             # Hourly Weather icon.
             icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
-                                                   rel_pos="BC", offset=(0, -5), **hr_img_cnf))
+                                                   rel_pos="BC", offset=(0, 0), **hr_img_cnf))
 
             # Hourly temperature.
             hr_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(item["main"]["temp"], sign)
-            hr_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC",
-                                 offset=(0, -10),
-                                 text=hr_temp_text, font=h4, **hr_top_cnf)
+            hr_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC", offset=(0, 0),
+                                 text=hr_temp_text, font=h4, **hr_cent_cnf)
 
             # Hourly pressure.
+            icon_path = icon_prefix + "atmospheric_pressure.png"
+            self.hr_pressure_icons.append(CanvasImg(self.main_canvas, icon_path,
+                                          rel_obj=day, rel_pos="BC", offset=(0, 25), **hr_img_cnf))
             hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
-            hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp, rel_pos="BC",
-                                     offset=(0, 5),
-                                     text=hr_pressure_text, font=h4, **hr_top_cnf)
+            hr_pressure = CanvasText(self.main_canvas, rel_obj=self.hr_pressure_icons[-1], rel_pos="CR",
+                                     offset=(0, 0),
+                                     text=hr_pressure_text, font=h4, **hr_left_cnf)
 
             # Rain / Snow.
             for name in ["rain", "snow"]:
@@ -577,7 +566,7 @@ class WeatherApp(tk.Tk):
                                                             rel_pos="BC", offset=(0, 0), **hr_img_cnf))
                     rain_snow = CanvasText(self.main_canvas, rel_obj=self.hr_rain_snow_imgs[-1], rel_pos="BC",
                                            offset=(0, 0),
-                                           text=rain_snow_text, font=h4, **hr_top_cnf)
+                                           text=rain_snow_text, font=h4, **hr_cent_cnf)
                     rain_snow_present = 1
 
                 except KeyError:
