@@ -16,7 +16,6 @@ from controller import Controller
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add a small button to open a selection list of previous locations.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Add abstract base class for canvas objects.
 # TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
 
 
@@ -323,9 +322,6 @@ class WeatherApp(tk.Tk):
             self.display_report()
 
     def mouse_wheel(self, event):
-        self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-    def up(self, event):
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def display_report(self):
@@ -669,19 +665,19 @@ class HoverButton(tk.Button):
             self.controller.app_data["var_status"].set("")
 
 
-class CanvasText(object):
-    """Creates text object on canvas.
+class CanvasObject(object):
+    """Base class to create objects on canvas.
 
-    Allows easier placement of text objects on canvas in relation to other objects.
+    Allows easier placement of objects on canvas in relation to other objects.
 
     Args:
-        object (object) -- Base Python object we inherit from.
+        object (object): Base Python object we inherit from.
 
     """
 
     def __init__(self, canvas, coordinates=None, rel_obj=None,
-                 rel_pos=None, offset=None, **args):
-        """Initialise class.
+                 rel_pos=None, offset=None):
+        """Initialise class - calculate x-y coordinates for our object.
 
         Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
         We can give absolute position for the text or a relative one.
@@ -702,15 +698,15 @@ class CanvasText(object):
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
             offset (tuple): Offset given as a pair of values to move the newly created text
                 away from the relative object.
-            **args: All the other arguments we need to pass to create_text method.
 
         :Attributes:
-        :id_num (int): Unique Id number returned by create_image method which will help us identify objects
-            and obtain their bounding boxes.
+        :pos_x (int): X coordinate for our object.
+        :pos_y (int): Y coordinate for our object.
 
         """
-        # Create text on canvas.
-        # If absolute position is given relative parameters are ignored.
+        pos_x = 0
+        pos_y = 0
+
         if offset:
             offset_x = offset[0]
             offset_y = offset[1]
@@ -759,20 +755,78 @@ class CanvasText(object):
                                  "TM - top - middle, TR - top - right, CL - center - left,"
                                  " CC - center - center, CR - center - right, BL - bottom - left, "
                                  "BC - bottom - center, BR - bottom - right")
+        self.pos_x = int(pos_x + offset_x)
+        self.pos_y = int(pos_y + offset_y)
 
-        id_num = canvas.create_text(int(pos_x) + offset_x, int(pos_y) + offset_y, **args)
+    def move_rel_to_obj_y(self, rel_obj):
+        """Move object relative to rel_obj in y direction.
+
+        Args:
+            rel_obj (): 
+
+        Returns:
+
+        """
+        pass
+
+
+class CanvasText(CanvasObject):
+    """Creates text object on canvas.
+
+    Allows easier placement of text objects on canvas in relation to other objects.
+
+    Args:
+        CanvasObject (object): Base class we inherit from.
+
+    """
+
+    def __init__(self, canvas, coordinates=None, rel_obj=None,
+                 rel_pos=None, offset=None, **args):
+        """Initialise class.
+
+        Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
+        We can give absolute position for the text or a relative one.
+        In case of absolute position given we will ignore the relative parameter.
+        The offset allows us to move the text away from the border of the relative object.
+        In **args we place all the normal canvas.create_text method parameters.
+
+        Args:
+            canvas (tk.Canvas): Canvas object to which the text will be attached to.
+            image (str): String with a path to the image.
+            coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
+                given in relative parameters section.
+            rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
+                as a relative one next to which text is meant to be written.
+            rel_pos (str): String determining position of newly created text in relation to the relative object.
+                Similar concept to anchor.
+                TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center,
+                CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
+            offset (tuple): Offset given as a pair of values to move the newly created text
+                away from the relative object.
+            **args: All the other arguments we need to pass to create_text method.
+
+        :Attributes:
+        :id_num (int): Unique Id number returned by create_text method which will help us identify objects
+            and obtain their bounding boxes.
+
+        """
+        # Initialise base class. Get x-y coordinates for CanvasText object.
+        super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
+
+        # Create text on canvas.
+        id_num = canvas.create_text(self.pos_x, self.pos_y, **args)
         # Store unique Id number returned from using canvas.create_text method as an instance attribute.
         self.id_num = id_num
 
 
-class CanvasImg(object):
+class CanvasImg(CanvasObject):
     """Creates image object on canvas.
 
     Allows easier placement of image objects on canvas in relation to other objects.
 
     Args:
-        object (object): Base Python object we inherit from.
-        
+        CanvasObject (object): Base class we inherit from.
+
     """
 
     def __init__(self, canvas, image, coordinates=None, rel_obj=None,
@@ -805,62 +859,13 @@ class CanvasImg(object):
                 and obtain their bounding boxes.
 
         """
-
-        # Create text on canvas.
-        # If absolute position is given relative parameters are ignored.
-        if offset:
-            offset_x = offset[0]
-            offset_y = offset[1]
-        else:
-            offset_x = 0
-            offset_y = 0
-        if coordinates:
-            pos_x = coordinates[0]
-            pos_y = coordinates[1]
-        elif rel_obj is not None and rel_pos is not None:
-            # Get Top-Left and Bottom-Right bounding points of the relative object.
-            r_x1, r_y1, r_x2, r_y2 = canvas.bbox(rel_obj.id_num)
-            # TL - top - left, TM - top - middle, TR - top - right, CL - center - left, CC - center - center,
-            # CR - center - right, BL - bottom - left, BC - bottom - center, BR - bottom - right
-
-            # Determine position of CanvasImg on canvas in relation to the rel_obj.
-            if rel_pos == "TL":
-                pos_x = r_x1
-                pos_y = r_y1
-            elif rel_pos == "TM":
-                pos_x = r_x2 - (r_x2 - r_x1) / 2
-                pos_y = r_y1
-            elif rel_pos == "TR":
-                pos_x = r_x2
-                pos_y = r_y1
-            elif rel_pos == "CL":
-                pos_x = r_x1
-                pos_y = r_y2 - (r_y2 - r_y1) / 2
-            elif rel_pos == "CC":
-                pos_x = r_x2 - (r_x2 - r_x1) / 2
-                pos_y = r_y2 - (r_y2 - r_y1) / 2
-            elif rel_pos == "CR":
-                pos_x = r_x2
-                pos_y = r_y2 - (r_y2 - r_y1) / 2
-            elif rel_pos == "BL":
-                pos_x = r_x1
-                pos_y = r_y2
-            elif rel_pos == "BC":
-                pos_x = r_x2 - (r_x2 - r_x1) / 2
-                pos_y = r_y2
-            elif rel_pos == "BR":
-                pos_x = r_x2
-                pos_y = r_y2
-            else:
-                raise ValueError("Please use the following strings for rel_pos: TL - top - left, "
-                                 "TM - top - middle, TR - top - right, CL - center - left,"
-                                 " CC - center - center, CR - center - right, BL - bottom - left, "
-                                 "BC - bottom - center, BR - bottom - right")
+        # Initialise base class. Get x-y coordinates for CanvasImg object.
+        super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
 
         # Prepare image for insertion. Should work with most image file formats.
         img = Image.open(image)
         self.img = ImageTk.PhotoImage(img)
-        id_num = canvas.create_image(int(pos_x) + offset_x, int(pos_y) + offset_y, image=self.img, **args)
+        id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img, **args)
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
