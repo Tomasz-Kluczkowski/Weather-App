@@ -17,6 +17,7 @@ from controller import Controller
 # TODO: Add a small button to open a selection list of previous locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
+# TODO: Create move method for CanvasObjects
 
 
 class WeatherApp(tk.Tk):
@@ -700,10 +701,12 @@ class CanvasObject(object):
                 away from the relative object.
 
         :Attributes:
+        :canvas (tk.Canvas): tkinter Ccanvas object.
         :pos_x (int): X coordinate for our object.
         :pos_y (int): Y coordinate for our object.
 
         """
+        self.canvas = canvas
         pos_x = 0
         pos_y = 0
 
@@ -758,15 +761,27 @@ class CanvasObject(object):
         self.pos_x = int(pos_x + offset_x)
         self.pos_y = int(pos_y + offset_y)
 
-    def move_rel_to_obj_y(self, rel_obj):
-        """Move object relative to rel_obj in y direction.
+    def move_rel_to_obj_y(self, obj, rel_obj):
+        """Move object relative to rel_obj in y direction. Initially aligning centers of objects is supported.
 
         Args:
-            rel_obj (): 
+            obj (CanvasText | CanvasImg): Object which we want to move.
+            rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj. 
 
         Returns:
 
         """
+        # Need to test if self.pos_x / y will update itself automatically.
+        # Looking at the canvas method used to create the objects it will not.
+        print("original coords:", self.pos_x, self.pos_y)
+
+        # Find y coordinate of the center of rel_obj.
+        r_x1, r_y1, r_x2, r_y2 = self.canvas.bbox(rel_obj.id_num)
+        r_pos_y = r_y2 - (r_y2 - r_y1) / 2
+        # Find y coordinate of the center of our object.
+        x1, y1, x2, y2 = self.canvas.bbox(self.id_num)
+
+
         pass
 
 
