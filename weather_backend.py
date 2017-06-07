@@ -10,9 +10,7 @@ class Report(object):
     Inherits from Python base object. This is our Model. 
     Model is allowed to directly communicate only with the Controller. 
     All the backend (business logic) will be carried out here.
-    
-    Args:
-        object (object) -- The class inherits from Python base object.
+
     """
 
     # TODO: Introduce database to store locations checked by the user in the past.
@@ -21,22 +19,23 @@ class Report(object):
 
     def __init__(self, controller):
         """Initialize Report class.
-        
+
         Args:
-            controller (Controller) -- controller object which will store all the data required by each segment
+            controller (Controller): controller object which will store all the data required by each segment
                 of the application.
         """
+
         self.controller = controller
 
     def finish_get_report(self, location):
         """Obtain data in json format from Open Weather and store it in appropriate dictionaries.
-        
+
         Args:
-            location (Str) -- String containing location typed into loc_entry by the user.
-            units (Str) -- String containing unit system selection from unit buttons.
+            location (str): String containing location typed into loc_entry by the user.
+
         Returns:
-            status (Tuple) -- First item is the error status (-1 means error / 0 means all ok).
-                Second item is an error message in case of an exception or 
+            Status (tuple), first item is the error status (-1 means error / 0 means all ok).
+                Second item is an error message in case of an exception or
                 weather_dicts - list of dictionaries with all weather reports.
         """
 
@@ -65,11 +64,10 @@ class Report(object):
         report_types = ["weather", "forecast", "forecast/daily"]
         keys = ["w_d_cur", "w_d_short", "w_d_long"]
         # Switch debug to 1 to load a set of data for a city without contacting the API via internet.
-        debug = 1
 
         for unit_dict, unit_type in zip(unit_dicts, unit_types):
             for report_type, key in zip(report_types, keys):
-                if debug == 0:
+                if self.controller.debug == 0:
                     try:
                         response = requests.get(base_url.format(report_type, location,
                                                                 units_prefix + unit_type) + api_key)
