@@ -973,7 +973,7 @@ class CanvasImg(CanvasObject):
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
-    def move_rel_to_obj_y(self, rel_obj):
+    def move_rel_to_obj_y(self, rel_obj, **kwargs):
         super().move_rel_to_obj_y(self, rel_obj)
 
 
