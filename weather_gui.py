@@ -609,7 +609,7 @@ class WeatherApp(tk.Tk):
                                  offset=(0, -10),
                                  text=hr_temp_text, font=h4, **hr_top_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
-            self.hr_temp_icons[-1].move_rel_to_obj_y(self.hr_temp_icons[-1], hr_temp)
+            self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
 
             # Hourly pressure.
             hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
@@ -617,7 +617,7 @@ class WeatherApp(tk.Tk):
                                      offset=(0, 5),
                                      text=hr_pressure_text, font=h4, **hr_top_cnf)
             # Update hr_pressure_icon y coordinate to center of hr_pressure.
-            self.hr_pressure_icons[-1].move_rel_to_obj_y(self.hr_pressure_icons[-1], hr_pressure)
+            self.hr_pressure_icons[-1].move_rel_to_obj_y(hr_pressure)
 
             # Hourly cloud coverage.
             hr_cloud_text = "{0}%".format(item["clouds"]["all"])
@@ -625,7 +625,7 @@ class WeatherApp(tk.Tk):
                                   offset=(0, 5),
                                   text=hr_cloud_text, font=h4, **hr_top_cnf)
             # Update hr_cloud_icon y coordinate to center of hr_cloud.
-            self.hr_cloud_icons[-1].move_rel_to_obj_y(self.hr_cloud_icons[-1], hr_cloud)
+            self.hr_cloud_icons[-1].move_rel_to_obj_y(hr_cloud)
 
             # Hourly humidity.
             hr_humidity_text = "{0}%".format(item["main"]["humidity"])
@@ -633,7 +633,7 @@ class WeatherApp(tk.Tk):
                                      offset=(0, 5),
                                      text=hr_humidity_text, font=h4, **hr_top_cnf)
             # Update hr_humidity_icon y coordinate to center of hr_humidity.
-            self.hr_humidity_icons[-1].move_rel_to_obj_y(self.hr_humidity_icons[-1], hr_humidity)
+            self.hr_humidity_icons[-1].move_rel_to_obj_y(hr_humidity)
 
             # Hourly wind speed.
             hr_wind_text = "{0} {1}".format(item["wind"]["speed"], speed_unit)
@@ -641,7 +641,7 @@ class WeatherApp(tk.Tk):
                                  offset=(0, 5),
                                  text=hr_wind_text, font=h4, **hr_top_cnf)
             # Update hr_wind_icon y coordinate to center of hr_wind.
-            self.hr_wind_icons[-1].move_rel_to_obj_y(self.hr_wind_icons[-1], hr_wind)
+            self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
 
             # Hourly wind direction.
             hr_wind_dir_text = "{0} deg".format(item["wind"]["deg"])
@@ -649,7 +649,7 @@ class WeatherApp(tk.Tk):
                                      offset=(0, 5),
                                      text=hr_wind_dir_text, font=h4, **hr_top_cnf)
             # Update hr_wind_dir_icon y coordinate to center of hr_wind_dir.
-            self.hr_wind_dir_icons[-1].move_rel_to_obj_y(self.hr_wind_dir_icons[-1], hr_wind_dir)
+            self.hr_wind_dir_icons[-1].move_rel_to_obj_y(hr_wind_dir)
 
             # Hourly Rain / Snow.
             for name in ["rain", "snow"]:
@@ -663,7 +663,7 @@ class WeatherApp(tk.Tk):
                                               offset=(0, 5),
                                               text=rain_snow_text, font=h4, **hr_top_cnf)
                     # Update hr_rain_snow_icon y coordinate to center of rain_snow.
-                    self.hr_rain_snow_icons[-1].move_rel_to_obj_y(self.hr_rain_snow_icons[-1], hr_rain_snow)
+                    self.hr_rain_snow_icons[-1].move_rel_to_obj_y(hr_rain_snow)
 
                     rain_snow_present = 1
 
@@ -972,6 +972,9 @@ class CanvasImg(CanvasObject):
         id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img, **args)
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
+
+    def move_rel_to_obj_y(self, rel_obj):
+        super().move_rel_to_obj_y(self, rel_obj)
 
 
 # Launch application.
