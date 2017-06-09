@@ -18,6 +18,7 @@ from controller import Controller
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
 # TODO: Create convert method for wind direction to display N-S-E-W instead of deg.
+# TODO: Add moving of the canvas by UP and DOWN arrow for laptops (no mouse wheel).
 
 
 
@@ -789,6 +790,7 @@ class CanvasObject(object):
         :pos_y (int): Y coordinate for our object.
 
         """
+        self.id_num = 0
         self.canvas = canvas
         pos_x = 0
         pos_y = 0
@@ -844,12 +846,11 @@ class CanvasObject(object):
         self.pos_x = int(pos_x + offset_x)
         self.pos_y = int(pos_y + offset_y)
 
-    def move_rel_to_obj_y(self, obj, rel_obj):
+    def move_rel_to_obj_y(self, rel_obj):
         """Move obj relative to rel_obj in y direction. 
         Initially aligning centers of the vertical side of objects is supported.
 
         Args:
-            obj (CanvasText | CanvasImg): Object which we want to move.
             rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj. 
 
         Returns:
@@ -861,16 +862,16 @@ class CanvasObject(object):
         r_center_y = r_y2 - (r_y2 - r_y1) / 2
 
         # Find y coordinate of the center of our object.
-        x1, y1, x2, y2 = self.canvas.bbox(obj.id_num)
+        x1, y1, x2, y2 = self.canvas.bbox(self.id_num)
         center_y = y2 - (y2 - y1) / 2
 
         # Find the delta.
         dy = int(r_center_y - center_y)
 
         # Move obj.
-        self.canvas.move(obj.id_num, 0, dy)
+        self.canvas.move(self.id_num, 0, dy)
         # Update obj pos_y attribute.
-        obj.pos_y += dy
+        self.pos_y += dy
 
 
 class CanvasText(CanvasObject):
@@ -972,20 +973,21 @@ class CanvasImg(CanvasObject):
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
-    def move_rel_to_obj_y(self, rel_obj, **kwargs):
-        """Move instance in relation to rel_obj. Align their y coordinate centers.
-        Override base class method to pass child instance as obj argument automatically.
+        # def move_rel_to_obj_y(self, rel_obj):
+        #     """Move instance in relation to rel_obj. Align their y coordinate centers.
+        #     Override base class method to pass child instance as obj argument automatically.
+        #
+        #
+        #     Args:
+        #         rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj.
+        #
+        #         **kwargs (): Not used
+        #     super().move_rel_to_obj_y(rel_obj)
+        #
+        #     Returns:
+        #     """
+        #         None
 
-        
-        Args:
-            rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj. 
-
-            **kwargs (): Not used
-
-        Returns:
-            None
-        """
-        super().move_rel_to_obj_y(self, rel_obj)
 
 
 # Launch application.
