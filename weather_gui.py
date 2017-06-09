@@ -771,8 +771,7 @@ class CanvasObject(object):
         The offset allows us to move the text away from the border of the relative object.
 
         Args:
-            canvas (tk.Canvas): Canvas object to which the text will be attached to.
-            image (str): String with a path to the image.
+            canvas (tk.Canvas): Canvas on which CanvasObject will be placed.
             coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
                 given in relative parameters section.
             rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
@@ -785,6 +784,7 @@ class CanvasObject(object):
                 away from the relative object.
 
         :Attributes:
+        :id_num (int): Unique id number of the CanvasObject given by canvas.bbox method in the subclass.  
         :canvas (tk.Canvas): tkinter Canvas object.
         :pos_x (int): X coordinate for our object.
         :pos_y (int): Y coordinate for our object.
@@ -896,7 +896,6 @@ class CanvasText(CanvasObject):
 
         Args:
             canvas (tk.Canvas): Canvas object to which the text will be attached to.
-            image (str): String with a path to the image.
             coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
                 given in relative parameters section.
             rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
@@ -946,11 +945,11 @@ class CanvasImg(CanvasObject):
         Args:
             canvas (tk.Canvas): Canvas object to which the text will be attached to.
             image (str): String with a path to the image.
-            coordinates (tuple): Absolute x, y coordinates where to place text in canvas. Overrides any parameters
+            coordinates (tuple): Absolute x, y coordinates where to place image in canvas. Overrides any parameters
                 given in relative parameters section.
             rel_obj (CanvasText / CanvasImg): CanvasText / CanvasImg object which will be used
-                as a relative one next to which text is meant to be written.
-            rel_pos (str): String determining position of newly created text in relation to the relative object.
+                as a relative one next to which image is meant to be placed.
+            rel_pos (str): String determining position of newly created image in relation to the relative object.
                 Similar concept to anchor.
                 TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center, 
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
