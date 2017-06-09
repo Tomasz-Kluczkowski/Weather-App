@@ -972,22 +972,6 @@ class CanvasImg(CanvasObject):
         # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
-        # def move_rel_to_obj_y(self, rel_obj):
-        #     """Move instance in relation to rel_obj. Align their y coordinate centers.
-        #     Override base class method to pass child instance as obj argument automatically.
-        #
-        #
-        #     Args:
-        #         rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj.
-        #
-        #         **kwargs (): Not used
-        #     super().move_rel_to_obj_y(rel_obj)
-        #
-        #     Returns:
-        #     """
-        #         None
-
-
 
 # Launch application.
 if __name__ == "__main__":
