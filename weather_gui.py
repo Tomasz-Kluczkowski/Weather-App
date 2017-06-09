@@ -765,10 +765,9 @@ class CanvasObject(object):
         """Initialise class - calculate x-y coordinates for our object.
 
         Allows positioning in relation to the rel_obj (CanvasText or CanvasImg object).
-        We can give absolute position for the text or a relative one.
+        We can give absolute position for the object or a relative one.
         In case of absolute position given we will ignore the relative parameter.
         The offset allows us to move the text away from the border of the relative object.
-        In **args we place all the normal canvas.create_text method parameters.
 
         Args:
             canvas (tk.Canvas): Canvas object to which the text will be attached to.
@@ -781,11 +780,11 @@ class CanvasObject(object):
                 Similar concept to anchor.
                 TL - top-left, TM - top-middle, TR - top-right, CL - center-left, CC - center-center,
                 CR - center-right, BL - bottom-left, BC - bottom-center, BR - bottom-right
-            offset (tuple): Offset given as a pair of values to move the newly created text
+            offset (tuple): Offset given as a pair of values to move the newly created object
                 away from the relative object.
 
         :Attributes:
-        :canvas (tk.Canvas): tkinter Ccanvas object.
+        :canvas (tk.Canvas): tkinter Canvas object.
         :pos_x (int): X coordinate for our object.
         :pos_y (int): Y coordinate for our object.
 
@@ -809,7 +808,7 @@ class CanvasObject(object):
             # TL - top - left, TM - top - middle, TR - top - right, CL - center - left, CC - center - center,
             # CR - center - right, BL - bottom - left, BC - bottom - center, BR - bottom - right
 
-            # Determine position of CanvasText on canvas in relation to the rel_obj.
+            # Determine position of CanvasObject on canvas in relation to the rel_obj.
             if rel_pos == "TL":
                 pos_x = r_x1
                 pos_y = r_y1
@@ -846,7 +845,7 @@ class CanvasObject(object):
         self.pos_y = int(pos_y + offset_y)
 
     def move_rel_to_obj_y(self, obj, rel_obj):
-        """Move object relative to rel_obj in y direction. 
+        """Move obj relative to rel_obj in y direction. 
         Initially aligning centers of the vertical side of objects is supported.
 
         Args:
@@ -974,6 +973,18 @@ class CanvasImg(CanvasObject):
         self.id_num = id_num
 
     def move_rel_to_obj_y(self, rel_obj, **kwargs):
+        """Move instance in relation to rel_obj. Align their y coordinate centers.
+        Override base class method to pass child instance as obj argument automatically.
+
+        
+        Args:
+            rel_obj (CanvasText | CanvasImg): Object in relation to which we want to move obj. 
+
+            **kwargs (): Not used
+
+        Returns:
+            None
+        """
         super().move_rel_to_obj_y(self, rel_obj)
 
 
