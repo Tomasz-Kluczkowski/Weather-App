@@ -182,6 +182,7 @@ class WeatherApp(tk.Tk):
         # Main display area canvas.
         self.main_canvas = tk.Canvas(self.canvas_frame, **canvas_cnf)
         self.main_canvas.grid(row=0, column=0, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
+        # self.main_canvas.focus_set()
 
         # Scrollbar.
         self.yscrollbar = tk.Scrollbar(self.canvas_frame)
@@ -327,6 +328,12 @@ class WeatherApp(tk.Tk):
     def mouse_wheel(self, event):
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
+    def move_canvas_up(self, event):
+        self.main_canvas.yview_scroll(-1, "units")
+
+    def move_canvas_down(self, event):
+        self.main_canvas.yview_scroll(1, "units")
+
     def display_report(self):
         """Display results of the API call in the main_canvas.
 
@@ -337,7 +344,10 @@ class WeatherApp(tk.Tk):
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
 
+        # Set mouse wheel and arrow keys up / down to control canvas scrolling.
         self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind_all("<Up>", self.move_canvas_up)
+        self.main_canvas.bind_all("<Down>", self.move_canvas_down)
 
         # Units system to display report in.
         units = self.controller.app_data["var_units"].get()
@@ -918,7 +928,6 @@ class CanvasText(CanvasObject):
 
         # Create text on canvas.
         id_num = canvas.create_text(self.pos_x, self.pos_y, **args)
-        # Store unique Id number returned from using canvas.create_text method as an instance attribute.
         self.id_num = id_num
 
 
@@ -969,7 +978,6 @@ class CanvasImg(CanvasObject):
         img = Image.open(image)
         self.img = ImageTk.PhotoImage(img)
         id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img, **args)
-        # Store unique Id number returned from using canvas.create_image method as an instance attribute.
         self.id_num = id_num
 
 
