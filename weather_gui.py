@@ -130,43 +130,43 @@ class WeatherApp(tk.Tk):
         # LAYOUT DESIGN.
 
         # Location frame.
-        self.loc_frame = tk.Frame(self, **frame_cnf)
-        self.loc_frame.grid(row=0, column=0, padx=(2, 2), pady=(2, 2),
-                            sticky=tk.EW)
+        loc_frame = tk.Frame(self, **frame_cnf)
+        loc_frame.grid(row=0, column=0, padx=(2, 2), pady=(2, 2),
+                       sticky=tk.EW)
 
         # Location label.
-        self.loc_label = tk.Label(self.loc_frame, text="Location name:", **label_cnf)
-        self.loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4), sticky=tk.NSEW)
+        loc_label = tk.Label(loc_frame, text="Location name:", **label_cnf)
+        loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4), sticky=tk.NSEW)
 
         # Location entry.
-        self.loc_entry = tk.Entry(self.loc_frame,
-                                  textvariable=self.controller.app_data["var_loc"],
-                                  **entry_cnf)
-        self.loc_entry.focus()
-        self.loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
-                            sticky=tk.NSEW)
-        self.loc_entry.bind("<Return>", self.begin_get_report)
+        loc_entry = tk.Entry(loc_frame,
+                             textvariable=self.controller.app_data["var_loc"],
+                             **entry_cnf)
+        loc_entry.focus()
+        loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+                       sticky=tk.NSEW)
+        loc_entry.bind("<Return>", self.begin_get_report)
         # If there is an error message and user starts to correct location name, remove error.
-        self.loc_entry.bind("<Key>", self.clear_error_message)
+        loc_entry.bind("<Key>", self.clear_error_message)
 
         # Search button.
         self.search_img = tk.PhotoImage(file=r"Resources\Buttons\magnifier-tool.png")
-        self.search_button = HoverButton(self.loc_frame, controller, "Press to get a weather report.",
-                                         clear_cnf, image=self.search_img,
-                                         command=self.begin_get_report)
-        self.search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4), pady=(4, 5))
+        search_button = HoverButton(loc_frame, controller, "Press to get a weather report.",
+                                    clear_cnf, image=self.search_img,
+                                    command=self.begin_get_report)
+        search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4), pady=(4, 5))
         # Press Enter to get report.
-        self.search_button.bind("<Return>", self.begin_get_report)
+        search_button.bind("<Return>", self.begin_get_report)
 
         # Metric units button.
-        self.metric_button = HoverButton(self.loc_frame, controller, "Press to change units to metric.",
+        self.metric_button = HoverButton(loc_frame, controller, "Press to change units to metric.",
                                          self.button_pushed_cnf,
                                          text=u"\N{DEGREE SIGN}C", command=self.metric_pushed)
         self.metric_button.grid(row=0, column=3, padx=(2, 4), pady=(4, 5),
                                 sticky=tk.NSEW)
 
         # Imperial units button.
-        self.imperial_button = HoverButton(self.loc_frame, controller,
+        self.imperial_button = HoverButton(loc_frame, controller,
                                            "Press to change units to imperial.",
                                            self.button_released_cnf,
                                            text=u"\N{DEGREE SIGN}F",
@@ -175,18 +175,18 @@ class WeatherApp(tk.Tk):
                                   sticky=tk.NSEW)
 
         # Canvas frame to put canvas and scrollbar into.
-        self.canvas_frame = tk.Frame(self, **frame_cnf)
-        self.canvas_frame.grid(row=1, column=0, columnspan=5, padx=(2, 2), pady=(2, 2),
-                               sticky=tk.EW)
-        self.canvas_frame.columnconfigure(0, weight=4)
+        canvas_frame = tk.Frame(self, **frame_cnf)
+        canvas_frame.grid(row=1, column=0, columnspan=5, padx=(2, 2), pady=(2, 2),
+                          sticky=tk.EW)
+        canvas_frame.columnconfigure(0, weight=4)
 
         # Main display area canvas.
-        self.main_canvas = tk.Canvas(self.canvas_frame, **canvas_cnf)
+        self.main_canvas = tk.Canvas(canvas_frame, **canvas_cnf)
         self.main_canvas.grid(row=0, column=0, padx=(0, 0), pady=(0, 2), sticky=tk.NSEW)
         # self.main_canvas.focus_set()
 
         # Scrollbar.
-        self.yscrollbar = tk.Scrollbar(self.canvas_frame)
+        self.yscrollbar = tk.Scrollbar(canvas_frame)
         self.yscrollbar.grid(row=0, column=1, padx=(2, 0), pady=(0, 0), sticky=tk.NS)
         self.yscrollbar.config(command=self.main_canvas.yview)
 
@@ -211,9 +211,9 @@ class WeatherApp(tk.Tk):
         # print("main window required size:", self.winfo_reqwidth())
 
         # Error/Status Bar.
-        self.status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
-        self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
-        self.status_bar_label.configure(relief="sunken")
+        status_bar_label = tk.Label(self, textvariable=self.controller.app_data["var_status"], **label_cnf)
+        status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2), sticky=tk.NSEW)
+        status_bar_label.configure(relief="sunken")
 
     def metric_pushed(self, *args):
         """Activates metric units and changes the look of the units buttons.
@@ -387,7 +387,7 @@ class WeatherApp(tk.Tk):
             # Draw coordinate lines to help in item placement.
             # Vertical lines.
             # for i in range(1, 250):
-            #     self.main_canvas.create_line(i * 10, 0, i * 10, 1000, dash=(2, 15))
+            #     self.main_canvas.create_line(i * 10, 0, i * 10, 1000, dash=(2, 15, 1, 10))
             # Horizontal lines.
             for i in range(1, 250):
                 self.main_canvas.create_line(0, i * 10, 1000, i * 10, dash=(2, 15, 1, 10))
