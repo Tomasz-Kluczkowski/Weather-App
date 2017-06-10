@@ -18,7 +18,8 @@ from controller import Controller
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add timezone checks as for remote locations time is given in local (my UK) time and it makes no sense.
 # TODO: Create convert method for wind direction to display N-S-E-W instead of deg.
-# TODO: Add moving of the canvas by UP and DOWN arrow for laptops (no mouse wheel).
+# TODO: Add mousewheel movement for MAC and LINUX.
+# TODO: Change background picture so that it does not have to be resized to fill the space (looks ugly).
 
 
 
@@ -346,6 +347,7 @@ class WeatherApp(tk.Tk):
 
         # Set mouse wheel and arrow keys up / down to control canvas scrolling.
         self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
+
         self.main_canvas.bind_all("<Up>", self.move_canvas_up)
         self.main_canvas.bind_all("<Down>", self.move_canvas_down)
 
