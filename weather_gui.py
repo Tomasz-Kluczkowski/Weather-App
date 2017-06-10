@@ -191,7 +191,7 @@ class WeatherApp(tk.Tk):
         self.yscrollbar.config(command=self.main_canvas.yview)
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        image = Image.open(r"Resources\Images\main_background_2.jpg")
+        image = Image.open(r"Resources\Images\main_background.jpg")
         # image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
@@ -673,7 +673,7 @@ class WeatherApp(tk.Tk):
                                                              rel_obj=self.hr_wind_dir_icons[-1],
                                                              rel_pos="BC", offset=(0, 0), **hr_img_cnf))
                     hr_rain_snow = CanvasText(self.main_canvas, rel_obj=hr_wind_dir, rel_pos="BC",
-                                              offset=(0, 5),
+                                              offset=(0, 10),
                                               text=rain_snow_text, font=h4, **hr_top_cnf)
                     # Update hr_rain_snow_icon y coordinate to center of rain_snow.
                     self.hr_rain_snow_icons[-1].move_rel_to_obj_y(hr_rain_snow)
