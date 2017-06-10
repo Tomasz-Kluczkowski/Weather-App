@@ -191,8 +191,8 @@ class WeatherApp(tk.Tk):
         self.yscrollbar.config(command=self.main_canvas.yview)
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        image = Image.open(r"Resources\Images\paradise-08.jpg")
-        image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
+        image = Image.open(r"Resources\Images\main_background_2.jpg")
+        # image = image.resize((image.size[0] * 2, image.size[1] * 2), PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
