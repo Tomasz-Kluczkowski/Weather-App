@@ -22,7 +22,6 @@ from controller import Controller
 # TODO: Change background picture so that it does not have to be resized to fill the space (looks ugly).
 
 
-
 class WeatherApp(tk.Tk):
     """Class for generating graphic user interface for the weather application.
     
@@ -370,8 +369,9 @@ class WeatherApp(tk.Tk):
         h1 = ("Arial", -40)
         h2 = ("Arial", -25)
         h3 = ("Arial", -18)
-        h4 = ("Arial", -12)
-        h4_bold = ("Arial", -12, "bold")
+        h4 = ("Arial", -15)
+        h5 = ("Arial", -12)
+        h5_bold = ("Arial", -12, "bold")
 
         # Icon size and color.
         icon_color = "true-blue"
@@ -380,7 +380,7 @@ class WeatherApp(tk.Tk):
 
         # Display location information.
         # Start coordinates in pixels of the report title.
-        x1 = 10
+        x1 = 20
         y1 = 13
 
         if self.controller.debug == 1:
@@ -560,7 +560,7 @@ class WeatherApp(tk.Tk):
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon, rel_pos="BC",
                                  offset=(0, 81 + day_y_offset),
-                                 text=day_text, justify=tk.CENTER, font=h4_bold, **hr_top_cnf)
+                                 text=day_text, justify=tk.CENTER, font=h3, **hr_top_cnf)
 
                 # Draw temperature icon.
                 icon_path = icon_prefix + "temperature.png"
@@ -606,7 +606,7 @@ class WeatherApp(tk.Tk):
             hr_x_offset = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(100 + hr_x_offset * 100, -8),
-                              text=hour_txt, justify=tk.CENTER, font=h4_bold, **hr_left_cnf)
+                              text=hour_txt, justify=tk.CENTER, font=h3, **hr_left_cnf)
 
             # Hourly Weather icon.
             icon_path = "Resources\Icons\Weather\\" + item["weather"][0]["icon"] + ".png"
@@ -620,7 +620,7 @@ class WeatherApp(tk.Tk):
 
             hr_temp = CanvasText(self.main_canvas, rel_obj=self.hr_weather_icons[-1], rel_pos="BC",
                                  offset=(0, -10),
-                                 text=hr_temp_text, font=h4, **hr_top_cnf)
+                                 text=hr_temp_text, font=h3, **hr_top_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
             self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
 
@@ -971,6 +971,7 @@ class CanvasImg(CanvasObject):
         :Attributes:
             :id_num (int): Unique Id number returned by create_image method which will help us identify objects
                 and obtain their bounding boxes.
+            :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
 
         """
         # Initialise base class. Get x-y coordinates for CanvasImg object.
