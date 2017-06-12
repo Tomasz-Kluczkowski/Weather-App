@@ -56,6 +56,7 @@ class WeatherApp(tk.Tk):
         :controller (Controller): Controller class object used for 
             passing data between the View (weather_gui) and the Model
             (weather_backend).
+        :v_link (dict): Link to access variables in controller.
         :dusty (str): color definition in hex number.
         :lavender (str): color definition in hex number.
         :overcast (str): color definition in hex number.
@@ -84,6 +85,7 @@ class WeatherApp(tk.Tk):
         # Add Controller to the WeatherApp class instance.
         controller = Controller()
         self.controller = controller
+        self.v_link = self.controller.app_data
 
         # Add main application instance as a View to the Controller.
         self.controller.add_view(self)
@@ -157,15 +159,12 @@ class WeatherApp(tk.Tk):
                        sticky=tk.NSEW)
 
         # Location entry.
-        loc_entry = tk.Entry(loc_frame,
-                             textvariable=self.controller.app_data["var_loc"],
+        loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
                              **entry_cnf)
         loc_entry.focus()
         loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                        sticky=tk.NSEW)
         loc_entry.bind("<Return>", lambda e: self.begin_get_report())
-        # If there is an error message and user starts to correct
-        # location name, remove error.
         loc_entry.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
@@ -192,11 +191,10 @@ class WeatherApp(tk.Tk):
         # Imperial units button.
         self.imperial_button = \
             HoverButton(loc_frame, controller,
-                        "Press to change units "
-                        "to imperial.",
+                        "Press to change units to imperial.",
                         self.button_released_cnf,
                         text=u"\N{DEGREE SIGN}F",
-                        command=lambda:self.imperial_pushed())
+                        command=lambda: self.imperial_pushed())
         self.imperial_button.grid(row=0, column=4, padx=(2, 4), pady=(4, 5),
                                   sticky=tk.NSEW)
 
@@ -242,8 +240,7 @@ class WeatherApp(tk.Tk):
 
         # Error/Status Bar.
         status_bar_label = tk.Label(self,
-                                    textvariable=self.controller.app_data[
-                                        "var_status"],
+                                    textvariable=self.v_link["var_status"],
                                     **label_cnf)
         status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
                               sticky=tk.NSEW)
@@ -261,13 +258,13 @@ class WeatherApp(tk.Tk):
         # If button is pushed when there is a report already on the
         # screen and location entry was not changed
         # get a new report with changed units.
-        if self.controller.app_data["var_units"].get() == "imperial":
-            self.controller.app_data["var_units"].set("metric")
+        if self.v_link["var_units"].get() == "imperial":
+            self.v_link["var_units"].set("metric")
 
             # If there is data already stored change units displayed.
-            if self.controller.app_data["metric"]["w_d_cur"] \
-                    and self.controller.app_data["metric"]["w_d_short"] \
-                    and self.controller.app_data["metric"]["w_d_long"]:
+            if self.v_link["metric"]["w_d_cur"] \
+                    and self.v_link["metric"]["w_d_short"] \
+                    and self.v_link["metric"]["w_d_long"]:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -282,12 +279,12 @@ class WeatherApp(tk.Tk):
         self.imperial_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
         # screen get a new report with changed units.
-        if self.controller.app_data["var_units"].get() == "metric":
-            self.controller.app_data["var_units"].set("imperial")
+        if self.v_link["var_units"].get() == "metric":
+            self.v_link["var_units"].set("imperial")
 
-            if self.controller.app_data["imperial"]["w_d_cur"] \
-                    and self.controller.app_data["imperial"]["w_d_short"] \
-                    and self.controller.app_data["imperial"]["w_d_long"]:
+            if self.v_link["imperial"]["w_d_cur"] \
+                    and self.v_link["imperial"]["w_d_short"] \
+                    and self.v_link["imperial"]["w_d_long"]:
                 self.display_report()
 
     def clear_error_message(self):
@@ -298,9 +295,9 @@ class WeatherApp(tk.Tk):
             None
         """
 
-        if self.controller.app_data["error_status"] == -1:
-            self.controller.app_data["var_status"].set("")
-            self.controller.app_data["error_status"] = 0
+        if self.v_link["error_status"] == -1:
+            self.v_link["var_status"].set("")
+            self.v_link["error_status"] = 0
 
     def time_conv(self, unix_time):
         """Converts time from unix format to a human readable one.
@@ -343,24 +340,31 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         # Do nothing if no location is entered.
-        if self.controller.app_data["var_loc"].get() == "":
+        if self.v_link["var_loc"].get() == "":
             return
         # Request a report using a Mediating Controller.
         self.controller.get_report()
         # Upon a successful contact with the API display the result in
         # the GUI.
-        if self.controller.app_data["error_status"] == 0:
+        if self.v_link["error_status"] == 0:
             self.display_report()
 
     def mouse_wheel(self, event):
+        """Allows movement of main_canvas using the mouse wheel.
+        
+        Args:
+            event (tkinter.event): Tkinter event object.   
+
+        Returns:
+            None
+        """
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    def move_canvas_up(self, event):
+    def move_canvas_up(self):
         self.main_canvas.yview_scroll(-1, "units")
 
-    def move_canvas_down(self, event):
+    def move_canvas_down(self):
         self.main_canvas.yview_scroll(1, "units")
 
     def display_report(self):
@@ -369,7 +373,6 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
 
@@ -377,11 +380,11 @@ class WeatherApp(tk.Tk):
         # scrolling.
         self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
 
-        self.main_canvas.bind_all("<Up>", self.move_canvas_up)
-        self.main_canvas.bind_all("<Down>", self.move_canvas_down)
+        self.main_canvas.bind_all("<Up>", lambda e: self.move_canvas_up())
+        self.main_canvas.bind_all("<Down>", lambda e: self.move_canvas_down())
 
         # Units system to display report in.
-        units = self.controller.app_data["var_units"].get()
+        units = self.v_link["var_units"].get()
 
         # Config parameters for main section (current weather).
         main_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.NW}
@@ -412,8 +415,8 @@ class WeatherApp(tk.Tk):
 
         # Display location information.
         # Start coordinates in pixels of the report title.
-        x1 = 20
-        y1 = 13
+        x1 = 30
+        y1 = 0
 
         if self.controller.debug == 1:
             # Draw coordinate lines to help in item placement.
@@ -426,42 +429,42 @@ class WeatherApp(tk.Tk):
                 self.main_canvas.create_line(0, i * 10, 1000, i * 10,
                                              dash=(2, 15, 1, 10))
 
-        link = self.controller.app_data[units]["w_d_cur"]
-        """Link to access data in controller."""
+        cw_link = self.controller.app_data[units]["w_d_cur"]
+        """Link to access current weather data in controller."""
 
         # Title.
-        title_text = "Report for: {0}, {1}".format(link["name"],
-                                                   link["sys"]["country"])
+        title_text = "Report for: {0}, {1}".format(cw_link["name"],
+                                                   cw_link["sys"]["country"])
         title = CanvasText(self.main_canvas, (x1, y1), text=title_text,
                            font=h1, **main_cnf)
 
         # Date.
-        date_text = "Received at: {0}".format(self.controller.app_data["time"])
+        date_text = "Received at: {0}".format(self.v_link["time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL",
                           offset=(1, -1), text=date_text, font=h2, **main_cnf)
 
         # Geo-coords.
-        coords_text = "Lon: {0}, Lat: {1}".format(link["coord"]["lon"],
-                                                  link["coord"]["lat"])
+        coords_text = "Lon: {0}, Lat: {1}".format(cw_link["coord"]["lon"],
+                                                  cw_link["coord"]["lat"])
         coords = CanvasText(self.main_canvas, rel_obj=date, rel_pos="BL",
                             offset=(1, 2), text=coords_text, font=h2,
                             **main_cnf)
 
         # Draw a current weather icon.
-        icon_path = "Resources\Icons\Weather\\" + link["weather"][0]["icon"] \
-                    + ".png"
+        icon_path = "Resources\Icons\Weather\\" \
+                    + cw_link["weather"][0]["icon"] + ".png"
         # Images have to be added as attributes or otherwise they get
         # garbage collected and will not display at all.
         self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords,
                                   rel_pos="BL", offset=(5, 42), **img_cnf)
 
         # Current temperature.
-        if self.controller.app_data["var_units"].get() == "metric":
+        if self.v_link["var_units"].get() == "metric":
             sign = "C"
         else:
             sign = "F"
         cur_temp_text = "{0:.1f}\N{DEGREE SIGN}{1}".format(
-            link["main"]["temp"],
+            cw_link["main"]["temp"],
             sign)
 
         cur_temp = CanvasText(self.main_canvas, rel_obj=self.cur_icon,
@@ -470,7 +473,7 @@ class WeatherApp(tk.Tk):
 
         # Max temperature.
         max_temp_text = "max: {0:.1f}\N{DEGREE SIGN}{1}".format(
-            link["main"]['temp_max'],
+            cw_link["main"]['temp_max'],
             sign)
         max_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="TR",
                               offset=(15, 5),
@@ -478,7 +481,7 @@ class WeatherApp(tk.Tk):
 
         # Min temperature.
         min_temp_text = "min: {0:.1f}\N{DEGREE SIGN}{1}".format(
-            link["main"]['temp_min'],
+            cw_link["main"]['temp_min'],
             sign)
         min_temp = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BR",
                               offset=(15, -27),
@@ -486,7 +489,7 @@ class WeatherApp(tk.Tk):
 
         # Weather description.
         w_desc_text = "{0}".format(
-            link["weather"][0]["description"].capitalize())
+            cw_link["weather"][0]["description"].capitalize())
         w_desc = CanvasText(self.main_canvas, rel_obj=cur_temp, rel_pos="BL",
                             offset=(3, -2),
                             text=w_desc_text, font=h2, **main_cnf)
@@ -497,7 +500,7 @@ class WeatherApp(tk.Tk):
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
                                       coordinates=(370, max_temp_bounds[1]),
                                       offset=(0, 0), **img_cnf)
-        pressure_text = "{0:.1f} hPa".format(link["main"]["pressure"])
+        pressure_text = "{0:.1f} hPa".format(cw_link["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img,
                               rel_pos="CR", offset=(5, 0),
                               text=pressure_text, font=h2, **cent_cnf)
@@ -509,7 +512,7 @@ class WeatherApp(tk.Tk):
                                     rel_pos="BL", offset=(0, 3), **img_cnf)
         clouds_cnf = {"tags": "main", "fill": self.paper, "anchor": tk.W}
         clouds_text = "{0}%".format(
-            link["clouds"]["all"])
+            cw_link["clouds"]["all"])
         clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img,
                             rel_pos="CR", offset=(5, 0),
                             text=clouds_text, font=h2, **clouds_cnf)
@@ -518,7 +521,7 @@ class WeatherApp(tk.Tk):
         # Assumption is that it never rains and snows at the same time.
         for name in ["rain", "snow"]:
             try:
-                rain_snow_text = "{0:.4} mm/3h".format(link[name]["3h"])
+                rain_snow_text = "{0:.4} mm/3h".format(cw_link[name]["3h"])
                 icon_path = icon_prefix + name + ".png"
                 self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
                                                rel_obj=self.clouds_img,
@@ -537,7 +540,7 @@ class WeatherApp(tk.Tk):
         self.humidity_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.pressure_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
-        humidity_text = "{0}%".format(link["main"]["humidity"])
+        humidity_text = "{0}%".format(cw_link["main"]["humidity"])
         humidity = CanvasText(self.main_canvas, rel_obj=self.humidity_img,
                               rel_pos="CR", offset=(5, 0),
                               text=humidity_text, font=h2, **cent_cnf)
@@ -547,11 +550,11 @@ class WeatherApp(tk.Tk):
         self.wind_img = CanvasImg(self.main_canvas, icon_path,
                                   rel_obj=self.humidity_img,
                                   rel_pos="BL", offset=(0, 4), **img_cnf)
-        if self.controller.app_data["var_units"].get() == "metric":
+        if self.v_link["var_units"].get() == "metric":
             speed_unit = "m/s"
         else:
             speed_unit = "mile/hr"
-        wind_text = "{0:.1f} {1}".format(link["wind"]["speed"], speed_unit)
+        wind_text = "{0:.1f} {1}".format(cw_link["wind"]["speed"], speed_unit)
         wind = CanvasText(self.main_canvas, rel_obj=self.wind_img,
                           rel_pos="CR", offset=(5, 0),
                           text=wind_text, font=h2, **cent_cnf)
@@ -561,7 +564,7 @@ class WeatherApp(tk.Tk):
         self.wind_dir_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
-        wind_dir_text = "{0:.1f} deg".format(link["wind"]["deg"])
+        wind_dir_text = "{0:.1f} deg".format(cw_link["wind"]["deg"])
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
@@ -571,7 +574,7 @@ class WeatherApp(tk.Tk):
         self.sunrise_img = CanvasImg(self.main_canvas, icon_path,
                                      coordinates=(670, max_temp_bounds[1]),
                                      offset=(0, 0), **img_cnf)
-        sunrise_text = "{0}".format(self.time_conv(link["sys"]["sunrise"]))
+        sunrise_text = "{0}".format(self.time_conv(cw_link["sys"]["sunrise"]))
         sunrise = CanvasText(self.main_canvas, rel_obj=self.sunrise_img,
                              rel_pos="CR", offset=(5, 0),
                              text=sunrise_text, font=h2, **cent_cnf)
@@ -581,7 +584,7 @@ class WeatherApp(tk.Tk):
         self.sunset_img = CanvasImg(self.main_canvas, icon_path,
                                     rel_obj=self.sunrise_img, rel_pos="BL",
                                     offset=(0, 4), **img_cnf)
-        sunset_text = "{0}".format(self.time_conv(link["sys"]["sunset"]))
+        sunset_text = "{0}".format(self.time_conv(cw_link["sys"]["sunset"]))
         sunset = CanvasText(self.main_canvas, rel_obj=self.sunset_img,
                             rel_pos="CR", offset=(5, 0),
                             text=sunset_text, font=h2, **cent_cnf)
@@ -591,7 +594,7 @@ class WeatherApp(tk.Tk):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "20px"
-        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size \
+        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size\
                       + "-" + icon_color + "/"
 
         # Date and day of the week and hours report was taken.
@@ -616,7 +619,7 @@ class WeatherApp(tk.Tk):
         hr_x_offset = 0
         max_y = 0
         rain_snow_present = 0
-        for item in self.controller.app_data[units]["w_d_short"]["list"]:
+        for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0],
                                                self.date_conv(item["dt"])[1])
@@ -690,8 +693,8 @@ class WeatherApp(tk.Tk):
                               **hr_left_cnf)
 
             # Hourly Weather icon.
-            icon_path = "Resources\Icons\Weather\\" + item["weather"][0][
-                "icon"] + ".png"
+            icon_path = "Resources\Icons\Weather\\"\
+                        + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
                           rel_pos="BC", offset=(0, -5), **hr_img_cnf))
@@ -826,16 +829,20 @@ class HoverButton(tk.Button):
             **args: Keyword arguments to further initialise the button.
             
         :Attributes:
+        
         :tip (str): Text to display in the status_bar_label of the app.
         :controller (Controller): controller object which will store all
             the data required by each segment of the application. 
             This has to be the same Controller as for the WeatherApp.
+        :v_link (dict): Link to access variables in controller.
+
         
         """
 
         super().__init__(master, cnf, **args)
 
         self.controller = controller
+        self.v_link = self.controller.app_data
         self.tip = tip
         # Action on entering the button with mouse.
         self.bind("<Enter>", self.enter_button)
@@ -854,7 +861,7 @@ class HoverButton(tk.Button):
             None
         """
 
-        self.controller.app_data["var_status"].set(self.tip)
+        self.v_link["var_status"].set(self.tip)
 
     def leave_button(self, *args):
         """Clears status_bar_label after mouse leaves the button area.
@@ -867,11 +874,11 @@ class HoverButton(tk.Button):
             None
         """
 
-        if self.controller.app_data["error_status"] == -1:
-            self.controller.app_data["var_status"].set(
-                self.controller.app_data["error_message"])
+        if self.v_link["error_status"] == -1:
+            self.v_link["var_status"].set(
+                self.v_link["error_message"])
         else:
-            self.controller.app_data["var_status"].set("")
+            self.v_link["var_status"].set("")
 
 
 class CanvasObject(object):
