@@ -3,12 +3,15 @@ import datetime
 
 
 class Controller(object):
-    """Mediating Controller(Adapter) class which will help passing data between objects.
+    """Mediating Controller(Adapter) class which will help passing
+    data between objects.
 
     Model and View can be added using methods add_view and add_model.
-    This class should allow a clear separation of functionality of each class used in the project and avoid calling
-    on each others data by using instance's names.
-    It will be used to store and pass data between front (GUI) and backend (model).
+    This class should allow a clear separation of functionality of each 
+    class used in the project and avoid calling on each others data 
+    by using instance's names.
+    It will be used to store and pass data between front (GUI) and 
+    backend (model).
     
     """
 
@@ -16,25 +19,41 @@ class Controller(object):
         """Initialise the Controller.
 
         :Attributes:
-            app_data (dict): Dictionary of data necessary for running each segment of the application.
+            app_data (dict): Dictionary of data necessary for running
+            each segment of the application.
                 :Keys:
-                    :var_units (tk.StringVar): Value of selection of units (metric / imperial).
-                    :var_status (tk.StringVar): Stores error message to be displayed in the status bar.
-                    :var_loc (tk.StringVar): Current text entered into loc_entry field by the user. 
+                    :var_units (tk.StringVar): Value of selection of 
+                        units (metric / imperial).
+                    :var_status (tk.StringVar): Stores error message to
+                        be displayed in the status bar.
+                    :var_loc (tk.StringVar): Current text entered into
+                        loc_entry field by the user. 
                     :error_message (str): Last error message.
-                    :error_status (int): Value -1 means an error occurred and was not cleared. 0 means all ok.
-                    :time (str): String with date / time when call to the API was made.
-                    :last_call (list): Contains location parameter of last successful call to the API.
-                    :metric (dict): Contains dictionaries with weather data in metric system.
-                    :imperial (dict): Contains dictionaries with weather data in imperial system.
-                        The following keys are the same in both metric and imperial dictionaries.
-                        w_d_cur (dict): Dictionary containing current weather report.
-                        w_d_short (dict): Dictionary containing short forecast (5 days / every 3 hours).
-                        w_d_long (dict): Dictionary containing long forecast (16 days max / daily).
-            :debug (int): If set to 1 switches debug functions in the whole app on. Set to 0 to turn them off.
-                They include displaying alignment lines to position widgets on canvas and displaying report from 
-                saved files instead of contacting API.
-            :model (Report): Report class object which will handle all the backend operations.
+                    :error_status (int): Value -1 means an error 
+                        occurred and was not cleared. 0 means all ok.
+                    :time (str): String with date / time when call to
+                        the API was made.
+                    :last_call (list): Contains location parameter of
+                        last successful call to the API.
+                    :metric (dict): Contains dictionaries with weather
+                        data in metric system.
+                    :imperial (dict): Contains dictionaries with weather
+                        data in imperial system.
+                    The following keys are the same in both metric and
+                        imperial dictionaries.
+                    w_d_cur (dict): Dictionary containing current
+                        weather report.
+                    w_d_short (dict): Dictionary containing short
+                        forecast (5 days / every 3 hours).
+                    w_d_long (dict): Dictionary containing long forecast
+                        (16 days max / daily).
+            :debug (int): If set to 1 switches debug functions in the
+                whole app on. Set to 0 to turn them off. They include 
+                displaying alignment lines to position widgets on canvas
+                and displaying report from saved files instead of 
+                contacting API.
+            :model (Report): Report class object which will handle all
+                the backend operations.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -56,7 +75,8 @@ class Controller(object):
         """Adds a model (business logic) to the Controller.
         
         Args:
-            model (Report): Report class object which will handle all the backend operations.
+            model (Report): Report class object which will handle all
+                the backend operations.
             
         Returns:
             None
@@ -68,7 +88,8 @@ class Controller(object):
         """Adds a view (GUI) to the Controller.
         
         Args:
-            view (WeatherApp): WeatherApp class object which will deal with displaying the GUI.
+            view (WeatherApp): WeatherApp class object which will deal
+                with displaying the GUI.
 
         Returns:
             None
@@ -84,24 +105,29 @@ class Controller(object):
         """
 
         # Current date & time.
-        self.app_data["time"] = datetime.datetime.now().strftime("%H:%M  %d/%m/%Y")
+        self.app_data["time"] = datetime.datetime.now()\
+            .strftime("%H:%M  %d/%m/%Y")
         # Get dictionaries.
         data = self.model.finish_get_report(self.app_data["var_loc"].get())
 
-        # We expect a tuple returning from get_report. Item 0 contains error status.
+        # We expect a tuple returning from get_report. Item 0 contains
+        # error status.
         self.app_data["error_status"] = data[0]
 
         # Error handling.
         if self.app_data["error_status"] == -1:
             self.app_data["error_message"] = data[1]
-            # Return to the view and display only the error in the status_bar_label.
+            # Return to the view and display only the error in the
+            # status_bar_label.
             self.app_data["var_status"].set(self.app_data["error_message"])
         else:
-            # Clear any error status and message upon successful response from API.
+            # Clear any error status and message upon successful
+            # response from API.
             self.app_data["var_status"].set("")
             self.app_data["error_message"] = ""
 
-            # Copy dictionaries from data into metric and imperial dictionary.
+            # Copy dictionaries from data into metric and imperial
+            # dictionary.
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
             self.app_data["last_call"].append(self.app_data["var_loc"])
