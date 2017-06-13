@@ -19,9 +19,11 @@ from controller import Controller
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add timezone checks as for remote locations time is given in
 # TODO: local (my UK) time and it makes no sense.
-# TODO: Create convert method for wind direction to display N-S-E-W
-# TODO: instead of deg.
-# TODO: Add mousewheel movement for MAC and LINUX.
+# TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Add data_present condition in attributes of controller for simplifying
+# TODO: conditional checks on presence of all 3 json dictionaries from API in
+# TODO: metric_pushed and imperial_pushed methods.
+
 
 
 class WeatherApp(tk.Tk):
@@ -224,16 +226,15 @@ class WeatherApp(tk.Tk):
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
 
-        # Some window application dimensions info below.
+        # Some window application dimensions info below. Useful if altering
+        # shape of the app.
         # self.update_idletasks()
         # print("main window size:", self.winfo_geometry())
         # print("canvas size:", self.main_canvas.winfo_geometry())
         # print("top decoration:", self.winfo_rooty())
         # print("left edge:", self.winfo_rootx())
-        #
         # print("top decoration canvas:", self.main_canvas.winfo_rooty())
         # print("left edge canvas:", self.main_canvas.winfo_rootx())
-        #
         # print("main window required size:", self.winfo_reqwidth())
 
         # Error/Status Bar.
@@ -297,7 +298,8 @@ class WeatherApp(tk.Tk):
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
 
-    def time_conv(self, unix_time):
+    @staticmethod
+    def time_conv(unix_time):
         """Converts time from unix format to a human readable one.
 
         Args:
@@ -311,7 +313,8 @@ class WeatherApp(tk.Tk):
         time = datetime.datetime.utcfromtimestamp(unix_time).strftime("%H:%M")
         return time
 
-    def date_conv(self, unix_time):
+    @staticmethod
+    def date_conv(unix_time):
         """Converts date from unix time to string.
 
         Args:
@@ -330,53 +333,39 @@ class WeatherApp(tk.Tk):
 
         return name_of_day, date_str
 
-    def deg_conv(self, wind_dir_deg):
-        """
+    @staticmethod
+    def deg_conv(wind_dir_deg):
+        """Converts meteorological degrees to cardinal directions.
         
         Args:
-            wind_dir_deg (str): Wind direction in meteorological 
+            wind_dir_deg (float): Wind direction in meteorological 
                 degrees.
 
         Returns:
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-        if 348.75 <= wind_dir_deg < 11.25:
-            wind_dir_cardinal = "N"
-        elif 11.25 <= wind_dir_deg < 33.75:
-            wind_dir_cardinal = "NNE"
-        elif 33.75 <= wind_dir_deg < 56.25:
-            wind_dir_cardinal = "NE"
-        elif 56.25 <= wind_dir_deg < 78.75:
-            wind_dir_cardinal = "ENE"
-        elif 78.75 <= wind_dir_deg < 101.25:
-            wind_dir_cardinal = "E"
-        elif 101.25 <= wind_dir_deg < 123.75:
-            wind_dir_cardinal = "ESE"
-        elif 123.75 <= wind_dir_deg < 146.25:
-            wind_dir_cardinal = "SE"
-        elif 146.25 <= wind_dir_deg < 168.75:
-            wind_dir_cardinal = "SSE"
-        elif 168.75 <= wind_dir_deg < 191.25:
-            wind_dir_cardinal = "S"
-        elif 191.25 <= wind_dir_deg < 213.75:
-            wind_dir_cardinal = "SSW"
-        elif 213.75 <= wind_dir_deg < 236.25:
-            wind_dir_cardinal = "SW"
-        elif 236.25 <= wind_dir_deg < 258.75:
-            wind_dir_cardinal = "WSW"
-        elif 258.75 <= wind_dir_deg < 281.25:
-            wind_dir_cardinal = "W"
-        elif 281.25 <= wind_dir_deg < 303.75:
-            wind_dir_cardinal = "WNW"
-        elif 303.75 <= wind_dir_deg < 326.25:
-            wind_dir_cardinal = "NW"
-        else:
-            wind_dir_cardinal = "NNW"
+        directions = {(348.75, 360): "N",
+                      (0, 11.25): "N",
+                      (11.25, 33.75): "NNE",
+                      (33.75, 56.25): "NE",
+                      (56.25, 78.75): "ENE",
+                      (78.75, 101.25): "E",
+                      (101.25, 123.75): "ESE",
+                      (123.75, 146.25): "SE",
+                      (146.25, 168.75): "SSE",
+                      (168.75, 191.25): "S",
+                      (191.25, 213.75): "SSW",
+                      (213.75, 236.25): "SW",
+                      (236.25, 258.75): "WSW",
+                      (258.75, 281.25): "W",
+                      (281.25, 303.75): "WNW",
+                      (303.75, 326.25): "NW",
+                      (326.25, 348.75): "NNW"}
 
-
-
-
+        for interval, wind_dir_cardinal in directions.items():
+            if interval[0] <= wind_dir_deg < interval[1]:
+                return wind_dir_cardinal
 
     def begin_get_report(self):
         """Begin getting data for the weather report to display it on 
@@ -472,7 +461,7 @@ class WeatherApp(tk.Tk):
         # Display location information.
         # Start coordinates in pixels of the report title.
         x1 = 30
-        y1 = 0
+        y1 = 5
 
         if self.controller.debug == 1:
             # Draw coordinate lines to help in item placement.
@@ -483,7 +472,7 @@ class WeatherApp(tk.Tk):
             # Horizontal lines.
             for i in range(1, 250):
                 self.main_canvas.create_line(0, i * 10, 1000, i * 10,
-                                             dash=(2, 15, 1, 10))
+                                             dash=(2, 15, 1, 10), fill="blue")
 
         cw_link = self.controller.app_data[units]["w_d_cur"]
         """Link to access current weather data in controller."""
@@ -620,7 +609,7 @@ class WeatherApp(tk.Tk):
         self.wind_dir_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4), **img_cnf)
-        wind_dir_text = "{0:.1f} deg".format(cw_link["wind"]["deg"])
+        wind_dir_text = "{0}".format(self.deg_conv(cw_link["wind"]["deg"]))
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
@@ -810,7 +799,7 @@ class WeatherApp(tk.Tk):
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
 
             # Hourly wind direction.
-            hr_wind_dir_text = "{0} deg".format(item["wind"]["deg"])
+            hr_wind_dir_text = "{0}".format(self.deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
                                      rel_pos="BC",
                                      offset=(0, 5),
@@ -903,17 +892,13 @@ class HoverButton(tk.Button):
         self.v_link = self.controller.app_data
         self.tip = tip
         # Action on entering the button with mouse.
-        self.bind("<Enter>", self.enter_button)
+        self.bind("<Enter>", lambda e: self.enter_button())
         # Action on leaving the button with mouse.
-        self.bind("<Leave>", self.leave_button)
+        self.bind("<Leave>", lambda e: self.leave_button())
 
-    def enter_button(self, *args):
+    def enter_button(self):
         """Displays information on button function to the user in the 
         status_bar_label.
-
-        Args:
-            *args (): Contains event object passed automatically from 
-                the button.
 
         Returns:
             None
@@ -921,12 +906,8 @@ class HoverButton(tk.Button):
 
         self.v_link["var_status"].set(self.tip)
 
-    def leave_button(self, *args):
+    def leave_button(self):
         """Clears status_bar_label after mouse leaves the button area.
-
-        Args:
-            *args (): *args contains event object passed automatically 
-                from the button.
 
         Returns:
             None
@@ -943,7 +924,11 @@ class CanvasObject(object):
     """Base class to create objects on canvas.
 
     Allows easier placement of objects on canvas in relation to other 
-    objects.
+    objects. Allowed positions in relation to the relative object:
+    TL - top-left, TC - top-center, TR - top-right, 
+    CL - center-left, CC - center-center,
+    CR - center-right, BL - bottom-left, BC - bottom-center,
+    BR - bottom-right
 
     Args:
         object (object): Base Python object we inherit from.
@@ -957,9 +942,9 @@ class CanvasObject(object):
         Allows positioning in relation to the rel_obj (CanvasText or 
         CanvasImg object).
         We can give absolute position for the object or a relative one.
-        In case of absolute position given we will ignore the relative 
-        parameter.
-        The offset allows us to move the text away from the border of 
+        In case of an absolute position given we will ignore the 
+        relative parameter.
+        The offset allows us to move the instance away from the border of 
         the relative object.
 
         Args:
@@ -974,7 +959,7 @@ class CanvasObject(object):
             rel_pos (str): String determining position of newly created 
                 text in relation to the relative object. Similar concept
                 to anchor.
-                TL - top-left, TM - top-middle, TR - top-right, 
+                TL - top-left, TC - top-center, TR - top-right, 
                 CL - center-left, CC - center-center,
                 CR - center-right, BL - bottom-left, BC - bottom-center,
                 BR - bottom-right
@@ -1007,17 +992,13 @@ class CanvasObject(object):
             # Get Top-Left and Bottom-Right bounding points of the
             # relative object.
             r_x1, r_y1, r_x2, r_y2 = canvas.bbox(rel_obj.id_num)
-            # TL - top - left, TM - top - middle, TR - top - right,
-            # CL - center - left, CC - center - center,
-            # CR - center - right, BL - bottom - left,
-            # BC - bottom - center, BR - bottom - right
 
             # Determine position of CanvasObject on canvas in relation
             # to the rel_obj.
             if rel_pos == "TL":
                 pos_x = r_x1
                 pos_y = r_y1
-            elif rel_pos == "TM":
+            elif rel_pos == "TC":
                 pos_x = r_x2 - (r_x2 - r_x1) / 2
                 pos_y = r_y1
             elif rel_pos == "TR":
@@ -1044,11 +1025,11 @@ class CanvasObject(object):
             else:
                 raise ValueError(
                     "Please use the following strings for rel_pos: "
-                    "TL - top - left, "
-                    "TM - top - middle, TR - top - right, CL - center - left, "
-                    "CC - center - center, CR - center - right, "
-                    "BL - bottom - left, "
-                    "BC - bottom - center, BR - bottom - right")
+                    "TL - top-left, "
+                    "TC - top-center, TR - top-right, CL - center-left, "
+                    "CC - center-center, CR - center-right, "
+                    "BL - bottom-left, "
+                    "BC - bottom-center, BR - bottom-right")
         self.pos_x = int(pos_x + offset_x)
         self.pos_y = int(pos_y + offset_y)
 
@@ -1118,7 +1099,7 @@ class CanvasText(CanvasObject):
             rel_pos (str): String determining position of newly created 
                 text in relation to the relative object. Similar 
                 concept to anchor.
-                TL - top-left, TM - top-middle, TR - top-right,
+                TL - top-left, TC - top-center, TR - top-right, 
                 CL - center-left, CC - center-center,
                 CR - center-right, BL - bottom-left, BC - bottom-center,
                 BR - bottom-right
@@ -1180,8 +1161,8 @@ class CanvasImg(CanvasObject):
             rel_pos (str): String determining position of newly created 
                 image in relation to the relative object. Similar 
                 concept to anchor.
-                TL - top-left, TM - top-middle, TR - top-right,
-                CL - center-left, CC - center-center, 
+                TL - top-left, TC - top-center, TR - top-right, 
+                CL - center-left, CC - center-center,
                 CR - center-right, BL - bottom-left, BC - bottom-center,
                 BR - bottom-right
             offset (tuple): Offset given as a pair of values to move the
