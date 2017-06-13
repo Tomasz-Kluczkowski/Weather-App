@@ -12,7 +12,7 @@ from weather_backend import Report
 from controller import Controller
 
 
-# TODO: Have to add then a combobox with selection of previous locations.
+# TODO: Have to add a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add a small button to open a selection list of previous
 # TODO: locations.
@@ -22,8 +22,6 @@ from controller import Controller
 # TODO: Create convert method for wind direction to display N-S-E-W
 # TODO: instead of deg.
 # TODO: Add mousewheel movement for MAC and LINUX.
-# TODO: Change background picture so that it does not have to be
-# TODO: resized to fill the space (looks ugly).
 
 
 class WeatherApp(tk.Tk):
@@ -332,6 +330,54 @@ class WeatherApp(tk.Tk):
 
         return name_of_day, date_str
 
+    def deg_conv(self, wind_dir_deg):
+        """
+        
+        Args:
+            wind_dir_deg (str): Wind direction in meteorological 
+                degrees.
+
+        Returns:
+            wind_dir_cardinal (str): Wind direction in cardinal 
+                direction.
+        """
+        if 348.75 <= wind_dir_deg < 11.25:
+            wind_dir_cardinal = "N"
+        elif 11.25 <= wind_dir_deg < 33.75:
+            wind_dir_cardinal = "NNE"
+        elif 33.75 <= wind_dir_deg < 56.25:
+            wind_dir_cardinal = "NE"
+        elif 56.25 <= wind_dir_deg < 78.75:
+            wind_dir_cardinal = "ENE"
+        elif 78.75 <= wind_dir_deg < 101.25:
+            wind_dir_cardinal = "E"
+        elif 101.25 <= wind_dir_deg < 123.75:
+            wind_dir_cardinal = "ESE"
+        elif 123.75 <= wind_dir_deg < 146.25:
+            wind_dir_cardinal = "SE"
+        elif 146.25 <= wind_dir_deg < 168.75:
+            wind_dir_cardinal = "SSE"
+        elif 168.75 <= wind_dir_deg < 191.25:
+            wind_dir_cardinal = "S"
+        elif 191.25 <= wind_dir_deg < 213.75:
+            wind_dir_cardinal = "SSW"
+        elif 213.75 <= wind_dir_deg < 236.25:
+            wind_dir_cardinal = "SW"
+        elif 236.25 <= wind_dir_deg < 258.75:
+            wind_dir_cardinal = "WSW"
+        elif 258.75 <= wind_dir_deg < 281.25:
+            wind_dir_cardinal = "W"
+        elif 281.25 <= wind_dir_deg < 303.75:
+            wind_dir_cardinal = "WNW"
+        elif 303.75 <= wind_dir_deg < 326.25:
+            wind_dir_cardinal = "NW"
+        else:
+            wind_dir_cardinal = "NNW"
+
+
+
+
+
     def begin_get_report(self):
         """Begin getting data for the weather report to display it on 
         the main_canvas.
@@ -362,9 +408,19 @@ class WeatherApp(tk.Tk):
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def move_canvas_up(self):
+        """Scroll main_canvas when Up arrow key is pressed.
+        
+        Returns:
+            None
+        """
         self.main_canvas.yview_scroll(-1, "units")
 
     def move_canvas_down(self):
+        """Scroll main_canvas when Down arrow key is pressed.
+
+        Returns:
+            None
+        """
         self.main_canvas.yview_scroll(1, "units")
 
     def display_report(self):
@@ -598,8 +654,14 @@ class WeatherApp(tk.Tk):
                       + "-" + icon_color + "/"
 
         # Date and day of the week and hours report was taken.
+        day = None
         previous_day_text = ""
         date_index = 0
+        hr_rain_snow = None
+        day_y_offset = 0
+        hr_x_offset = 0
+        max_y = 0
+        rain_snow_present = 0
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
@@ -615,10 +677,6 @@ class WeatherApp(tk.Tk):
         """:type : list[CanvasImg]"""
         self.hr_wind_dir_icons = []
         """:type : list[CanvasImg]"""
-        day_y_offset = 0
-        hr_x_offset = 0
-        max_y = 0
-        rain_snow_present = 0
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0],
