@@ -47,12 +47,13 @@ For example to obtain a weather report after user presses the search button:
         finish_get_report()
        
 Data structure obtained from the API in finish_get_report: 
-status (tuple): (error_status, [weather_dicts])
 
-weather_dicts: {
-                 "metric": [{w_d_cur}, {w_d_short}, {w_d_long}]
-                 "imperial": [{w_d_cur}, {w_d_short}, {w_d_long}]
-               } 
+    status (tuple): (error_status, [weather_dicts])
+
+    weather_dicts: {
+                    "metric": [{w_d_cur}, {w_d_short}, {w_d_long}]
+                    "imperial": [{w_d_cur}, {w_d_short}, {w_d_long}]
+                   } 
       
 
 
