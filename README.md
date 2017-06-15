@@ -16,7 +16,7 @@ The aim of refactoring the original "all in one file" approach is to learn to is
 
 During the development I have found out that due to the construction of the tkinter library it is necessary to provide the root Tk() object not only for the View which will use it for drawing of its widgets but also for the Controller which requires it to create tkinter special variables like StringVar etc.
 
-Since there can be only on active Tk() object at any time we launch our View class first which inherits from this object and then create Controller object inside the view class.
+Since there can be only one active Tk() object at any time we launch our View class first which inherits from this object and then create Controller object inside the view class.
 
 Still the View is not aware in any way of the Model and vice versa.
 
@@ -45,5 +45,18 @@ For example to obtain a weather report after user presses the search button:
     
     Model:
         finish_get_report()
-    
+       
+Data structure obtained from the API in finish_get_report: 
+status (tuple): (error_status, [weather_dicts])
+
+weather_dicts: {
+                 "metric": [{w_d_cur}, {w_d_short}, {w_d_long}]
+                 "imperial": [{w_d_cur}, {w_d_short}, {w_d_long}]
+               } 
+      
+
+
+
+
+
     
