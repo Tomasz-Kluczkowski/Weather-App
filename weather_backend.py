@@ -103,7 +103,7 @@ class Report(object):
                         status = (-1,
                                   "Error: {0}, {1}".format(weather_dict["cod"],
                                                            weather_dict[
-                                                           "message"]))
+                                                               "message"]))
                         return status
                     else:
                         unit_dict[unit_type][key] = weather_dict

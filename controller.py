@@ -54,6 +54,8 @@ class Controller(object):
                 contacting API.
             :model (Report): Report class object which will handle all
                 the backend operations.
+            :data_present (int): Confirms presence of all data from
+                API.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -70,6 +72,7 @@ class Controller(object):
         self.debug = 1
         self.view = None
         self.model = None
+        self.data_present = 0
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.
@@ -130,5 +133,6 @@ class Controller(object):
             # dictionary.
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
+            self.data_present = 1
             self.app_data["last_call"].append(self.app_data["var_loc"])
             # Now we are ready do display the report.

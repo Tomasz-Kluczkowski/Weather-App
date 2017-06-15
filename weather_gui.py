@@ -20,9 +20,6 @@ from controller import Controller
 # TODO: Add timezone checks as for remote locations time is given in
 # TODO: local (my UK) time and it makes no sense.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Add data_present condition in attributes of controller for simplifying
-# TODO: conditional checks on presence of all 3 json dictionaries from API in
-# TODO: metric_pushed and imperial_pushed methods.
 
 
 
@@ -255,15 +252,11 @@ class WeatherApp(tk.Tk):
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen and location entry was not changed
-        # get a new report with changed units.
+        # screen - change units but dont call the API.
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
-            # If there is data already stored change units displayed.
-            if self.v_link["metric"]["w_d_cur"] \
-                    and self.v_link["metric"]["w_d_short"] \
-                    and self.v_link["metric"]["w_d_long"]:
+            if self.controller.data_present:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -277,13 +270,11 @@ class WeatherApp(tk.Tk):
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen get a new report with changed units.
+        # screen - change units but dont call the API.
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
-            if self.v_link["imperial"]["w_d_cur"] \
-                    and self.v_link["imperial"]["w_d_short"] \
-                    and self.v_link["imperial"]["w_d_long"]:
+            if self.controller.data_present:
                 self.display_report()
 
     def clear_error_message(self):
