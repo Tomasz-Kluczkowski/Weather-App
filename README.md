@@ -8,9 +8,12 @@ Internet communication library: requests v. 2.13.0.
 
 `Goal: To create a visual representation of a weather report obtained via Open Weather API. `
 
-The API used for this project: https://openweathermap.org/api
+The APIs used for this project:
+ 
+ https://openweathermap.org/api - weather data
+ http://api.geonames.org/timezone - time zone from geolocation service
 
-I created this simple application to apply in practice knowledge gained in the past 3 months and give myself a challenge and coding exercise which does not end after writing one algorithm.
+I created this simple application to apply in practice knowledge gained in the past months of learning Python 3 and give myself a challenge and coding exercise which does not end after writing one algorithm.
 
 The aim of refactoring the original "all in one file" approach is to learn to isolate main parts of the application from each other to allow for developing more complicated structures in the future without tying up the components to each other unnecessarily.
 
@@ -45,8 +48,9 @@ For example to obtain a weather report after user presses the search button:
     
     Model:
         finish_get_report()
-       
-Data structure obtained from the API in finish_get_report: 
+
+Data structure obtained from the API and stored in memory in
+finish_get_report: 
 
     status (tuple): (error_status, [weather_dicts])
 

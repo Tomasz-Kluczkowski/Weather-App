@@ -56,6 +56,7 @@ class Controller(object):
                 the backend operations.
             :data_present (int): Confirms presence of all data from
                 API.
+            :timezone (dict): Timezone offset for geolocation.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -69,10 +70,11 @@ class Controller(object):
                          "imperial": {},
                          }
 
-        self.debug = 1
+        self.debug = 0
         self.view = None
         self.model = None
         self.data_present = 0
+        self.timezone = {}
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.
@@ -99,6 +101,20 @@ class Controller(object):
         """
 
         self.view = view
+
+    def get_timezone(self, lat, lon):
+        """
+        
+        Args:
+            lat: 
+            lon: 
+
+        Returns:
+
+        """
+
+        timezone = self.model.finish_get_timezone(lat, lon)
+        self.timezone = timezone
 
     def get_report(self):
         """Obtains data for the View to display the report.
@@ -134,5 +150,12 @@ class Controller(object):
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
             self.data_present = 1
+            # Obtain timezone for geolocation.
+            cw_link = self.app_data["metric"]["w_d_cur"]
+            """:type : dict"""
+            """Link to access current weather data in controller."""
+            lat = cw_link["coord"]["lat"]
+            lon = cw_link["coord"]["lon"]
+            self.get_timezone(lat, lon)
             self.app_data["last_call"].append(self.app_data["var_loc"])
             # Now we are ready do display the report.

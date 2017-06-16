@@ -170,7 +170,7 @@ class WeatherApp(tk.Tk):
         search_button = HoverButton(loc_frame, controller,
                                     "Press to get a weather report.",
                                     clear_cnf, image=self.search_img,
-                                    command=lambda e: self.begin_get_report())
+                                    command=lambda: self.begin_get_report())
         search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4),
                            pady=(4, 5))
         # Press Enter to get report.
@@ -534,7 +534,7 @@ class WeatherApp(tk.Tk):
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
         icon_path = icon_prefix + "atmospheric_pressure.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
-                                      coordinates=(370, max_temp_bounds[1]),
+                                      coordinates=(450, max_temp_bounds[1]),
                                       offset=(0, 0), **img_cnf)
         pressure_text = "{0:.1f} hPa".format(cw_link["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img,
@@ -803,7 +803,7 @@ class WeatherApp(tk.Tk):
             # Hourly Rain / Snow.
             for name in ["rain", "snow"]:
                 try:
-                    rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
+                    rain_snow_text = "{0:.4f} mm/3h".format(item[name]["3h"])
                     icon_path = icon_prefix + name + ".png"
                     self.hr_rain_snow_icons.append(
                         CanvasImg(self.main_canvas, icon_path,

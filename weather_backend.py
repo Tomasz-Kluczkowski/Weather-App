@@ -32,6 +32,24 @@ class Report(object):
 
         self.controller = controller
 
+    def finish_get_timezone(self, lat, lon):
+        """
+
+        Args:
+            lat (float): Latitude
+            lon (float): Longitude
+
+        Returns:
+            time_zone (dict): Timezone data for geolocation.
+        """
+        base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
+        user_name = "tomasz_kluczkowski"
+        response = requests.get(base_url.format(lat, lon, user_name))
+        time_zone = response.json()
+        print(time_zone)
+
+        return time_zone
+
     def finish_get_report(self, location):
         """Obtain data in json format from Open Weather and store it 
         in appropriate dictionaries.
@@ -78,8 +96,8 @@ class Report(object):
         # List of report types accepted by the API.
         report_types = ["weather", "forecast", "forecast/daily"]
         keys = ["w_d_cur", "w_d_short", "w_d_long"]
-        # Switch debug to 1 to load a set of data for a city without
-        # contacting the API via internet.
+        # Switch debug to 1 in controller to load a set of data for a
+        # city without contacting the API via internet.
 
         for unit_dict, unit_type in zip(unit_dicts, unit_types):
             for report_type, key in zip(report_types, keys):
@@ -113,4 +131,5 @@ class Report(object):
                     with open(unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
         status = (0, unit_dicts)
+
         return status
