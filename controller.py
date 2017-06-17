@@ -39,8 +39,9 @@ class Controller(object):
                         data in metric system.
                     :imperial (dict): Contains dictionaries with weather
                         data in imperial system.
+                    :timezone (dict): Timezone offset for geolocation.
                     The following keys are the same in both metric and
-                        imperial dictionaries.
+                        imperial dictionaries:
                     w_d_cur (dict): Dictionary containing current
                         weather report.
                     w_d_short (dict): Dictionary containing short
@@ -56,7 +57,6 @@ class Controller(object):
                 the backend operations.
             :data_present (int): Confirms presence of all data from
                 API.
-            :timezone (dict): Timezone offset for geolocation.
 
         """
         self.app_data = {"var_units": tk.StringVar(value="metric"),
@@ -68,13 +68,13 @@ class Controller(object):
                          "last_call": [],
                          "metric": {},
                          "imperial": {},
+                         "timezone": {}
                          }
 
         self.debug = 0
         self.view = None
         self.model = None
         self.data_present = 0
-        self.timezone = {}
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.
@@ -114,7 +114,7 @@ class Controller(object):
         """
 
         timezone = self.model.finish_get_timezone(lat, lon)
-        self.timezone = timezone
+        self.app_data["timezone"] = timezone
 
     def get_report(self):
         """Obtains data for the View to display the report.

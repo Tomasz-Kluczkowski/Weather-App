@@ -17,9 +17,8 @@ from controller import Controller
 # TODO: Add a small button to open a selection list of previous
 # TODO: locations.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Add timezone checks as for remote locations time is given in
-# TODO: local (my UK) time and it makes no sense.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Correct mist icon - too dark, not visible on dark wood background.
 
 
 
@@ -289,8 +288,7 @@ class WeatherApp(tk.Tk):
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
 
-    @staticmethod
-    def time_conv(unix_time):
+    def time_conv(self, unix_time):
         """Converts time from unix format to a human readable one.
 
         Args:
@@ -300,8 +298,9 @@ class WeatherApp(tk.Tk):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-
-        time = datetime.datetime.utcfromtimestamp(unix_time).strftime("%H:%M")
+        offset = self.v_link["timezone"]["dstOffset"]*3600
+        time = datetime.datetime.utcfromtimestamp(
+            unix_time + offset).strftime("%H:%M")
         return time
 
     @staticmethod
@@ -642,6 +641,7 @@ class WeatherApp(tk.Tk):
         hr_x_offset = 0
         max_y = 0
         rain_snow_present = 0
+        dst_offset = self.v_link["timezone"]["dstOffset"]
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
@@ -723,7 +723,7 @@ class WeatherApp(tk.Tk):
                 max_y = 0
 
             # Hour.
-            hour_txt = self.time_conv(item["dt"])
+            hour_txt = self.time_conv(item["dt"] - dst_offset*3600)
             hr_x_offset = int(hour_txt.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(100 + hr_x_offset * 100, -8),

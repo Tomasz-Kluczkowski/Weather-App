@@ -32,7 +32,8 @@ class Report(object):
 
         self.controller = controller
 
-    def finish_get_timezone(self, lat, lon):
+    @staticmethod
+    def finish_get_timezone(lat, lon):
         """
 
         Args:
@@ -46,7 +47,6 @@ class Report(object):
         user_name = "tomasz_kluczkowski"
         response = requests.get(base_url.format(lat, lon, user_name))
         time_zone = response.json()
-        print(time_zone)
 
         return time_zone
 
