@@ -49,10 +49,10 @@ class Controller(object):
                     w_d_long (dict): Dictionary containing long forecast
                         (16 days max / daily).
             :debug (int): If set to 1 switches debug functions in the
-                whole app on. Set to 0 to turn them off. They include 
-                displaying alignment lines to position widgets on canvas
-                and displaying report from saved files instead of 
-                contacting API.
+                whole app on. Set to 0 to turn them off. Displays
+                report from saved files instead of contacting API.
+            :draw_lines (int): Set to 1 to draw alignment lines on
+                main_canvas.
             :model (Report): Report class object which will handle all
                 the backend operations.
             :data_present (int): Confirms presence of all data from
@@ -71,7 +71,8 @@ class Controller(object):
                          "timezone": {}
                          }
 
-        self.debug = 0
+        self.debug = 1
+        self.draw_lines = 0
         self.view = None
         self.model = None
         self.data_present = 0
