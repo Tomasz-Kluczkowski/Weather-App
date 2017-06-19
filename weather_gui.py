@@ -17,8 +17,6 @@ from controller import Controller
 # TODO: Add a small button to open a selection list of previous
 # TODO: locations.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Add timezone checks as for remote locations time is given in
-# TODO: local (my UK) time and it makes no sense.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
 
 
@@ -169,7 +167,7 @@ class WeatherApp(tk.Tk):
         search_button = HoverButton(loc_frame, controller,
                                     "Press to get a weather report.",
                                     clear_cnf, image=self.search_img,
-                                    command=lambda e: self.begin_get_report())
+                                    command=lambda: self.begin_get_report())
         search_button.grid(row=0, column=2, sticky=tk.NSEW, padx=(0, 4),
                            pady=(4, 5))
         # Press Enter to get report.
@@ -251,7 +249,7 @@ class WeatherApp(tk.Tk):
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen - change units but dont call the API.
+        # screen - change units but don't call the API.
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
@@ -269,7 +267,7 @@ class WeatherApp(tk.Tk):
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen - change units but dont call the API.
+        # screen - change units but don't call the API.
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
@@ -288,19 +286,25 @@ class WeatherApp(tk.Tk):
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
 
-    @staticmethod
-    def time_conv(unix_time):
+    def time_conv(self, unix_time, dst_offset=True):
         """Converts time from unix format to a human readable one.
 
         Args:
+            dst_offset: (bool) Set to True to offset time received from
+                open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
 
         Returns:
             time (str): Time in Hour:Minute format.
         """
+        if dst_offset:
+            dst_offset = self.v_link["timezone"]["dstOffset"]*3600
+        else:
+            dst_offset = 0
+        time = datetime.datetime.utcfromtimestamp(
+            unix_time + dst_offset).strftime("%H:%M")
 
-        time = datetime.datetime.utcfromtimestamp(unix_time).strftime("%H:%M")
         return time
 
     @staticmethod
@@ -429,8 +433,8 @@ class WeatherApp(tk.Tk):
         # Config parameters for hourly section.
         hr_left_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
         hr_top_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
-        hr_center_cnf = {"tags": "hourly", "fill": self.paper,
-                         "anchor": tk.CENTER}
+        # hr_center_cnf = {"tags": "hourly", "fill": self.paper,
+        #                  "anchor": tk.CENTER}
         hr_img_cnf = {"tags": "hourly", "anchor": tk.N}
 
         # Font sizes
@@ -439,8 +443,8 @@ class WeatherApp(tk.Tk):
         h2 = ("Arial", -25)
         h3 = ("Arial", -18)
         h4 = ("Arial", -15)
-        h5 = ("Arial", -12)
-        h5_bold = ("Arial", -12, "bold")
+        # h5 = ("Arial", -12)
+        # h5_bold = ("Arial", -12, "bold")
 
         # Icon size and color.
         icon_color = "true-blue"
@@ -453,7 +457,7 @@ class WeatherApp(tk.Tk):
         x1 = 30
         y1 = 5
 
-        if self.controller.debug == 1:
+        if self.controller.draw_lines == 1:
             # Draw coordinate lines to help in item placement.
             # Vertical lines.
             # for i in range(1, 250):
@@ -533,7 +537,7 @@ class WeatherApp(tk.Tk):
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
         icon_path = icon_prefix + "atmospheric_pressure.png"
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
-                                      coordinates=(370, max_temp_bounds[1]),
+                                      coordinates=(450, max_temp_bounds[1]),
                                       offset=(0, 0), **img_cnf)
         pressure_text = "{0:.1f} hPa".format(cw_link["main"]["pressure"])
         pressure = CanvasText(self.main_canvas, rel_obj=self.pressure_img,
@@ -556,7 +560,7 @@ class WeatherApp(tk.Tk):
         # Assumption is that it never rains and snows at the same time.
         for name in ["rain", "snow"]:
             try:
-                rain_snow_text = "{0:.4} mm/3h".format(cw_link[name]["3h"])
+                rain_snow_text = "{0:.2f} mm/3h".format(cw_link[name]["3h"])
                 icon_path = icon_prefix + name + ".png"
                 self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
                                                rel_obj=self.clouds_img,
@@ -641,6 +645,7 @@ class WeatherApp(tk.Tk):
         hr_x_offset = 0
         max_y = 0
         rain_snow_present = 0
+        dst_offset = self.v_link["timezone"]["dstOffset"]
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
@@ -656,6 +661,7 @@ class WeatherApp(tk.Tk):
         """:type : list[CanvasImg]"""
         self.hr_wind_dir_icons = []
         """:type : list[CanvasImg]"""
+
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0],
@@ -722,11 +728,11 @@ class WeatherApp(tk.Tk):
                 max_y = 0
 
             # Hour.
-            hour_txt = self.time_conv(item["dt"])
-            hr_x_offset = int(hour_txt.split(":")[0]) // 3
+            hour_text = self.time_conv(item["dt"], False)
+            hr_x_offset = int(hour_text.split(":")[0]) // 3
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
-                              offset=(100 + hr_x_offset * 100, -8),
-                              text=hour_txt, justify=tk.CENTER, font=h3,
+                              offset=(120 + hr_x_offset * 105, -8),
+                              text=hour_text, justify=tk.CENTER, font=h3,
                               **hr_left_cnf)
 
             # Hourly Weather icon.
@@ -802,7 +808,7 @@ class WeatherApp(tk.Tk):
             # Hourly Rain / Snow.
             for name in ["rain", "snow"]:
                 try:
-                    rain_snow_text = "{0:.4} mm/3h".format(item[name]["3h"])
+                    rain_snow_text = "{0:.2f} mm/3h".format(item[name]["3h"])
                     icon_path = icon_prefix + name + ".png"
                     self.hr_rain_snow_icons.append(
                         CanvasImg(self.main_canvas, icon_path,

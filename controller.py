@@ -39,8 +39,9 @@ class Controller(object):
                         data in metric system.
                     :imperial (dict): Contains dictionaries with weather
                         data in imperial system.
+                    :timezone (dict): Timezone offset for geolocation.
                     The following keys are the same in both metric and
-                        imperial dictionaries.
+                        imperial dictionaries:
                     w_d_cur (dict): Dictionary containing current
                         weather report.
                     w_d_short (dict): Dictionary containing short
@@ -48,10 +49,10 @@ class Controller(object):
                     w_d_long (dict): Dictionary containing long forecast
                         (16 days max / daily).
             :debug (int): If set to 1 switches debug functions in the
-                whole app on. Set to 0 to turn them off. They include 
-                displaying alignment lines to position widgets on canvas
-                and displaying report from saved files instead of 
-                contacting API.
+                whole app on. Set to 0 to turn them off. Displays
+                report from saved files instead of contacting API.
+            :draw_lines (int): Set to 1 to draw alignment lines on
+                main_canvas.
             :model (Report): Report class object which will handle all
                 the backend operations.
             :data_present (int): Confirms presence of all data from
@@ -67,9 +68,11 @@ class Controller(object):
                          "last_call": [],
                          "metric": {},
                          "imperial": {},
+                         "timezone": {}
                          }
 
-        self.debug = 1
+        self.debug = 0
+        self.draw_lines = 0
         self.view = None
         self.model = None
         self.data_present = 0
@@ -99,6 +102,20 @@ class Controller(object):
         """
 
         self.view = view
+
+    def get_timezone(self, lat, lon):
+        """
+        
+        Args:
+            lat: 
+            lon: 
+
+        Returns:
+
+        """
+
+        timezone = self.model.finish_get_timezone(lat, lon)
+        self.app_data["timezone"] = timezone
 
     def get_report(self):
         """Obtains data for the View to display the report.
@@ -134,5 +151,12 @@ class Controller(object):
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
             self.data_present = 1
+            # Obtain timezone for geolocation.
+            cw_link = self.app_data["metric"]["w_d_cur"]
+            """:type : dict"""
+            """Link to access current weather data in controller."""
+            lat = cw_link["coord"]["lat"]
+            lon = cw_link["coord"]["lon"]
+            self.get_timezone(lat, lon)
             self.app_data["last_call"].append(self.app_data["var_loc"])
             # Now we are ready do display the report.
