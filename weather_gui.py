@@ -22,7 +22,6 @@ from controller import Controller
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
 
 
-
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
     
