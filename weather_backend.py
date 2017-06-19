@@ -45,8 +45,10 @@ class Report(object):
         """
         base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
         user_name = "tomasz_kluczkowski"
-        response = requests.get(base_url.format(lat, lon, user_name))
-        time_zone = response.json()
+        try:
+            response = requests.get(base_url.format(lat, lon, user_name))
+            time_zone = response.json()
+        except requests.exceptions.ConnectionError:
 
         return time_zone
 
@@ -107,7 +109,7 @@ class Report(object):
                                                 format(report_type, location,
                                                        units_prefix
                                                        + unit_type)
-                                                + api_key)
+                                                       + api_key)
                     except requests.exceptions.ConnectionError:
                         status = (-1,
                                   "Unable to establish internet connection."
