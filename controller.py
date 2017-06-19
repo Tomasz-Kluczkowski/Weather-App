@@ -71,7 +71,7 @@ class Controller(object):
                          "timezone": {}
                          }
 
-        self.debug = 1
+        self.debug = 0
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -104,18 +104,42 @@ class Controller(object):
         self.view = view
 
     def get_timezone(self, lat, lon):
+        """Obtains time zone data for the View to adjust the time 
+        received from Open Weather to correct offset.
+        
+        Args:
+            lat (float): Latitude
+            lon (float): Longitude
+
+        Returns:
+            None
+        """
+        # Get time zone data.
+        data = self.model.finish_get_timezone(lat, lon)
+        # We expect a tuple returning from get_report. Item 0 contains
+        # error status.
+        self.app_data["error_status"] = data[0]
+        # Error handling.
+        if self.app_data["error_status"] == -1:
+            self.display_error(data[1])
+        else:
+            self.app_data["timezone"] = data[1]
+
+    def display_error(self, error):
         """
         
         Args:
-            lat: 
-            lon: 
+            error (dict): Dictionary containing error data from the API.
 
         Returns:
-
+            None
         """
 
-        timezone = self.model.finish_get_timezone(lat, lon)
-        self.app_data["timezone"] = timezone
+        # Error handling.
+        self.app_data["error_message"] = error
+        # Return to the view and display only the error in the
+        # status_bar_label.
+        self.app_data["var_status"].set(self.app_data["error_message"])
 
     def get_report(self):
         """Obtains data for the View to display the report.
@@ -136,10 +160,7 @@ class Controller(object):
 
         # Error handling.
         if self.app_data["error_status"] == -1:
-            self.app_data["error_message"] = data[1]
-            # Return to the view and display only the error in the
-            # status_bar_label.
-            self.app_data["var_status"].set(self.app_data["error_message"])
+            self.display_error(data[1])
         else:
             # Clear any error status and message upon successful
             # response from API.
@@ -150,7 +171,6 @@ class Controller(object):
             # dictionary.
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
-            self.data_present = 1
             # Obtain timezone for geolocation.
             cw_link = self.app_data["metric"]["w_d_cur"]
             """:type : dict"""
@@ -158,5 +178,6 @@ class Controller(object):
             lat = cw_link["coord"]["lat"]
             lon = cw_link["coord"]["lon"]
             self.get_timezone(lat, lon)
+            self.data_present = 1
             self.app_data["last_call"].append(self.app_data["var_loc"])
             # Now we are ready do display the report.

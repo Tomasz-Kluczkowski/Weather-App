@@ -253,7 +253,9 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
-            if self.controller.data_present:
+            if (self.controller.data_present
+                    and self.v_link["error_status"]) == 0:
+
                 self.display_report()
 
     def imperial_pushed(self):
@@ -271,7 +273,9 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
-            if self.controller.data_present:
+            if (self.controller.data_present
+                    and self.v_link["error_status"]) == 0:
+
                 self.display_report()
 
     def clear_error_message(self):
@@ -299,7 +303,7 @@ class WeatherApp(tk.Tk):
             time (str): Time in Hour:Minute format.
         """
         if dst_offset:
-            dst_offset = self.v_link["timezone"]["dstOffset"]*3600
+            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
         else:
             dst_offset = 0
         time = datetime.datetime.utcfromtimestamp(
@@ -633,7 +637,7 @@ class WeatherApp(tk.Tk):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "20px"
-        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size\
+        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size \
                       + "-" + icon_color + "/"
 
         # Date and day of the week and hours report was taken.
@@ -736,7 +740,7 @@ class WeatherApp(tk.Tk):
                               **hr_left_cnf)
 
             # Hourly Weather icon.
-            icon_path = "Resources\Icons\Weather\\"\
+            icon_path = "Resources\Icons\Weather\\" \
                         + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,

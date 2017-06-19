@@ -32,8 +32,7 @@ class Report(object):
 
         self.controller = controller
 
-    @staticmethod
-    def finish_get_timezone(lat, lon):
+    def finish_get_timezone(self, lat, lon):
         """
 
         Args:
@@ -41,16 +40,43 @@ class Report(object):
             lon (float): Longitude
 
         Returns:
-            time_zone (dict): Timezone data for geolocation.
+             Status (tuple):, first item is the error status 
+                (-1 means error / 0 means all ok).
+                Second item is an error message in case of an exception
+                or time_zone (dict) - Timezone data for geolocation 
+                after a successful call to the API.
         """
         base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
         user_name = "tomasz_kluczkowski"
-        try:
-            response = requests.get(base_url.format(lat, lon, user_name))
-            time_zone = response.json()
-        except requests.exceptions.ConnectionError:
+        if self.controller.debug == 0:
+            try:
+                response = requests.get(base_url.format(lat, lon, user_name))
 
-        return time_zone
+            except requests.exceptions.ConnectionError:
+                status = (-1,
+                          "Unable to establish internet connection."
+                          " Please connect to the internet.")
+
+                return status
+
+            time_zone = response.json()
+            # Error handling.
+            if "status" in time_zone:
+                status = (-1,
+                          "Error: {0}, {1}".format(
+                              time_zone["status"]["value"],
+                              time_zone["status"]["message"]))
+
+                return status
+            else:
+                with open("time_zone", "w") as file:
+                    json.dump(time_zone, file)
+        else:
+            with open("time_zone", "r") as file:
+                time_zone = json.load(file)
+
+        status = (0, time_zone)
+        return status
 
     def finish_get_report(self, location):
         """Obtain data in json format from Open Weather and store it 
@@ -132,6 +158,6 @@ class Report(object):
                 else:
                     with open(unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
-        status = (0, unit_dicts)
 
+        status = (0, unit_dicts)
         return status
