@@ -18,8 +18,8 @@ from controller import Controller
 # TODO: locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Correct time bug for locations on the other side of the globe in
-# TODO: hourly section - they show night times in the day time.
+# TODO: Add local time display in main info section.
+
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
