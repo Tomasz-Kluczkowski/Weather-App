@@ -249,7 +249,8 @@ class WeatherApp(tk.Tk):
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen - change units but don't call the API.
+        # screen and no errors registered - change units but don't call
+        # the API.
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
@@ -269,7 +270,8 @@ class WeatherApp(tk.Tk):
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
-        # screen - change units but don't call the API.
+        # screen and no errors registered - change units but don't call
+        # the API.
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
