@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"sunrise": "2017-06-19 04:42", "lng": -0.13, "countryCode": "GB", "gmtOffset": 0, "rawOffset": 0, "sunset": "2017-06-19 21:20", "timezoneId": "Europe/London", "dstOffset": 1, "countryName": "United Kingdom", "time": "2017-06-19 21:33", "lat": 51.51}
-=======
-{"sunrise": "2017-06-21 06:59", "lng": 151.21, "countryCode": "AU", "gmtOffset": 11, "rawOffset": 10, "sunset": "2017-06-21 16:53", "timezoneId": "Australia/Sydney", "dstOffset": 10, "countryName": "Australia", "time": "2017-06-21 01:52", "lat": -33.87}
->>>>>>> d207de84f947abfa0f7142eb2184071d522d7f0b
+{"sunrise": "2017-06-20 04:42", "lng": -0.13, "countryCode": "GB", "gmtOffset": 0, "rawOffset": 0, "sunset": "2017-06-20 21:21", "timezoneId": "Europe/London", "dstOffset": 1, "countryName": "United Kingdom", "time": "2017-06-20 19:15", "lat": 51.51}
