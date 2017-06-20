@@ -515,7 +515,8 @@ class WeatherApp(tk.Tk):
                            font=h1, **main_cnf)
 
         # Date.
-        date_text = "Received at: {0}".format(self.v_link["time"])
+        date_text = "Received at: {0}\nLocal time: {1}".format(
+            self.v_link["time"], self.v_link["local_time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL",
                           offset=(1, -1), text=date_text, font=h2, **main_cnf)
 

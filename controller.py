@@ -33,6 +33,8 @@ class Controller(object):
                         occurred and was not cleared. 0 means all ok.
                     :time (str): String with date / time when call to
                         the API was made.
+                    local_time (str): String with local date / time 
+                        when call to the API was made.
                     :last_call (list): Contains location parameter of
                         last successful call to the API.
                     :metric (dict): Contains dictionaries with weather
@@ -65,6 +67,7 @@ class Controller(object):
                          "error_message": "",
                          "error_status": 0,
                          "time": "",
+                         "local_time": "",
                          "last_call": [],
                          "metric": {},
                          "imperial": {},
@@ -116,8 +119,8 @@ class Controller(object):
         """
         # Get time zone data.
         data = self.model.finish_get_timezone(lat, lon)
-        # We expect a tuple returning from get_report. Item 0 contains
-        # error status.
+        # We expect a tuple returning from finish_get_report.
+        # Item 0 contains error status.
         self.app_data["error_status"] = data[0]
         # Error handling.
         if self.app_data["error_status"] == -1:
@@ -148,14 +151,11 @@ class Controller(object):
             None
         """
 
-        # Current date & time.
-        self.app_data["time"] = datetime.datetime.now()\
-            .strftime("%H:%M  %d/%m/%Y")
         # Get dictionaries.
         data = self.model.finish_get_report(self.app_data["var_loc"].get())
 
-        # We expect a tuple returning from get_report. Item 0 contains
-        # error status.
+        # We expect a tuple returning from finish_get_report. Item 0
+        # contains error status.
         self.app_data["error_status"] = data[0]
 
         # Error handling.
@@ -180,4 +180,11 @@ class Controller(object):
             self.get_timezone(lat, lon)
             self.data_present = 1
             self.app_data["last_call"].append(self.app_data["var_loc"])
+            # Current date & time.
+            date = datetime.datetime.now()
+            self.app_data["time"] = date.strftime("%H:%M  %d/%m/%Y")
+            local_date = date + datetime.timedelta(
+                hours=self.app_data["timezone"]["rawOffset"])
+            self.app_data["local_time"] = local_date.strftime(
+                "%H:%M  %d/%m/%Y")
             # Now we are ready do display the report.
