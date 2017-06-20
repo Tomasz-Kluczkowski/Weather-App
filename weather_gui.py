@@ -18,7 +18,6 @@ from controller import Controller
 # TODO: locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Add local time display in main info section.
 
 
 class WeatherApp(tk.Tk):
