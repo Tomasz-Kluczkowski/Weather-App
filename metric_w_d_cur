@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"coord": {"lon": -0.13, "lat": 51.51}, "weather": [{"id": 800, "main": "Clear", "description": "clear sky", "icon": "02d"}], "base": "stations", "main": {"temp": 24.99, "pressure": 1017, "humidity": 50, "temp_min": 23, "temp_max": 27}, "visibility": 10000, "wind": {"speed": 4.1, "deg": 100}, "clouds": {"all": 8}, "dt": 1497901800, "sys": {"type": 1, "id": 5091, "message": 0.2946, "country": "GB", "sunrise": 1497843774, "sunset": 1497903680}, "id": 2643743, "name": "London", "cod": 200}
+=======
+{"coord": {"lon": 151.21, "lat": -33.87}, "weather": [{"id": 701, "main": "Mist", "description": "mist", "icon": "50n"}], "base": "stations", "main": {"temp": 12, "pressure": 1023, "humidity": 93, "temp_min": 12, "temp_max": 12}, "visibility": 10000, "wind": {"speed": 4.1, "deg": 290}, "clouds": {"all": 0}, "dt": 1497970800, "sys": {"type": 1, "id": 8233, "message": 0.0063, "country": "AU", "sunrise": 1497905993, "sunset": 1497941626}, "id": 2147714, "name": "Sydney", "cod": 200}
+>>>>>>> d207de84f947abfa0f7142eb2184071d522d7f0b

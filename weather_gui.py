@@ -18,7 +18,8 @@ from controller import Controller
 # TODO: locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Add error handling for timezone.
+# TODO: Add local time display in main info section.
+
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -255,8 +256,7 @@ class WeatherApp(tk.Tk):
             self.v_link["var_units"].set("metric")
 
             if (self.controller.data_present
-                    and self.v_link["error_status"]) == 0:
-
+                and self.v_link["error_status"]) == 0:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -276,8 +276,7 @@ class WeatherApp(tk.Tk):
             self.v_link["var_units"].set("imperial")
 
             if (self.controller.data_present
-                    and self.v_link["error_status"]) == 0:
-
+                and self.v_link["error_status"]) == 0:
                 self.display_report()
 
     def clear_error_message(self):
@@ -313,11 +312,12 @@ class WeatherApp(tk.Tk):
 
         return time
 
-    @staticmethod
-    def date_conv(unix_time):
+    def date_conv(self, unix_time, dst_offset=True):
         """Converts date from unix time to string.
 
         Args:
+            dst_offset: (bool) Set to True to offset time received from
+                open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
 
@@ -326,12 +326,43 @@ class WeatherApp(tk.Tk):
             date_str (str): Date in string representation.
         """
 
-        date = datetime.datetime.utcfromtimestamp(unix_time)
-        date_str = datetime.datetime.utcfromtimestamp(unix_time).strftime(
-            "%d/%m/%Y")
+        if dst_offset:
+            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
+        else:
+            dst_offset = 0
+
+        date = datetime.datetime.utcfromtimestamp(unix_time + dst_offset)
+        date_str = date.strftime("%d/%m/%Y")
         name_of_day = calendar.day_name[date.weekday()]
 
         return name_of_day, date_str
+
+    @staticmethod
+    def calculate_hr_x_offset(text_time):
+        """
+        
+        Args:
+            text_time (str): Time in text form.
+
+        Returns:
+            hr_x_offset (int): Offset value necessary to display the 
+            next column of text.
+        """
+
+        hours = int(text_time.split(":")[0])
+
+        hr_intervals = {(0, 3): 0,
+                        (3, 6): 1,
+                        (6, 9): 2,
+                        (9, 12): 3,
+                        (12, 15): 4,
+                        (15, 18): 5,
+                        (18, 21): 6,
+                        (21, 24): 7}
+
+        for interval, hr_x_offset in hr_intervals.items():
+            if interval[0] <= hours < interval[1]:
+                return hr_x_offset
 
     @staticmethod
     def deg_conv(wind_dir_deg):
@@ -651,7 +682,6 @@ class WeatherApp(tk.Tk):
         hr_x_offset = 0
         max_y = 0
         rain_snow_present = 0
-        dst_offset = self.v_link["timezone"]["dstOffset"]
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
@@ -734,8 +764,8 @@ class WeatherApp(tk.Tk):
                 max_y = 0
 
             # Hour.
-            hour_text = self.time_conv(item["dt"], False)
-            hr_x_offset = int(hour_text.split(":")[0]) // 3
+            hour_text = self.time_conv(item["dt"])
+            hr_x_offset = self.calculate_hr_x_offset(hour_text)
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(120 + hr_x_offset * 105, -8),
                               text=hour_text, justify=tk.CENTER, font=h3,
@@ -792,7 +822,8 @@ class WeatherApp(tk.Tk):
             self.hr_humidity_icons[-1].move_rel_to_obj_y(hr_humidity)
 
             # Hourly wind speed.
-            hr_wind_text = "{0} {1}".format(item["wind"]["speed"], speed_unit)
+            hr_wind_text = "{0:.1f} {1}".format(item["wind"]["speed"],
+                                              speed_unit)
             hr_wind = CanvasText(self.main_canvas, rel_obj=hr_humidity,
                                  rel_pos="BC",
                                  offset=(0, 5),
