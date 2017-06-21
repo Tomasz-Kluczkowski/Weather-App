@@ -53,10 +53,10 @@ class WeatherApp(Tk):
         # LAYOUT DESIGN
 
         # main background image
-        self.image = Image.open(r"Resources\Images\main_bg.jpg")
-        self.image_conv = ImageTk.PhotoImage(self.image)
-        self.main_bg_img = self.image_conv
-        self.background_label = Label(self, image=self.main_bg_img)
+        # self.image = Image.open(r"Resources\Images\main_bg.jpg")
+        # self.image_conv = ImageTk.PhotoImage(self.image)
+        # self.ma in_bg_img = self.image_conv
+        self.background_label = Label(self) # , image=self.main_bg_img)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         # LOCATION FRAME

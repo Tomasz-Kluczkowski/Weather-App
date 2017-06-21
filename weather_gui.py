@@ -4,6 +4,7 @@
 
 
 import tkinter as tk
+import tkinter.ttk as tkk
 import datetime
 import calendar
 # import PIL
@@ -776,7 +777,7 @@ class WeatherApp(tk.Tk):
                         + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
-                          rel_pos="BC", offset=(0, -5), **hr_img_cnf))
+                          rel_pos="BC", offset=(0, 0), **hr_img_cnf))
 
             # Hourly temperature.
             hr_temp_text = "{0:.1f}\N{DEGREE SIGN}{sign}".format(
@@ -785,7 +786,7 @@ class WeatherApp(tk.Tk):
             hr_temp = CanvasText(self.main_canvas,
                                  rel_obj=self.hr_weather_icons[-1],
                                  rel_pos="BC",
-                                 offset=(0, -10),
+                                 offset=(0, 0),
                                  text=hr_temp_text, font=h3, **hr_top_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
             self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
