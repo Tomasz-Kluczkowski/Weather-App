@@ -116,7 +116,7 @@ class WeatherApp(tk.Tk):
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
-        entry_cnf = {"fg": "black", "bg": self.paper, "width": 70, "bd": 2,
+        entry_cnf = {"fg": "black", "bg": self.paper, "width": 80, "bd": 2,
                      "font": self.font, "relief": "sunken"}
         clear_cnf = {"bg": self.lavender, "fg": "black",
                      "activebackground": self.dusty,
@@ -470,9 +470,12 @@ class WeatherApp(tk.Tk):
         # Config parameters for hourly section.
         hr_w_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
         hr_n_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
+        hr_ne_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NE}
+        hr_nw_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
         # hr_center_cnf = {"tags": "hourly", "fill": self.paper,
         #                  "anchor": tk.CENTER}
-        hr_img_cnf = {"tags": "hourly", "anchor": tk.N}
+        hr_img_n_cnf = {"tags": "hourly", "anchor": tk.N}
+        hr_img_nw_cnf = {"tags": "hourly", "anchor": tk.NW}
 
         # Font sizes
         h0 = ("Arial", -50)
@@ -491,19 +494,19 @@ class WeatherApp(tk.Tk):
 
         # Display location information.
         # Start coordinates in pixels of the report title.
-        x1 = 30
-        y1 = 5
+        x1 = 10
+        y1 = 4
 
         if self.controller.draw_lines == 1:
             # Draw coordinate lines to help in item placement.
             # Vertical lines.
             for i in range(1, 250):
-                self.main_canvas.create_line(i * 10, 0, i * 10, 1000,
-                                             dash=(2, 15, 1, 10))
+                self.main_canvas.create_line(i * 10, 0, i * 10, 2500,
+                                             fill="blue")
             # Horizontal lines.
-            # for i in range(1, 250):
-            #     self.main_canvas.create_line(0, i * 10, 1000, i * 10,
-            #                                  dash=(2, 15, 1, 10), fill="blue")
+            for i in range(1, 250):
+                self.main_canvas.create_line(0, i * 10, 1000, i * 10,
+                                             fill="blue")
 
         cw_link = self.controller.app_data[units]["w_d_cur"]
         """Link to access current weather data in controller."""
@@ -518,7 +521,7 @@ class WeatherApp(tk.Tk):
         date_text = "Received at: {0}\nLocal time: {1}".format(
             self.v_link["time"], self.v_link["local_time"])
         date = CanvasText(self.main_canvas, rel_obj=title, rel_pos="BL",
-                          offset=(1, -1), text=date_text, font=h2, **main_cnf)
+                          offset=(2, -1), text=date_text, font=h2, **main_cnf)
 
         # Geo-coords.
         coords_text = "Lon: {0}, Lat: {1}".format(cw_link["coord"]["lon"],
@@ -533,7 +536,7 @@ class WeatherApp(tk.Tk):
         # Images have to be added as attributes or otherwise they get
         # garbage collected and will not display at all.
         self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords,
-                                  rel_pos="BL", offset=(5, 42), **img_nw_cnf)
+                                  rel_pos="BL", offset=(2, 42), **img_nw_cnf)
 
         # Current temperature.
         if self.v_link["var_units"].get() == "metric":
@@ -598,7 +601,7 @@ class WeatherApp(tk.Tk):
         # Assumption is that it never rains and snows at the same time.
         for name in ["rain", "snow"]:
             try:
-                rain_snow_text = "{0:.2f} mm/3h".format(cw_link[name]["3h"])
+                rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
                 icon_path = icon_prefix + name + ".png"
                 self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
                                                rel_obj=self.clouds_img,
@@ -616,7 +619,8 @@ class WeatherApp(tk.Tk):
         icon_path = icon_prefix + "humidity.png"
         self.humidity_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.pressure_img,
-                                      rel_pos="BL", offset=(0, 4), **img_nw_cnf)
+                                      rel_pos="BL", offset=(0, 4),
+                                      **img_nw_cnf)
         humidity_text = "{0}%".format(cw_link["main"]["humidity"])
         humidity = CanvasText(self.main_canvas, rel_obj=self.humidity_img,
                               rel_pos="CR", offset=(5, 0),
@@ -640,7 +644,8 @@ class WeatherApp(tk.Tk):
         icon_path = icon_prefix + "wind_rose.png"
         self.wind_dir_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.wind_img,
-                                      rel_pos="BL", offset=(0, 4), **img_nw_cnf)
+                                      rel_pos="BL", offset=(0, 4),
+                                      **img_nw_cnf)
         wind_dir_text = "{0}".format(self.deg_conv(cw_link["wind"]["deg"]))
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
@@ -701,8 +706,8 @@ class WeatherApp(tk.Tk):
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 
-            day_text = "{0:^8}\n{1:^8}".format(self.date_conv(item["dt"])[0],
-                                               self.date_conv(item["dt"])[1])
+            day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
+                                                 self.date_conv(item["dt"])[1])
             if previous_day_text == day_text:
                 pass
             else:
@@ -713,62 +718,63 @@ class WeatherApp(tk.Tk):
 
                 # Display date and day of the week.
                 day = CanvasText(self.main_canvas, rel_obj=self.cur_icon,
-                                 rel_pos="BC",
-                                 offset=(0, 81 + day_y_offset),
-                                 text=day_text, justify=tk.CENTER, font=h3,
-                                 **hr_n_cnf)
+                                 rel_pos="BL",
+                                 offset=(0, 86 + day_y_offset),
+                                 text=day_text, justify=tk.LEFT, font=h3,
+                                 **hr_nw_cnf)
 
                 # Draw temperature icon.
                 icon_path = icon_prefix + "temperature.png"
                 self.hr_temp_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=day, rel_pos="BC", offset=(0, 0),
-                              **hr_img_cnf))
+                              rel_obj=day, rel_pos="BL", offset=(0, 0),
+                              **hr_img_nw_cnf))
 
                 # Draw pressure icon.
                 icon_path = icon_prefix + "atmospheric_pressure.png"
                 self.hr_pressure_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=self.hr_temp_icons[-1], rel_pos="BC",
-                              offset=(0, 0), **hr_img_cnf))
+                              rel_obj=self.hr_temp_icons[-1], rel_pos="BL",
+                              offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw cloud coverage icon.
                 icon_path = icon_prefix + "cloud.png"
                 self.hr_cloud_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=self.hr_pressure_icons[-1], rel_pos="BC",
-                              offset=(0, 0), **hr_img_cnf))
+                              rel_obj=self.hr_pressure_icons[-1], rel_pos="BL",
+                              offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw humidity icon.
                 icon_path = icon_prefix + "humidity.png"
                 self.hr_humidity_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=self.hr_cloud_icons[-1], rel_pos="BC",
-                              offset=(0, 0), **hr_img_cnf))
+                              rel_obj=self.hr_cloud_icons[-1], rel_pos="BL",
+                              offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw wind icon.
                 icon_path = icon_prefix + "windsock_filled.png"
                 self.hr_wind_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=self.hr_humidity_icons[-1], rel_pos="BC",
-                              offset=(0, 0), **hr_img_cnf))
+                              rel_obj=self.hr_humidity_icons[-1], rel_pos="BL",
+                              offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw wind direction icon.
                 icon_path = icon_prefix + "wind_rose.png"
                 self.hr_wind_dir_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
-                              rel_obj=self.hr_wind_icons[-1], rel_pos="BC",
-                              offset=(0, 0), **hr_img_cnf))
+                              rel_obj=self.hr_wind_icons[-1], rel_pos="BL",
+                              offset=(0, 0), **hr_img_nw_cnf))
 
                 previous_day_text = day_text
                 date_index += 1
                 max_y = 0
+                day_rain_present = 0
 
             # Hour.
             hour_text = self.time_conv(item["dt"])
             hr_x_offset = self.calculate_hr_x_offset(hour_text)
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
-                              offset=(120 + hr_x_offset * 105, -8),
+                              offset=(120 + hr_x_offset * 105, 0),
                               text=hour_text, justify=tk.CENTER, font=h3,
                               **hr_w_cnf)
 
@@ -777,27 +783,27 @@ class WeatherApp(tk.Tk):
                         + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
-                          rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+                          rel_pos="BC", offset=(0, -5), **hr_img_n_cnf))
 
             # Hourly temperature.
             hr_temp_text = "{0:.1f}\N{DEGREE SIGN}{sign}".format(
                 item["main"]["temp"], sign=sign)
 
             hr_temp = CanvasText(self.main_canvas,
-                                 rel_obj=self.hr_weather_icons[-1],
-                                 rel_pos="BC",
-                                 offset=(0, 0),
-                                 text=hr_temp_text, font=h3, **hr_n_cnf)
+                                 rel_obj=hour,
+                                 rel_pos="BR",
+                                 offset=(-1, 40),
+                                 text=hr_temp_text, font=h3, **hr_ne_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
             self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
 
             # Hourly pressure.
             hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
             hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp,
-                                     rel_pos="BC",
-                                     offset=(0, 5),
+                                     rel_pos="BR",
+                                     offset=(-2, 5),
                                      text=hr_pressure_text, font=h4,
-                                     **hr_n_cnf)
+                                     **hr_ne_cnf)
             # Update hr_pressure_icon y coordinate to center of
             # hr_pressure.
             self.hr_pressure_icons[-1].move_rel_to_obj_y(hr_pressure)
@@ -805,40 +811,40 @@ class WeatherApp(tk.Tk):
             # Hourly cloud coverage.
             hr_cloud_text = "{0}%".format(item["clouds"]["all"])
             hr_cloud = CanvasText(self.main_canvas, rel_obj=hr_pressure,
-                                  rel_pos="BC",
+                                  rel_pos="BR",
                                   offset=(0, 5),
-                                  text=hr_cloud_text, font=h4, **hr_n_cnf)
+                                  text=hr_cloud_text, font=h4, **hr_ne_cnf)
             # Update hr_cloud_icon y coordinate to center of hr_cloud.
             self.hr_cloud_icons[-1].move_rel_to_obj_y(hr_cloud)
 
             # Hourly humidity.
             hr_humidity_text = "{0}%".format(item["main"]["humidity"])
             hr_humidity = CanvasText(self.main_canvas, rel_obj=hr_cloud,
-                                     rel_pos="BC",
-                                     offset=(0, 5),
+                                     rel_pos="BR",
+                                     offset=(-1, 5),
                                      text=hr_humidity_text, font=h4,
-                                     **hr_n_cnf)
+                                     **hr_ne_cnf)
             # Update hr_humidity_icon y coordinate to center of
             # hr_humidity.
             self.hr_humidity_icons[-1].move_rel_to_obj_y(hr_humidity)
 
             # Hourly wind speed.
             hr_wind_text = "{0:.1f} {1}".format(item["wind"]["speed"],
-                                              speed_unit)
+                                                speed_unit)
             hr_wind = CanvasText(self.main_canvas, rel_obj=hr_humidity,
-                                 rel_pos="BC",
-                                 offset=(0, 5),
-                                 text=hr_wind_text, font=h4, **hr_n_cnf)
+                                 rel_pos="BR",
+                                 offset=(-1, 5),
+                                 text=hr_wind_text, font=h4, **hr_ne_cnf)
             # Update hr_wind_icon y coordinate to center of hr_wind.
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
 
             # Hourly wind direction.
             hr_wind_dir_text = "{0}".format(self.deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
-                                     rel_pos="BC",
-                                     offset=(0, 5),
+                                     rel_pos="BR",
+                                     offset=(-1, 5),
                                      text=hr_wind_dir_text, font=h4,
-                                     **hr_n_cnf)
+                                     **hr_ne_cnf)
             # Update hr_wind_dir_icon y coordinate to center of
             # hr_wind_dir.
             self.hr_wind_dir_icons[-1].move_rel_to_obj_y(hr_wind_dir)
@@ -846,22 +852,28 @@ class WeatherApp(tk.Tk):
             # Hourly Rain / Snow.
             for name in ["rain", "snow"]:
                 try:
-                    rain_snow_text = "{0:.2f} mm/3h".format(item[name]["3h"])
-                    icon_path = icon_prefix + name + ".png"
-                    self.hr_rain_snow_icons.append(
-                        CanvasImg(self.main_canvas, icon_path,
-                                  rel_obj=self.hr_wind_dir_icons[-1],
-                                  rel_pos="BC", offset=(0, 0), **hr_img_cnf))
+                    rain_snow_text = "{0:.1f} mm/3h".format(item[name]["3h"])
+                    # Only draw rain/snow icon once in the entire day.
+                    if day_rain_present == 0:
+                        icon_path = icon_prefix + name + ".png"
+                        self.hr_rain_snow_icons.append(
+                            CanvasImg(self.main_canvas, icon_path,
+                                      rel_obj=self.hr_wind_dir_icons[-1],
+                                      rel_pos="BC", offset=(0, 0),
+                                      **hr_img_n_cnf))
                     hr_rain_snow = CanvasText(self.main_canvas,
                                               rel_obj=hr_wind_dir,
-                                              rel_pos="BC",
-                                              offset=(0, 10),
+                                              rel_pos="BR",
+                                              offset=(-1, 10),
                                               text=rain_snow_text, font=h4,
-                                              **hr_n_cnf)
+                                              **hr_ne_cnf)
                     # Update hr_rain_snow_icon y coordinate to center of
                     # rain_snow.
-                    self.hr_rain_snow_icons[-1].move_rel_to_obj_y(hr_rain_snow)
+                    if day_rain_present == 0:
+                        self.hr_rain_snow_icons[-1].move_rel_to_obj_y(
+                            hr_rain_snow)
 
+                    day_rain_present = 1
                     rain_snow_present = 1
 
                 except KeyError:
