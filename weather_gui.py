@@ -497,13 +497,13 @@ class WeatherApp(tk.Tk):
         if self.controller.draw_lines == 1:
             # Draw coordinate lines to help in item placement.
             # Vertical lines.
-            # for i in range(1, 250):
-            #     self.main_canvas.create_line(i * 10, 0, i * 10, 1000,
-            #                                  dash=(2, 15, 1, 10))
-            # Horizontal lines.
             for i in range(1, 250):
-                self.main_canvas.create_line(0, i * 10, 1000, i * 10,
-                                             dash=(2, 15, 1, 10), fill="blue")
+                self.main_canvas.create_line(i * 10, 0, i * 10, 1000,
+                                             dash=(2, 15, 1, 10))
+            # Horizontal lines.
+            # for i in range(1, 250):
+            #     self.main_canvas.create_line(0, i * 10, 1000, i * 10,
+            #                                  dash=(2, 15, 1, 10), fill="blue")
 
         cw_link = self.controller.app_data[units]["w_d_cur"]
         """Link to access current weather data in controller."""
