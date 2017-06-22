@@ -113,6 +113,17 @@ class WeatherApp(tk.Tk):
         # GUI style definitions.
 
         # Widget styles.
+        self.style = tkk.Style()
+        self.style.theme_use('clam')
+        # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+        self.style.configure("my.TCombobox",
+                             fieldbackground=self.paper, foreground="black",
+                             borderwidth=2,
+                             relief="sunken",
+                             font=("Arial", -18),
+                             width=70,
+                             values=["test1", "test2", "test3"])
+
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
@@ -154,13 +165,21 @@ class WeatherApp(tk.Tk):
                        sticky=tk.NSEW)
 
         # Location entry.
-        loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
-                             **entry_cnf)
-        loc_entry.focus()
-        loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
-                       sticky=tk.NSEW)
-        loc_entry.bind("<Return>", lambda e: self.begin_get_report())
-        loc_entry.bind("<Key>", lambda e: self.clear_error_message())
+        # loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
+        #                      **entry_cnf)
+        # loc_entry.focus()
+        # loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+        #                sticky=tk.NSEW)
+        # loc_entry.bind("<Return>", lambda e: self.begin_get_report())
+        # loc_entry.bind("<Key>", lambda e: self.clear_error_message())
+
+        # Location combobox.
+
+        loc_combobox = tkk.Combobox(loc_frame, textvariable=self.v_link[
+            "var_loc"], style="my.TCombobox")
+        loc_combobox.grid(row=0, column=1, sticky=tk.NSEW)
+        loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
+        loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
         self.search_img = tk.PhotoImage(
@@ -707,7 +726,7 @@ class WeatherApp(tk.Tk):
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
-                                                 self.date_conv(item["dt"])[1])
+                                               self.date_conv(item["dt"])[1])
             if previous_day_text == day_text:
                 pass
             else:
