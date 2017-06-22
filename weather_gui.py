@@ -113,16 +113,13 @@ class WeatherApp(tk.Tk):
         # GUI style definitions.
 
         # Widget styles.
-        self.style = tkk.Style()
-        self.style.theme_use('clam')
+        style = tkk.Style()
+        style.theme_use("default")
         # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
-        self.style.configure("my.TCombobox",
-                             fieldbackground=self.paper, foreground="black",
-                             borderwidth=2,
-                             relief="sunken",
-                             font=("Arial", -18),
-                             width=70,
-                             values=["test1", "test2", "test3"])
+        style.configure("my.TCombobox",
+                        fieldbackground=self.paper,
+                        foreground="black",
+                        )
 
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
@@ -175,9 +172,17 @@ class WeatherApp(tk.Tk):
 
         # Location combobox.
 
-        loc_combobox = tkk.Combobox(loc_frame, textvariable=self.v_link[
-            "var_loc"], style="my.TCombobox")
-        loc_combobox.grid(row=0, column=1, sticky=tk.NSEW)
+        loc_combobox = tkk.Combobox(loc_frame,
+                                    textvariable=self.v_link["var_loc"],
+                                    relief="sunken",
+                                    font=("Arial", -18),
+                                    width=70,
+                                    values=["test1", "test2",
+                                            "test3"],
+                                    style="my.TCombobox")
+        loc_combobox.focus()
+        loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+                          sticky=tk.NSEW)
         loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
         loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
 

@@ -42,7 +42,7 @@ class WeatherApp(Tk):
         # mist:         #7A9D96
         self.style.configure("my.TLabel", foreground="#00303F", background="#CAE4D8", borderwidth=0, relief="flat",
                              padding=0)
-        self.style.configure("my.TEntry", foreground="#00303F", borderwidth=2, relief="groove", padding=3)
+        self.style.configure("my.TEntry", foreground="#00303F", borderwidth=2, relief="raised", padding=3)
         self.style.configure("my.TButton", foreground="#00303F", background="#DCAE1D", borderwidth=2, relief="flat",
                              padding=2)
         self.style.configure("clear.TButton", foreground="#00303F", background="#CAE4D8", borderwidth=0, relief="flat",
@@ -55,9 +55,9 @@ class WeatherApp(Tk):
         # LAYOUT DESIGN
 
         #main background image
-        self.image = Image.open(r"Resources\Images\main_bg.jpg")
-        self.image_conv = ImageTk.PhotoImage(self.image)
-        self.main_bg_img = self.image_conv
+        # self.image = Image.open(r"Resources\Images\main_bg.jpg")
+        # self.image_conv = ImageTk.PhotoImage(self.image)
+        # self.main_bg_img = self.image_conv
         # self.background_label = Label(self, image=self.main_bg_img)
         # self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
@@ -98,7 +98,7 @@ class WeatherApp(Tk):
         # self.image = Image.open(r"Resources\Images\canvas_bg.jpg")
         # self.image_conv = ImageTk.PhotoImage(self.image)
         # self.canvas_bg_img = self.image_conv
-        self.main_canvas.create_image(0, 0, image=self.main_bg_img, anchor=NW)
+        # self.main_canvas.create_image(0, 0, image=self.main_bg_img, anchor=NW)
 
         self.image = Image.open(r"Resources\Labels\location.png")
         self.image_conv = ImageTk.PhotoImage(self.image)
