@@ -294,7 +294,7 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
-            if self.controller.data_present == 1\
+            if self.controller.data_present == 1 \
                     and self.v_link["error_status"] == 0:
                 self.display_report()
 
@@ -703,17 +703,20 @@ class WeatherApp(tk.Tk):
         day = None
         previous_day_text = ""
         date_index = 0
-        hr_rain_snow = None
+        hr_rain = None
         day_y_offset = 0
         hr_x_offset = 0
         max_y = 0
-        rain_snow_present = 0
+        hr_rain_present = False
+        hr_snow_present = False
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
         self.hr_pressure_icons = []
         """:type : list[CanvasImg]"""
-        self.hr_rain_snow_icons = []
+        self.hr_rain_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_snow_icons = []
         """:type : list[CanvasImg]"""
         self.hr_cloud_icons = []
         """:type : list[CanvasImg]"""
@@ -788,7 +791,8 @@ class WeatherApp(tk.Tk):
                 previous_day_text = day_text
                 date_index += 1
                 max_y = 0
-                day_rain_present = 0
+                day_rain_present = False
+                day_snow_present = False
 
             # Hour.
             hour_text = self.time_conv(item["dt"])
@@ -869,45 +873,85 @@ class WeatherApp(tk.Tk):
             # hr_wind_dir.
             self.hr_wind_dir_icons[-1].move_rel_to_obj_y(hr_wind_dir)
 
-            # Hourly Rain / Snow.
-            for name in ["rain", "snow"]:
-                try:
-                    rain_snow_text = "{0:.1f} mm/3h".format(item[name]["3h"])
-                    # Only draw rain/snow icon once in the entire day.
-                    if day_rain_present == 0:
-                        icon_path = icon_prefix + name + ".png"
-                        self.hr_rain_snow_icons.append(
-                            CanvasImg(self.main_canvas, icon_path,
-                                      rel_obj=self.hr_wind_dir_icons[-1],
-                                      rel_pos="BC", offset=(0, 0),
-                                      **hr_img_n_cnf))
-                    hr_rain_snow = CanvasText(self.main_canvas,
-                                              rel_obj=hr_wind_dir,
-                                              rel_pos="BR",
-                                              offset=(-1, 10),
-                                              text=rain_snow_text, font=h4,
-                                              **hr_ne_cnf)
-                    # Update hr_rain_snow_icon y coordinate to center of
-                    # rain_snow.
-                    if day_rain_present == 0:
-                        self.hr_rain_snow_icons[-1].move_rel_to_obj_y(
-                            hr_rain_snow)
+            # Hourly Rain.
+            try:
+                rain_text = "{0:.1f} mm/3h".format(item["rain"]["3h"])
+                # Only draw rain icon once in the entire day.
+                if not day_rain_present:
+                    icon_path = icon_prefix + "rain" + ".png"
+                    self.hr_rain_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=self.hr_wind_dir_icons[-1],
+                                  rel_pos="BC", offset=(0, 0),
+                                  **hr_img_n_cnf))
+                hr_rain = CanvasText(self.main_canvas,
+                                     rel_obj=hr_wind_dir,
+                                     rel_pos="BR",
+                                     offset=(-1, 10),
+                                     text=rain_text, font=h4,
+                                     **hr_ne_cnf)
+                # Update hr_rain_icon y coordinate to center of
+                # hr_rain.
+                if not day_rain_present:
+                    self.hr_rain_icons[-1].move_rel_to_obj_y(
+                        hr_rain)
 
-                    day_rain_present = 1
-                    rain_snow_present = 1
+                day_rain_present = True
+                hr_rain_present = True
 
-                except KeyError:
-                    pass
+            except KeyError:
+                pass
 
+            # Hourly Snow.
+            try:
+                snow_text = "{0:.1f} mm/3h".format(item["snow"]["3h"])
+                # Only draw snow icon once in the entire day.
+                # If rain is also present, draw beneath it.
+                if day_rain_present:
+                    rel_obj_icon = self.hr_rain_icons[-1]
+                    rel_obj_text = hr_rain
+                else:
+                    rel_obj_icon = self.hr_wind_dir_icons[-1]
+                    rel_obj_text = hr_wind_dir
+                if not day_snow_present:
+                    icon_path = icon_prefix + "snow" + ".png"
+                    self.hr_snow_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=rel_obj_icon,
+                                  rel_pos="BC", offset=(0, 0),
+                                  **hr_img_n_cnf))
+                hr_snow = CanvasText(self.main_canvas,
+                                     rel_obj=rel_obj_text,
+                                     rel_pos="BR",
+                                     offset=(-1, 10),
+                                     text=snow_text, font=h4,
+                                     **hr_ne_cnf)
+                # Update hr_snow_icon y coordinate to center of
+                # hr_snow.
+                if not day_snow_present:
+                    self.hr_snow_icons[-1].move_rel_to_obj_y(
+                        hr_snow)
+
+                day_snow_present = True
+                hr_snow_present = True
+
+            except KeyError:
+                pass
+
+            # TODO: correct positioning of bottom including if rain and/or
+            # TODO: snow is present.
             # Get the maximum y coordinate present on the canvas.
-            if rain_snow_present:
-                cur_y = self.main_canvas.bbox(hr_rain_snow.id_num)[3]
+            if hr_snow_present:
+                cur_y = self.main_canvas.bbox(hr_snow.id_num)[3]
+            elif hr_rain_present:
+                cur_y = self.main_canvas.bbox(hr_rain.id_num)[3]
             else:
                 cur_y = self.main_canvas.bbox(hr_wind_dir.id_num)[3]
             if cur_y > max_y:
                 max_y = cur_y
 
-            rain_snow_present = 0
+            hr_snow_present = False
+            hr_rain_present = False
 
         self.update()
         self.main_canvas.config(
