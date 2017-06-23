@@ -74,8 +74,8 @@ class Controller(object):
                          "timezone": {}
                          }
 
-        self.debug = 0
-        self.draw_lines = 1
+        self.debug = 1
+        self.draw_lines = 0
         self.view = None
         self.model = None
         self.data_present = 0

@@ -13,12 +13,10 @@ from weather_backend import Report
 from controller import Controller
 
 
-# TODO: Have to add a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
-# TODO: Add a small button to open a selection list of previous
-# TODO: locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Fix rain / snow on same day / week possible !!!
 
 
 class WeatherApp(tk.Tk):
@@ -113,6 +111,13 @@ class WeatherApp(tk.Tk):
         # GUI style definitions.
 
         # Widget styles.
+        style = tkk.Style()
+        style.theme_use("vista")
+        # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+        style.configure("my.TCombobox",
+                        fieldbackground=self.paper,
+                        foreground="black",
+                        )
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
@@ -150,17 +155,31 @@ class WeatherApp(tk.Tk):
 
         # Location label.
         loc_label = tk.Label(loc_frame, text="Location name:", **label_cnf)
-        loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4),
+        loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 5),
                        sticky=tk.NSEW)
 
-        # Location entry.
-        loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
-                             **entry_cnf)
-        loc_entry.focus()
-        loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
-                       sticky=tk.NSEW)
-        loc_entry.bind("<Return>", lambda e: self.begin_get_report())
-        loc_entry.bind("<Key>", lambda e: self.clear_error_message())
+        loc_combobox = tkk.Combobox(loc_frame,
+                                    textvariable=self.v_link["var_loc"],
+                                    font=("Arial", -18),
+                                    width=70,
+                                    values=["test1", "test2",
+                                            "test3"],
+                                    style="my.TCombobox")
+
+        loc_combobox.focus()
+        loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 6),
+                          sticky=tk.NSEW)
+        loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
+        loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
+
+        # # Location entry.
+        # loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
+        #                      **entry_cnf)
+        # loc_entry.focus()
+        # loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+        #                sticky=tk.NSEW)
+        # loc_entry.bind("<Return>", lambda e: self.begin_get_report())
+        # loc_entry.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
         self.search_img = tk.PhotoImage(
@@ -454,10 +473,9 @@ class WeatherApp(tk.Tk):
 
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
-        self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
-
-        self.main_canvas.bind_all("<Up>", lambda e: self.move_canvas_up())
-        self.main_canvas.bind_all("<Down>", lambda e: self.move_canvas_down())
+        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
+        self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()
@@ -597,23 +615,25 @@ class WeatherApp(tk.Tk):
                             rel_pos="CR", offset=(5, 0),
                             text=clouds_text, font=h2, **clouds_cnf)
 
-        # Rain and snow.
-        # Assumption is that it never rains and snows at the same time.
-        for name in ["rain", "snow"]:
-            try:
-                rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
-                icon_path = icon_prefix + name + ".png"
-                self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
-                                               rel_obj=self.clouds_img,
-                                               rel_pos="BL", offset=(0, 4),
-                                               **img_nw_cnf)
-                rain_snow = CanvasText(self.main_canvas,
-                                       rel_obj=self.rain_snow_img,
-                                       rel_pos="CR", offset=(5, 0),
-                                       text=rain_snow_text, font=h2,
-                                       **cent_cnf)
-            except KeyError:
-                pass
+        # TODO: Never saw any data in the current weather regarding rain / snow.
+        # TODO: Check with some cold climate reports and delete this section.
+        # # Rain and snow.
+        # # Assumption is that it never rains and snows at the same time.
+        # for name in ["rain", "snow"]:
+        #     try:
+        #         rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
+        #         icon_path = icon_prefix + name + ".png"
+        #         self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
+        #                                        rel_obj=self.clouds_img,
+        #                                        rel_pos="BL", offset=(0, 4),
+        #                                        **img_nw_cnf)
+        #         rain_snow = CanvasText(self.main_canvas,
+        #                                rel_obj=self.rain_snow_img,
+        #                                rel_pos="CR", offset=(5, 0),
+        #                                text=rain_snow_text, font=h2,
+        #                                **cent_cnf)
+        #     except KeyError:
+        #         pass
 
         # Humidity.
         icon_path = icon_prefix + "humidity.png"

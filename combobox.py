@@ -5,7 +5,8 @@
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
-                        )  # Location combobox.
+                        )
+# Location combobox.
 
 loc_combobox = tkk.Combobox(loc_frame,
                             textvariable=self.v_link["var_loc"],
