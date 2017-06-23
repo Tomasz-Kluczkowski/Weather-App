@@ -21,7 +21,7 @@ class App:
                         fieldbackground="white",
                         foreground="black",
                         borderwidth=0,
-                        relief="flat",
+                        relief="raised",
                         )
         # LOCATION FRAME
         loc_frame = tkk.Frame(root, style="my.TFrame", relief="sunken")

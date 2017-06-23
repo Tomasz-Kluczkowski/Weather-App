@@ -114,11 +114,12 @@ class WeatherApp(tk.Tk):
 
         # Widget styles.
         style = tkk.Style()
-        style.theme_use("default")
+        style.theme_use("winnative")
         # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
+                        borderwidth=0
                         )
 
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
@@ -174,7 +175,6 @@ class WeatherApp(tk.Tk):
 
         loc_combobox = tkk.Combobox(loc_frame,
                                     textvariable=self.v_link["var_loc"],
-                                    relief="sunken",
                                     font=("Arial", -18),
                                     width=70,
                                     values=["test1", "test2",
