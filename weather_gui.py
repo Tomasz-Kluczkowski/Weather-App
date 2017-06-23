@@ -255,8 +255,8 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
-            if (self.controller.data_present
-                and self.v_link["error_status"]) == 0:
+            if self.controller.data_present == 1 \
+                    and self.v_link["error_status"] == 0:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -275,8 +275,8 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
-            if (self.controller.data_present
-                and self.v_link["error_status"]) == 0:
+            if self.controller.data_present == 1\
+                    and self.v_link["error_status"] == 0:
                 self.display_report()
 
     def clear_error_message(self):
@@ -707,7 +707,7 @@ class WeatherApp(tk.Tk):
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
-                                                 self.date_conv(item["dt"])[1])
+                                               self.date_conv(item["dt"])[1])
             if previous_day_text == day_text:
                 pass
             else:
