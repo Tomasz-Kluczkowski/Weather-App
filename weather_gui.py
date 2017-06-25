@@ -699,7 +699,29 @@ class WeatherApp(tk.Tk):
         icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size \
                       + "-" + icon_color + "/"
 
-        # Date and day of the week and hours report was taken.
+        # Here we iterate through w_d_short dictionary to confirm on
+        # which days we have rain and/or snow to display their
+        # corresponding icons properly without overlapping.
+        rain_dates = {}
+        snow_dates = {}
+        previous_date = ""
+        for item in self.v_link[units]["w_d_short"]["list"]:
+
+            for name in ["rain", "snow"]:
+                try:
+                    if item[name]["3h"]:
+                        current_date = self.date_conv(item["dt"])[1]
+                        if current_date != previous_date:
+                            if name == "rain":
+                                rain_dates[current_date] = "rain"
+                            else:
+                                snow_dates[current_date] = "snow"
+                except KeyError:
+                    pass
+
+        print(rain_dates)
+        print(snow_dates)
+
         day = None
         previous_day_text = ""
         date_index = 0
@@ -727,12 +749,11 @@ class WeatherApp(tk.Tk):
         self.hr_wind_dir_icons = []
         """:type : list[CanvasImg]"""
 
+
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
                                                self.date_conv(item["dt"])[1])
-
-            
 
             if previous_day_text == day_text:
                 pass
