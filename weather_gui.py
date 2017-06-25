@@ -710,7 +710,9 @@ class WeatherApp(tk.Tk):
             for name in ["rain", "snow"]:
                 try:
                     if item[name]["3h"]:
-                        current_date = self.date_conv(item["dt"])[1]
+                        current_date = "{0:.3}, {1:.5}".format(
+                            self.date_conv(item["dt"])[0],
+                            self.date_conv(item["dt"])[1])
                         if current_date != previous_date:
                             if name == "rain":
                                 rain_dates[current_date] = "rain"
@@ -812,6 +814,29 @@ class WeatherApp(tk.Tk):
                               rel_obj=self.hr_wind_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
+                # Draw rain icon if phenomena present during the day.
+                if day_text in rain_dates:
+                    icon_path = icon_prefix + "rain" + ".png"
+                    self.hr_rain_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=self.hr_wind_dir_icons[-1],
+                                  rel_pos="BL", offset=(0, 0),
+                                  **hr_img_nw_cnf))
+
+                # Draw snow icon if phenomena present during the day.
+                if day_text in rain_dates:
+                    rel_obj_icon = self.hr_rain_icons[-1]
+                else:
+                    rel_obj_icon = self.hr_wind_dir_icons[-1]
+
+                if day_text in snow_dates:
+                    icon_path = icon_prefix + "snow" + ".png"
+                    self.hr_snow_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=rel_obj_icon,
+                                  rel_pos="BL", offset=(0, 0),
+                                  **hr_img_nw_cnf))
+
                 previous_day_text = day_text
                 date_index += 1
                 max_y = 0
@@ -900,14 +925,6 @@ class WeatherApp(tk.Tk):
             # Hourly Rain.
             try:
                 rain_text = "{0:.1f} mm/3h".format(item["rain"]["3h"])
-                # Only draw rain icon once in the entire day.
-                if not day_rain_present:
-                    icon_path = icon_prefix + "rain" + ".png"
-                    self.hr_rain_icons.append(
-                        CanvasImg(self.main_canvas, icon_path,
-                                  rel_obj=self.hr_wind_dir_icons[-1],
-                                  rel_pos="BC", offset=(0, 0),
-                                  **hr_img_n_cnf))
                 hr_rain = CanvasText(self.main_canvas,
                                      rel_obj=hr_wind_dir,
                                      rel_pos="BR",
@@ -929,25 +946,21 @@ class WeatherApp(tk.Tk):
             # Hourly Snow.
             try:
                 snow_text = "{0:.2f} mm/3h".format(item["snow"]["3h"])
-                # Only draw snow icon once in the entire day.
-                # If rain is also present, draw beneath it.
-                if day_rain_present:
-                    rel_obj_icon = self.hr_rain_icons[-1]
-                else:
-                    rel_obj_icon = self.hr_wind_dir_icons[-1]
-
+                # Check if rain present at the current hour.
                 if hr_rain_present:
                     rel_obj_text = hr_rain
-                else:
+                # Check if no rain present during entire day.
+                elif day_text not in rain_dates:
                     rel_obj_text = hr_wind_dir
-
-                if not day_snow_present:
-                    icon_path = icon_prefix + "snow" + ".png"
-                    self.hr_snow_icons.append(
-                        CanvasImg(self.main_canvas, icon_path,
-                                  rel_obj=rel_obj_icon,
-                                  rel_pos="BC", offset=(0, 0),
-                                  **hr_img_n_cnf))
+                # Snow is present at current hour but no rain.
+                # We have to offset the text so that it is below rain
+                # text.
+                else:
+                # TODO: rel+obj_text = hr_rain and this is the hr_rain
+                # TODO: that is before in previous column (hour) so we
+                # TODO: have to update the x_position to line up with
+                # TODO: the current column (to hr_wind_dir) - make a
+                # TODO: new method in the base class for that.
                 hr_snow = CanvasText(self.main_canvas,
                                      rel_obj=rel_obj_text,
                                      rel_pos="BR",
