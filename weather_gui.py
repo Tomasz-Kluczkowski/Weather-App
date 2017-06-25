@@ -13,12 +13,10 @@ from weather_backend import Report
 from controller import Controller
 
 
-# TODO: Have to add a combobox with selection of previous locations.
 # TODO: See if autocompletion is possible in the entry field.
-# TODO: Add a small button to open a selection list of previous
-# TODO: locations.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Fix rain / snow on same day / week possible !!!
 
 
 class WeatherApp(tk.Tk):
@@ -114,14 +112,12 @@ class WeatherApp(tk.Tk):
 
         # Widget styles.
         style = tkk.Style()
-        style.theme_use("winnative")
+        style.theme_use("vista")
         # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
-                        borderwidth=0
                         )
-
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
@@ -159,19 +155,8 @@ class WeatherApp(tk.Tk):
 
         # Location label.
         loc_label = tk.Label(loc_frame, text="Location name:", **label_cnf)
-        loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 4),
+        loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 5),
                        sticky=tk.NSEW)
-
-        # Location entry.
-        # loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
-        #                      **entry_cnf)
-        # loc_entry.focus()
-        # loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
-        #                sticky=tk.NSEW)
-        # loc_entry.bind("<Return>", lambda e: self.begin_get_report())
-        # loc_entry.bind("<Key>", lambda e: self.clear_error_message())
-
-        # Location combobox.
 
         loc_combobox = tkk.Combobox(loc_frame,
                                     textvariable=self.v_link["var_loc"],
@@ -180,11 +165,21 @@ class WeatherApp(tk.Tk):
                                     values=["test1", "test2",
                                             "test3"],
                                     style="my.TCombobox")
+
         loc_combobox.focus()
-        loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+        loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 6),
                           sticky=tk.NSEW)
         loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
         loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
+
+        # # Location entry.
+        # loc_entry = tk.Entry(loc_frame, textvariable=self.v_link["var_loc"],
+        #                      **entry_cnf)
+        # loc_entry.focus()
+        # loc_entry.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+        #                sticky=tk.NSEW)
+        # loc_entry.bind("<Return>", lambda e: self.begin_get_report())
+        # loc_entry.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
         self.search_img = tk.PhotoImage(
@@ -279,8 +274,8 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
 
-            if (self.controller.data_present
-                and self.v_link["error_status"]) == 0:
+            if self.controller.data_present == 1 \
+                    and self.v_link["error_status"] == 0:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -299,8 +294,8 @@ class WeatherApp(tk.Tk):
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
 
-            if (self.controller.data_present
-                and self.v_link["error_status"]) == 0:
+            if self.controller.data_present == 1 \
+                    and self.v_link["error_status"] == 0:
                 self.display_report()
 
     def clear_error_message(self):
@@ -478,10 +473,9 @@ class WeatherApp(tk.Tk):
 
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
-        self.main_canvas.bind_all("<MouseWheel>", self.mouse_wheel)
-
-        self.main_canvas.bind_all("<Up>", lambda e: self.move_canvas_up())
-        self.main_canvas.bind_all("<Down>", lambda e: self.move_canvas_down())
+        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
+        self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()
@@ -621,23 +615,25 @@ class WeatherApp(tk.Tk):
                             rel_pos="CR", offset=(5, 0),
                             text=clouds_text, font=h2, **clouds_cnf)
 
-        # Rain and snow.
-        # Assumption is that it never rains and snows at the same time.
-        for name in ["rain", "snow"]:
-            try:
-                rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
-                icon_path = icon_prefix + name + ".png"
-                self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
-                                               rel_obj=self.clouds_img,
-                                               rel_pos="BL", offset=(0, 4),
-                                               **img_nw_cnf)
-                rain_snow = CanvasText(self.main_canvas,
-                                       rel_obj=self.rain_snow_img,
-                                       rel_pos="CR", offset=(5, 0),
-                                       text=rain_snow_text, font=h2,
-                                       **cent_cnf)
-            except KeyError:
-                pass
+        # TODO: Never saw any data in the current weather regarding rain / snow.
+        # TODO: Check with some cold climate reports and delete this section.
+        # # Rain and snow.
+        # # Assumption is that it never rains and snows at the same time.
+        # for name in ["rain", "snow"]:
+        #     try:
+        #         rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
+        #         icon_path = icon_prefix + name + ".png"
+        #         self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
+        #                                        rel_obj=self.clouds_img,
+        #                                        rel_pos="BL", offset=(0, 4),
+        #                                        **img_nw_cnf)
+        #         rain_snow = CanvasText(self.main_canvas,
+        #                                rel_obj=self.rain_snow_img,
+        #                                rel_pos="CR", offset=(5, 0),
+        #                                text=rain_snow_text, font=h2,
+        #                                **cent_cnf)
+        #     except KeyError:
+        #         pass
 
         # Humidity.
         icon_path = icon_prefix + "humidity.png"
@@ -703,21 +699,48 @@ class WeatherApp(tk.Tk):
         icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size \
                       + "-" + icon_color + "/"
 
-        # Date and day of the week and hours report was taken.
+        # Here we iterate through w_d_short dictionary to confirm on
+        # which days we have rain and/or snow to display their
+        # corresponding icons properly without overlapping.
+        rain_dates = {}
+        snow_dates = {}
+        previous_date = ""
+        for item in self.v_link[units]["w_d_short"]["list"]:
+
+            for name in ["rain", "snow"]:
+                try:
+                    if item[name]["3h"]:
+                        current_date = "{0:.3}, {1:.5}".format(
+                            self.date_conv(item["dt"])[0],
+                            self.date_conv(item["dt"])[1])
+                        if current_date != previous_date:
+                            if name == "rain":
+                                rain_dates[current_date] = "rain"
+                            else:
+                                snow_dates[current_date] = "snow"
+                except KeyError:
+                    pass
+
+        print(rain_dates)
+        print(snow_dates)
+
         day = None
         previous_day_text = ""
         date_index = 0
-        hr_rain_snow = None
+        hr_rain = None
         day_y_offset = 0
         hr_x_offset = 0
         max_y = 0
-        rain_snow_present = 0
+        hr_rain_present = False
+        hr_snow_present = False
         self.hr_weather_icons = []
         self.hr_temp_icons = []
         """:type : list[CanvasImg]"""
         self.hr_pressure_icons = []
         """:type : list[CanvasImg]"""
-        self.hr_rain_snow_icons = []
+        self.hr_rain_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_snow_icons = []
         """:type : list[CanvasImg]"""
         self.hr_cloud_icons = []
         """:type : list[CanvasImg]"""
@@ -728,10 +751,12 @@ class WeatherApp(tk.Tk):
         self.hr_wind_dir_icons = []
         """:type : list[CanvasImg]"""
 
+
         for item in self.v_link[units]["w_d_short"]["list"]:
 
             day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
                                                self.date_conv(item["dt"])[1])
+
             if previous_day_text == day_text:
                 pass
             else:
@@ -789,10 +814,34 @@ class WeatherApp(tk.Tk):
                               rel_obj=self.hr_wind_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
+                # Draw rain icon if phenomena present during the day.
+                if day_text in rain_dates:
+                    icon_path = icon_prefix + "rain" + ".png"
+                    self.hr_rain_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=self.hr_wind_dir_icons[-1],
+                                  rel_pos="BL", offset=(0, 0),
+                                  **hr_img_nw_cnf))
+
+                # Draw snow icon if phenomena present during the day.
+                if day_text in rain_dates:
+                    rel_obj_icon = self.hr_rain_icons[-1]
+                else:
+                    rel_obj_icon = self.hr_wind_dir_icons[-1]
+
+                if day_text in snow_dates:
+                    icon_path = icon_prefix + "snow" + ".png"
+                    self.hr_snow_icons.append(
+                        CanvasImg(self.main_canvas, icon_path,
+                                  rel_obj=rel_obj_icon,
+                                  rel_pos="BL", offset=(0, 0),
+                                  **hr_img_nw_cnf))
+
                 previous_day_text = day_text
                 date_index += 1
                 max_y = 0
-                day_rain_present = 0
+                day_rain_present = False
+                day_snow_present = False
 
             # Hour.
             hour_text = self.time_conv(item["dt"])
@@ -873,45 +922,77 @@ class WeatherApp(tk.Tk):
             # hr_wind_dir.
             self.hr_wind_dir_icons[-1].move_rel_to_obj_y(hr_wind_dir)
 
-            # Hourly Rain / Snow.
-            for name in ["rain", "snow"]:
-                try:
-                    rain_snow_text = "{0:.1f} mm/3h".format(item[name]["3h"])
-                    # Only draw rain/snow icon once in the entire day.
-                    if day_rain_present == 0:
-                        icon_path = icon_prefix + name + ".png"
-                        self.hr_rain_snow_icons.append(
-                            CanvasImg(self.main_canvas, icon_path,
-                                      rel_obj=self.hr_wind_dir_icons[-1],
-                                      rel_pos="BC", offset=(0, 0),
-                                      **hr_img_n_cnf))
-                    hr_rain_snow = CanvasText(self.main_canvas,
-                                              rel_obj=hr_wind_dir,
-                                              rel_pos="BR",
-                                              offset=(-1, 10),
-                                              text=rain_snow_text, font=h4,
-                                              **hr_ne_cnf)
-                    # Update hr_rain_snow_icon y coordinate to center of
-                    # rain_snow.
-                    if day_rain_present == 0:
-                        self.hr_rain_snow_icons[-1].move_rel_to_obj_y(
-                            hr_rain_snow)
+            # Hourly Rain.
+            try:
+                rain_text = "{0:.1f} mm/3h".format(item["rain"]["3h"])
+                hr_rain = CanvasText(self.main_canvas,
+                                     rel_obj=hr_wind_dir,
+                                     rel_pos="BR",
+                                     offset=(-1, 10),
+                                     text=rain_text, font=h4,
+                                     **hr_ne_cnf)
+                # Update hr_rain_icon y coordinate to center of
+                # hr_rain.
+                if not day_rain_present:
+                    self.hr_rain_icons[-1].move_rel_to_obj_y(
+                        hr_rain)
 
-                    day_rain_present = 1
-                    rain_snow_present = 1
+                day_rain_present = True
+                hr_rain_present = True
 
-                except KeyError:
-                    pass
+            except KeyError:
+                pass
 
+            # Hourly Snow.
+            try:
+                snow_text = "{0:.2f} mm/3h".format(item["snow"]["3h"])
+                # Check if rain present at the current hour.
+                if hr_rain_present:
+                    rel_obj_text = hr_rain
+                # Check if no rain present during entire day.
+                elif day_text not in rain_dates:
+                    rel_obj_text = hr_wind_dir
+                # Snow is present at current hour but no rain.
+                # We have to offset the text so that it is below rain
+                # text.
+                else:
+                # TODO: rel+obj_text = hr_rain and this is the hr_rain
+                # TODO: that is before in previous column (hour) so we
+                # TODO: have to update the x_position to line up with
+                # TODO: the current column (to hr_wind_dir) - make a
+                # TODO: new method in the base class for that.
+                hr_snow = CanvasText(self.main_canvas,
+                                     rel_obj=rel_obj_text,
+                                     rel_pos="BR",
+                                     offset=(-1, 10),
+                                     text=snow_text, font=h4,
+                                     **hr_ne_cnf)
+                # Update hr_snow_icon y coordinate to center of
+                # hr_snow.
+                if not day_snow_present:
+                    self.hr_snow_icons[-1].move_rel_to_obj_y(
+                        hr_snow)
+
+                day_snow_present = True
+                hr_snow_present = True
+
+            except KeyError:
+                pass
+
+            # TODO: correct positioning of bottom including if rain and/or
+            # TODO: snow is present.
             # Get the maximum y coordinate present on the canvas.
-            if rain_snow_present:
-                cur_y = self.main_canvas.bbox(hr_rain_snow.id_num)[3]
+            if hr_snow_present:
+                cur_y = self.main_canvas.bbox(hr_snow.id_num)[3]
+            elif hr_rain_present:
+                cur_y = self.main_canvas.bbox(hr_rain.id_num)[3]
             else:
                 cur_y = self.main_canvas.bbox(hr_wind_dir.id_num)[3]
             if cur_y > max_y:
                 max_y = cur_y
 
-            rain_snow_present = 0
+            hr_snow_present = False
+            hr_rain_present = False
 
         self.update()
         self.main_canvas.config(
