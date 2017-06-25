@@ -731,6 +731,9 @@ class WeatherApp(tk.Tk):
 
             day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
                                                self.date_conv(item["dt"])[1])
+
+            
+
             if previous_day_text == day_text:
                 pass
             else:
@@ -904,15 +907,19 @@ class WeatherApp(tk.Tk):
 
             # Hourly Snow.
             try:
-                snow_text = "{0:.1f} mm/3h".format(item["snow"]["3h"])
+                snow_text = "{0:.2f} mm/3h".format(item["snow"]["3h"])
                 # Only draw snow icon once in the entire day.
                 # If rain is also present, draw beneath it.
                 if day_rain_present:
                     rel_obj_icon = self.hr_rain_icons[-1]
-                    rel_obj_text = hr_rain
                 else:
                     rel_obj_icon = self.hr_wind_dir_icons[-1]
+
+                if hr_rain_present:
+                    rel_obj_text = hr_rain
+                else:
                     rel_obj_text = hr_wind_dir
+
                 if not day_snow_present:
                     icon_path = icon_prefix + "snow" + ".png"
                     self.hr_snow_icons.append(
