@@ -956,6 +956,7 @@ class WeatherApp(tk.Tk):
                 # We have to offset the text so that it is below rain
                 # text.
                 else:
+                    pass
                 # TODO: rel+obj_text = hr_rain and this is the hr_rain
                 # TODO: that is before in previous column (hour) so we
                 # TODO: have to update the x_position to line up with
