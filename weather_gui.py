@@ -457,6 +457,7 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
+        # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
         # Take keyboard focus from loc_combobox if left mouse button
@@ -498,8 +499,6 @@ class WeatherApp(tk.Tk):
         h2 = ("Arial", -25)
         h3 = ("Arial", -20)
         h4 = ("Arial", -18)
-        # h5 = ("Arial", -12)
-        # h5_bold = ("Arial", -12, "bold")
 
         # Icon size and color.
         icon_color = "true-blue"
