@@ -110,9 +110,10 @@ class WeatherApp(tk.Tk):
         # GUI style definitions.
 
         # Widget styles.
+        # Themes: 'winnative', 'clam', 'alt', 'default',
+        # 'classic', 'vista', 'xpnative'
         style = tkk.Style()
         style.theme_use("vista")
-        # ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
@@ -121,8 +122,6 @@ class WeatherApp(tk.Tk):
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
-        entry_cnf = {"fg": "black", "bg": self.paper, "width": 80, "bd": 2,
-                     "font": self.font, "relief": "sunken"}
         clear_cnf = {"bg": self.lavender, "fg": "black",
                      "activebackground": self.dusty,
                      "activeforeground": self.paper, "padx": 2, "pady": 2,
@@ -206,8 +205,7 @@ class WeatherApp(tk.Tk):
         # Canvas frame to put canvas and scrollbar into.
         canvas_frame = tk.Frame(self, **frame_cnf)
         canvas_frame.grid(row=1, column=0, columnspan=5, padx=(2, 2),
-                          pady=(2, 2),
-                          sticky=tk.EW)
+                          pady=(2, 2), sticky=tk.EW)
         canvas_frame.columnconfigure(0, weight=4)
 
         # Main display area canvas.
@@ -461,8 +459,8 @@ class WeatherApp(tk.Tk):
         """
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
-        # Take keyboard focus from loc_combobox if mouse 1 clicked on
-        # yscrollbar or main_canvas.
+        # Take keyboard focus from loc_combobox if left mouse button
+        # clicked on yscrollbar or main_canvas.
         self.yscrollbar.bind(
             "<Button-1>", lambda e: self.yscrollbar.focus_set())
         self.main_canvas.bind(
@@ -486,7 +484,7 @@ class WeatherApp(tk.Tk):
 
         # Config parameters for hourly section.
         hr_w_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
-        hr_n_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
+        # hr_n_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
         hr_ne_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NE}
         hr_nw_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
         # hr_center_cnf = {"tags": "hourly", "fill": self.paper,
@@ -529,6 +527,7 @@ class WeatherApp(tk.Tk):
         """Link to access current weather data in controller."""
 
         # Title.
+        # Check if location called is a country. (Antarctic is not).
         try:
             country = ", " + cw_link["sys"]["country"]
         except KeyError:
@@ -616,26 +615,6 @@ class WeatherApp(tk.Tk):
         clouds = CanvasText(self.main_canvas, rel_obj=self.clouds_img,
                             rel_pos="CR", offset=(5, 0),
                             text=clouds_text, font=h2, **clouds_cnf)
-
-        # TODO: Never saw any data in the current weather regarding rain / snow.
-        # TODO: Check with some cold climate reports and delete this section.
-        # # Rain and snow.
-        # # Assumption is that it never rains and snows at the same time.
-        # for name in ["rain", "snow"]:
-        #     try:
-        #         rain_snow_text = "{0:.1f} mm/3h".format(cw_link[name]["3h"])
-        #         icon_path = icon_prefix + name + ".png"
-        #         self.rain_snow_img = CanvasImg(self.main_canvas, icon_path,
-        #                                        rel_obj=self.clouds_img,
-        #                                        rel_pos="BL", offset=(0, 4),
-        #                                        **img_nw_cnf)
-        #         rain_snow = CanvasText(self.main_canvas,
-        #                                rel_obj=self.rain_snow_img,
-        #                                rel_pos="CR", offset=(5, 0),
-        #                                text=rain_snow_text, font=h2,
-        #                                **cent_cnf)
-        #     except KeyError:
-        #         pass
 
         # Humidity.
         icon_path = icon_prefix + "humidity.png"
