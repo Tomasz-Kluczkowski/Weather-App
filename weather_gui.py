@@ -473,9 +473,9 @@ class WeatherApp(tk.Tk):
 
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
-        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
-        self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
-        self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
+        self.yscrollbar.bind("<MouseWheel>", self.mouse_wheel)
+        self.yscrollbar.bind("<Up>", lambda e: self.move_canvas_up())
+        self.yscrollbar.bind("<Down>", lambda e: self.move_canvas_down())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()
@@ -998,6 +998,7 @@ class WeatherApp(tk.Tk):
         self.update()
         self.main_canvas.config(
             scrollregion=self.main_canvas.bbox("main", "hourly"))
+        self.yscrollbar.focus()
 
 
 class HoverButton(tk.Button):
