@@ -16,6 +16,8 @@ from controller import Controller
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Reorganize folder structure and store database separately, debug info
+# TODO: separately etc.
 
 
 class WeatherApp(tk.Tk):
@@ -29,7 +31,7 @@ class WeatherApp(tk.Tk):
     Due to the nature of tkinter library we have to initialise a root
     Tk object to which StringVar type variables and all the GUI elements
     are connected. Since there can be only one Tk object we have to 
-    create the WeatherApp class object first (it inherits from 
+    create the WeatherApp class object first (it inherits from TK
     object) and then inside the class call Controller and Report
     classes. 
     Controller class will have access then to the same Tk object as the 
