@@ -20,7 +20,7 @@ from controller import Controller
 # TODO:  to a dictionary.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
 # TODO: Check why it crashes when warsaaw typed as location.
-# TODO: When krakow, pl used as loction - returns Srodmiescie as name.
+# TODO: When krakow, pl used as location - returns Srodmiescie as name.
 
 
 class WeatherApp(tk.Tk):
@@ -984,7 +984,8 @@ class WeatherApp(tk.Tk):
             except KeyError:
                 pass
 
-            # Get the maximum y coordinate present on the canvas.
+            # Get the maximum y coordinate of the lowest object present
+            #  on the canvas.
             if hr_snow_present:
                 cur_y = self.main_canvas.bbox(hr_snow.id_num)[3]
             elif hr_rain_present:
