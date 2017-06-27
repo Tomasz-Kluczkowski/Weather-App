@@ -15,9 +15,12 @@ from controller import Controller
 
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
+# TODO: Start using last call to build the list of current values for the
+# TODO: combobox to display in the listbox. Eliminate double entries - change
+# TODO:  to a dictionary.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Reorganize folder structure and store database separately, debug info
-# TODO: separately etc.
+# TODO: Check why it crashes when warsaaw typed as location.
+# TODO: When krakow, pl used as loction - returns Srodmiescie as name.
 
 
 class WeatherApp(tk.Tk):
@@ -159,19 +162,18 @@ class WeatherApp(tk.Tk):
         loc_label.grid(row=0, column=0, padx=(4, 4), pady=(4, 5),
                        sticky=tk.NSEW)
 
-        values_list = ["test1", "test2", "test3"]
-        loc_combobox = tkk.Combobox(loc_frame,
-                                    textvariable=self.v_link["var_loc"],
-                                    font=("Arial", -18),
-                                    width=75,
-                                    values=values_list,
-                                    style="my.TCombobox")
-
-        loc_combobox.focus()
-        loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 6),
-                          sticky=tk.NSEW)
-        loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
-        loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
+        self.loc_combobox = tkk.Combobox(loc_frame,
+                                         textvariable=self.v_link["var_loc"],
+                                         font=("Arial", -18),
+                                         width=75,
+                                         style="my.TCombobox",
+                                         postcommand=self.loc_postcommand,
+                                         )
+        self.loc_combobox.focus()
+        self.loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
+                               sticky=tk.NSEW)
+        self.loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
+        self.loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
         self.search_img = tk.PhotoImage(
@@ -453,6 +455,14 @@ class WeatherApp(tk.Tk):
         """
         self.main_canvas.yview_scroll(1, "units")
 
+    def loc_postcommand(self):
+        """Updates the list of items to display in the loc_combobox.
+        
+        Returns:
+            None
+        """
+        self.loc_combobox["values"] = self.v_link["api_calls"]
+
     def display_report(self):
         """Display results of the API call in the main_canvas.
 
@@ -462,12 +472,17 @@ class WeatherApp(tk.Tk):
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
+        self.main_canvas.yview_moveto(0.0)
         # Take keyboard focus from loc_combobox if left mouse button
-        # clicked on yscrollbar or main_canvas.
-        self.yscrollbar.bind(
-            "<Button-1>", lambda e: self.yscrollbar.focus_set())
-        self.main_canvas.bind(
-            "<Button-1>", lambda e: self.main_canvas.focus_set())
+        # clicked on yscrollbar or main_canvas or if escape pressed
+        #  when entering text in loc_combobox.
+        self.yscrollbar.bind("<Button-1>",
+                             lambda e: self.yscrollbar.focus_set())
+        self.main_canvas.bind("<Button-1>",
+                              lambda e: self.main_canvas.focus_set())
+        self.loc_combobox.bind("<Escape>",
+                               lambda e: self.main_canvas.focus_set())
+
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
         self.yscrollbar.bind("<MouseWheel>", self.mouse_wheel)
@@ -476,6 +491,12 @@ class WeatherApp(tk.Tk):
         self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
         self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
         self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
+        # Restore keyboard focus to loc_combobox when enter pressed in
+        # main_canvas or yscrollbar.
+        self.main_canvas.bind("<Return>",
+                              lambda e: self.loc_combobox.focus_set())
+        self.yscrollbar.bind("<Return>",
+                              lambda e: self.loc_combobox.focus_set())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()

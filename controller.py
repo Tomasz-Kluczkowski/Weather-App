@@ -35,8 +35,8 @@ class Controller(object):
                         the API was made.
                     local_time (str): String with local date / time 
                         when call to the API was made.
-                    :last_call (list): Contains location parameter of
-                        last successful call to the API.
+                    :api_calls (list): List of locations with successful 
+                        calls to the API in current session.
                     :metric (dict): Contains dictionaries with weather
                         data in metric system.
                     :imperial (dict): Contains dictionaries with weather
@@ -68,11 +68,12 @@ class Controller(object):
                          "error_status": 0,
                          "time": "",
                          "local_time": "",
-                         "last_call": [],
+                         "api_calls": [],
                          "metric": {},
                          "imperial": {},
                          "timezone": {}
                          }
+        """:type : dict[str, any]"""
 
         self.debug = 0
         self.draw_lines = 0
@@ -162,7 +163,7 @@ class Controller(object):
         if self.app_data["error_status"] == -1:
             self.display_error(data[1])
         else:
-            # Clear any error status and message upon successful
+            # Clear any error status message upon successful
             # response from API.
             self.app_data["var_status"].set("")
             self.app_data["error_message"] = ""
@@ -171,6 +172,7 @@ class Controller(object):
             # dictionary.
             self.app_data["metric"] = data[1][0]["metric"]
             self.app_data["imperial"] = data[1][1]["imperial"]
+
             # Obtain timezone for geolocation.
             cw_link = self.app_data["metric"]["w_d_cur"]
             """:type : dict"""
@@ -179,7 +181,20 @@ class Controller(object):
             lon = cw_link["coord"]["lon"]
             self.get_timezone(lat, lon)
             self.data_present = 1
-            self.app_data["last_call"].append(self.app_data["var_loc"])
+
+            # Store location name of a successful call to the API
+            #  in api_calls.
+            # Check if location called is a country. (Antarctic
+            # is not).
+            try:
+                country = ", " + cw_link["sys"]["country"]
+            except KeyError:
+                country = ""
+            location = "{0}{1}".format(cw_link["name"], country)
+            if location not in self.app_data["api_calls"]:
+                self.app_data["api_calls"].append(location)
+            print(self.app_data["api_calls"])
+
             # Current date & time.
             date = datetime.datetime.now()
             self.app_data["time"] = date.strftime("%H:%M  %d/%m/%Y")
