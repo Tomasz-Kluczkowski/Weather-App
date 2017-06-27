@@ -69,10 +69,10 @@ class Report(object):
 
                 return status
             else:
-                with open("time_zone", "w") as file:
+                with open("Debug\\time_zone", "w") as file:
                     json.dump(time_zone, file)
         else:
-            with open("time_zone", "r") as file:
+            with open("Debug\\time_zone", "r") as file:
                 time_zone = json.load(file)
 
         status = (0, time_zone)
@@ -135,7 +135,7 @@ class Report(object):
                                                 format(report_type, location,
                                                        units_prefix
                                                        + unit_type)
-                                                       + api_key)
+                                                + api_key)
                     except requests.exceptions.ConnectionError:
                         status = (-1,
                                   "Unable to establish internet connection."
@@ -153,10 +153,11 @@ class Report(object):
                         return status
                     else:
                         unit_dict[unit_type][key] = weather_dict
-                        with open(unit_type + "_" + key, "w") as file:
+                        with open("Debug\\" + unit_type
+                                  + "_" + key, "w") as file:
                             json.dump(weather_dict, file)
                 else:
-                    with open(unit_type + "_" + key, "r") as file:
+                    with open("Debug\\" + unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
 
         status = (0, unit_dicts)
