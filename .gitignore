@@ -91,10 +91,10 @@ ENV/
 
 # Rope project settings
 .ropeproject
-/time_zone
-/imperial_w_d_short
-/metric_w_d_cur
-/metric_w_d_long
-/metric_w_d_short
-/imperial_w_d_cur
-/imperial_w_d_long
+/Debug/imperial_w_d_short
+/Debug/metric_w_d_cur
+/Debug/metric_w_d_short
+/Debug/imperial_w_d_cur
+/Debug/time_zone
+/Debug/imperial_w_d_long
+/Debug/metric_w_d_long
