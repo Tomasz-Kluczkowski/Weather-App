@@ -15,12 +15,9 @@ from controller import Controller
 
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Start using last call to build the list of current values for the
-# TODO: combobox to display in the listbox. Eliminate double entries - change
-# TODO:  to a dictionary.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
 # TODO: Check why it crashes when warsaaw typed as location.
-# TODO: When krakow, pl used as loction - returns Srodmiescie as name.
+# TODO: When krakow, pl used as location - returns Srodmiescie as name.
 
 
 class WeatherApp(tk.Tk):
