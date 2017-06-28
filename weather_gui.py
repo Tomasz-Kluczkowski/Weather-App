@@ -16,8 +16,6 @@ from controller import Controller
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
-# TODO: Check why it crashes when warsaaw typed as location.
-# TODO: When krakow, pl used as location - returns Srodmiescie as name.
 
 
 class WeatherApp(tk.Tk):
@@ -161,7 +159,7 @@ class WeatherApp(tk.Tk):
 
         self.loc_combobox = tkk.Combobox(loc_frame,
                                          textvariable=self.v_link["var_loc"],
-                                         font=("Arial", -18),
+                                         font=self.font,
                                          width=75,
                                          style="my.TCombobox",
                                          postcommand=self.loc_postcommand,
@@ -546,7 +544,7 @@ class WeatherApp(tk.Tk):
         """Link to access current weather data in controller."""
 
         # Title.
-        # Check if location called is a country. (Antarctic is not).
+        # Check if location called is in a country. (Antarctic is not).
         try:
             country = ", " + cw_link["sys"]["country"]
         except KeyError:
@@ -710,9 +708,9 @@ class WeatherApp(tk.Tk):
             for name in ["rain", "snow"]:
                 try:
                     if item[name]["3h"]:
+                        date = self.date_conv(item["dt"])
                         current_date = "{0:.3}, {1:.5}".format(
-                            self.date_conv(item["dt"])[0],
-                            self.date_conv(item["dt"])[1])
+                            date[0], date[1])
                         if current_date != previous_date:
                             if name == "rain":
                                 rain_dates[current_date] = "rain"

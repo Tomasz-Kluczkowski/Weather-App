@@ -193,7 +193,6 @@ class Controller(object):
             location = "{0}{1}".format(cw_link["name"], country)
             if location not in self.app_data["api_calls"]:
                 self.app_data["api_calls"].append(location)
-            print(self.app_data["api_calls"])
 
             # Current date & time.
             date = datetime.datetime.now()
