@@ -47,6 +47,8 @@ class Report(object):
                 after a successful call to the API.
         """
         base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
+        # Please register your unique user name at:
+        # www.geonames.org/login
         user_name = "tomasz_kluczkowski"
         if self.controller.debug == 0:
             try:
@@ -142,10 +144,7 @@ class Report(object):
                                   " Please connect to the internet.")
                         return status
                     weather_dict = response.json()
-                    # Had to add int(weather_dict["cod"]) as the output
-                    # from API is int (for current) /
-                    # string (for longer forecasts).
-                    if int(weather_dict["cod"]) != 200:
+                    if response.status_code != 200:
                         status = (-1,
                                   "Error: {0}, {1}".format(weather_dict["cod"],
                                                            weather_dict[

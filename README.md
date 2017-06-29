@@ -10,8 +10,14 @@ Internet communication library: requests v. 2.13.0.
 
 The APIs used for this project:
  
- https://openweathermap.org/api - weather data
- http://api.geonames.org/timezone - time zone from geolocation service
+https://openweathermap.org/api - weather data
+Please obtain your unique API key at:
+https://home.openweathermap.org/users/sign_up
+
+http://api.geonames.org/timezone - time zone from geolocation service
+Please register your unique user name at:
+www.geonames.org/login
+
 
 I created this simple application to apply in practice knowledge gained in the past months of learning Python 3 and give myself a challenge and coding exercise which does not end after writing one algorithm.
 
@@ -26,6 +32,7 @@ Still the View is not aware in any way of the Model and vice versa.
 Architecture which I will try to implement: Model-View-Adapter (Mediating-Controller).
 
 Due to that some naming conventions have to be established and kept at all times to allow us to quickly, at a glance be able to get the meaning of the call without digging deep into the code.
+
 
 Naming convention for actions which will be passed between the View - Controller and Model:
     
@@ -59,9 +66,12 @@ finish_get_report:
                     "imperial": [{w_d_cur}, {w_d_short}, {w_d_long}]
                    } 
       
+If you wish you can use the debug option by enabling it in the controller
+attributes (switch self.debug to 1). This will load data saved in Debug
+folder instead of contacting the API for it. Still you have to make at least
+one call to have the data in the first place.
 
-
-
-
-
-    
+To help placing objects on the canvas one can enable drawing alignment lines
+on the canvas. Switch self.draw_lines to 1 in the controller attributes.
+The vertical / horizontal lines have to be turned on / off by commenting
+code in gui (look for self.controller.draw_lines ==).
