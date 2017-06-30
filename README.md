@@ -11,10 +11,12 @@ Internet communication library: requests v. 2.13.0.
 The APIs used for this project:
  
 https://openweathermap.org/api - weather data
+
 Please obtain your unique API key at:
 https://home.openweathermap.org/users/sign_up
 
 http://api.geonames.org/timezone - time zone from geolocation service
+
 Please register your unique user name at:
 www.geonames.org/login
 

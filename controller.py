@@ -75,9 +75,9 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 0
+        self.debug = 1
         self.draw_lines = 0
-        self.view = None
+        # self.view = None
         self.model = None
         self.data_present = 0
 
@@ -129,8 +129,59 @@ class Controller(object):
         else:
             self.app_data["timezone"] = data[1]
 
-    def display_error(self, error):
+    def get_time(self, unix_time, dst_offset):
+        """Contacts model to obtain time converted from unix format to
+        human readable one. 
+        
+        Args:
+            dst_offset: (bool) Set to True to offset time received from
+                open weather API by daylight savings time.
+            unix_time (int): Time given in seconds from beginning of the
+                epoch as on unix machines.
+
+        Returns:
+            time (str): Time in Hour:Minute format.
         """
+        time = self.model.finish_get_time(unix_time, dst_offset)
+
+        return time
+
+    def get_date(self, unix_time, dst_offset):
+        """Contact model to convert date from unix time to string.
+
+                Args:
+                    dst_offset: (bool) Set to True to offset time received from
+                        open weather API by daylight savings time.
+                    unix_time (int): Time given in seconds from beginning of the
+                        epoch as on unix machines.
+
+                Returns:
+                    name_of_day (str): Name of the day on date.
+                    date_str (str): Date in string representation.
+                """
+        name_of_day, date_str = self.model.finish_get_date(unix_time,
+                                                           dst_offset)
+
+        return name_of_day, date_str
+
+    def deg_conv(self, wind_dir_deg):
+        """Contacts model to convert meteorological degrees to
+                cardinal directions.
+
+                Args:
+                    wind_dir_deg (float): Wind direction in meteorological 
+                        degrees.
+
+                Returns:
+                    wind_dir_cardinal (str): Wind direction in cardinal 
+                        direction.
+                """
+        wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
+
+        return wind_dir_cardinal
+
+    def display_error(self, error):
+        """Updates the View to display error.
         
         Args:
             error (dict): Dictionary containing error data from the API.

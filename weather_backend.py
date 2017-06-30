@@ -2,11 +2,12 @@ import requests
 import string
 import datetime
 import json
+import calendar
 
 
 class Report(object):
-    """This class will be used to call Open Weather API and gather 
-    data for displaying in the GUI.
+    """This class will be used to call APIs, gather 
+    and modify data for displaying in the GUI.
        
     Inherits from Python base object. This is our Model. 
     Model is allowed to directly communicate only with the Controller. 
@@ -18,8 +19,6 @@ class Report(object):
     # TODO: in  the past
     # TODO: This should only be passed to the database if the response
     # TODO: from the API is 200 (valid location was entered)
-    # TODO: Have to add then a combobox/list (?) with selection of
-    # TODO: previous locations or replace entry box with combobox.
 
     def __init__(self, controller):
         """Initialize Report class.
@@ -28,9 +27,14 @@ class Report(object):
             controller (Controller): controller object which will 
             store all the data required by each segment of the 
             application.
+        
+        :Attributes:
+        :v_link (dict): Link to access variables in controller.
+        
         """
 
         self.controller = controller
+        self.v_link = self.controller.app_data
 
     def finish_get_timezone(self, lat, lon):
         """
@@ -161,3 +165,83 @@ class Report(object):
 
         status = (0, unit_dicts)
         return status
+
+    def finish_get_time(self, unix_time, dst_offset):
+        """Converts time from unix format to a human readable one.
+
+        Args:
+            dst_offset: (bool) Set to True to offset time received from
+                open weather API by daylight savings time.
+            unix_time (int): Time given in seconds from beginning of the
+                epoch as on unix machines.
+
+        Returns:
+            time (str): Time in Hour:Minute format.
+        """
+        if dst_offset:
+            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
+        else:
+            dst_offset = 0
+        time = datetime.datetime.utcfromtimestamp(
+            unix_time + dst_offset).strftime("%H:%M")
+
+        return time
+
+    def finish_get_date(self, unix_time, dst_offset):
+        """Converts date from unix time to string.
+
+        Args:
+            dst_offset: (bool) Set to True to offset time received from
+                open weather API by daylight savings time.
+            unix_time (int): Time given in seconds from beginning of the
+                epoch as on unix machines.
+
+        Returns:
+            name_of_day (str): Name of the day on date.
+            date_str (str): Date in string representation.
+        """
+
+        if dst_offset:
+            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
+        else:
+            dst_offset = 0
+
+        date = datetime.datetime.utcfromtimestamp(unix_time + dst_offset)
+        date_str = date.strftime("%d/%m/%Y")
+        name_of_day = calendar.day_name[date.weekday()]
+
+        return name_of_day, date_str
+
+    @staticmethod
+    def finish_deg_conv(wind_dir_deg):
+        """Converts meteorological degrees to cardinal directions.
+
+        Args:
+            wind_dir_deg (float): Wind direction in meteorological 
+                degrees.
+
+        Returns:
+            wind_dir_cardinal (str): Wind direction in cardinal 
+                direction.
+        """
+        directions = {(348.75, 360): "N",
+                      (0, 11.25): "N",
+                      (11.25, 33.75): "NNE",
+                      (33.75, 56.25): "NE",
+                      (56.25, 78.75): "ENE",
+                      (78.75, 101.25): "E",
+                      (101.25, 123.75): "ESE",
+                      (123.75, 146.25): "SE",
+                      (146.25, 168.75): "SSE",
+                      (168.75, 191.25): "S",
+                      (191.25, 213.75): "SSW",
+                      (213.75, 236.25): "SW",
+                      (236.25, 258.75): "WSW",
+                      (258.75, 281.25): "W",
+                      (281.25, 303.75): "WNW",
+                      (303.75, 326.25): "NW",
+                      (326.25, 348.75): "NNW"}
+
+        for interval, wind_dir_cardinal in directions.items():
+            if interval[0] <= wind_dir_deg < interval[1]:
+                return wind_dir_cardinal

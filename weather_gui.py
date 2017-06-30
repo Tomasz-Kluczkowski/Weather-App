@@ -81,7 +81,9 @@ class WeatherApp(tk.Tk):
         self.v_link = self.controller.app_data
 
         # Add main application instance as a View to the Controller.
-        self.controller.add_view(self)
+        # At this stage since we use self updating special tkinter
+        # variables we do not need to call on the view for updates.
+        # self.controller.add_view(self)
 
         # Create a Report object for backend operations.
         report = Report(self.controller)
@@ -299,8 +301,9 @@ class WeatherApp(tk.Tk):
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
 
-    def time_conv(self, unix_time, dst_offset=True):
-        """Converts time from unix format to a human readable one.
+    def begin_get_time(self, unix_time, dst_offset=True):
+        """Contact controller to convert time from unix format to a human 
+        readable one.
 
         Args:
             dst_offset: (bool) Set to True to offset time received from
@@ -311,17 +314,12 @@ class WeatherApp(tk.Tk):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-        if dst_offset:
-            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
-        else:
-            dst_offset = 0
-        time = datetime.datetime.utcfromtimestamp(
-            unix_time + dst_offset).strftime("%H:%M")
+        time = self.controller.get_time(unix_time, dst_offset)
 
         return time
 
-    def date_conv(self, unix_time, dst_offset=True):
-        """Converts date from unix time to string.
+    def begin_get_date(self, unix_time, dst_offset=True):
+        """Contact controller to convert date from unix time to string.
 
         Args:
             dst_offset: (bool) Set to True to offset time received from
@@ -334,14 +332,7 @@ class WeatherApp(tk.Tk):
             date_str (str): Date in string representation.
         """
 
-        if dst_offset:
-            dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
-        else:
-            dst_offset = 0
-
-        date = datetime.datetime.utcfromtimestamp(unix_time + dst_offset)
-        date_str = date.strftime("%d/%m/%Y")
-        name_of_day = calendar.day_name[date.weekday()]
+        name_of_day, date_str = self.controller.get_date(unix_time, dst_offset)
 
         return name_of_day, date_str
 
@@ -372,9 +363,9 @@ class WeatherApp(tk.Tk):
             if interval[0] <= hours < interval[1]:
                 return hr_x_offset
 
-    @staticmethod
-    def deg_conv(wind_dir_deg):
-        """Converts meteorological degrees to cardinal directions.
+    def begin_deg_conv(self, wind_dir_deg):
+        """Contacts controller to convert meteorological degrees to
+        cardinal directions.
         
         Args:
             wind_dir_deg (float): Wind direction in meteorological 
@@ -384,27 +375,9 @@ class WeatherApp(tk.Tk):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-        directions = {(348.75, 360): "N",
-                      (0, 11.25): "N",
-                      (11.25, 33.75): "NNE",
-                      (33.75, 56.25): "NE",
-                      (56.25, 78.75): "ENE",
-                      (78.75, 101.25): "E",
-                      (101.25, 123.75): "ESE",
-                      (123.75, 146.25): "SE",
-                      (146.25, 168.75): "SSE",
-                      (168.75, 191.25): "S",
-                      (191.25, 213.75): "SSW",
-                      (213.75, 236.25): "SW",
-                      (236.25, 258.75): "WSW",
-                      (258.75, 281.25): "W",
-                      (281.25, 303.75): "WNW",
-                      (303.75, 326.25): "NW",
-                      (326.25, 348.75): "NNW"}
+        wind_dir_cardinal = self.controller.deg_conv(wind_dir_deg)
 
-        for interval, wind_dir_cardinal in directions.items():
-            if interval[0] <= wind_dir_deg < interval[1]:
-                return wind_dir_cardinal
+        return wind_dir_cardinal
 
     def begin_get_report(self):
         """Begin getting data for the weather report to display it on 
@@ -665,7 +638,7 @@ class WeatherApp(tk.Tk):
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4),
                                       **img_nw_cnf)
-        wind_dir_text = "{0}".format(self.deg_conv(cw_link["wind"]["deg"]))
+        wind_dir_text = "{0}".format(self.begin_deg_conv(cw_link["wind"]["deg"]))
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
@@ -675,7 +648,8 @@ class WeatherApp(tk.Tk):
         self.sunrise_img = CanvasImg(self.main_canvas, icon_path,
                                      coordinates=(670, max_temp_bounds[1]),
                                      offset=(0, 0), **img_nw_cnf)
-        sunrise_text = "{0}".format(self.time_conv(cw_link["sys"]["sunrise"]))
+        sunrise_text = "{0}".format(
+            self.begin_get_time(cw_link["sys"]["sunrise"]))
         sunrise = CanvasText(self.main_canvas, rel_obj=self.sunrise_img,
                              rel_pos="CR", offset=(5, 0),
                              text=sunrise_text, font=h2, **cent_cnf)
@@ -685,7 +659,8 @@ class WeatherApp(tk.Tk):
         self.sunset_img = CanvasImg(self.main_canvas, icon_path,
                                     rel_obj=self.sunrise_img, rel_pos="BL",
                                     offset=(0, 4), **img_nw_cnf)
-        sunset_text = "{0}".format(self.time_conv(cw_link["sys"]["sunset"]))
+        sunset_text = "{0}".format(
+            self.begin_get_time(cw_link["sys"]["sunset"]))
         sunset = CanvasText(self.main_canvas, rel_obj=self.sunset_img,
                             rel_pos="CR", offset=(5, 0),
                             text=sunset_text, font=h2, **cent_cnf)
@@ -709,7 +684,7 @@ class WeatherApp(tk.Tk):
             for name in ["rain", "snow"]:
                 try:
                     if item[name]["3h"]:
-                        date = self.date_conv(item["dt"])
+                        date = self.begin_get_date(item["dt"])
                         current_date = "{0:.3}, {1:.5}".format(
                             date[0], date[1])
                         if current_date != previous_date:
@@ -752,8 +727,8 @@ class WeatherApp(tk.Tk):
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 
-            day_text = "{0:.3}, {1:.5}".format(self.date_conv(item["dt"])[0],
-                                               self.date_conv(item["dt"])[1])
+            day_text = "{0:.3}, {1:.5}".format(self.begin_get_date(item["dt"])[0],
+                                               self.begin_get_date(item["dt"])[1])
 
             if previous_day_text == day_text:
                 pass
@@ -842,7 +817,7 @@ class WeatherApp(tk.Tk):
                 day_snow_present = False
 
             # Hour.
-            hour_text = self.time_conv(item["dt"])
+            hour_text = self.begin_get_time(item["dt"])
             hr_x_offset = self.calculate_hr_x_offset(hour_text)
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(130 + hr_x_offset * 115, 0),
@@ -910,7 +885,7 @@ class WeatherApp(tk.Tk):
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
 
             # Hourly wind direction.
-            hr_wind_dir_text = "{0}".format(self.deg_conv(item["wind"]["deg"]))
+            hr_wind_dir_text = "{0}".format(self.begin_deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
                                      rel_pos="BR",
                                      offset=(-1, 5),
@@ -1195,7 +1170,6 @@ class CanvasObject(object):
 
         Returns:
             None
-
         """
         # Find y coordinate of the center of rel_obj.
         r_x1, r_y1, r_x2, r_y2 = self.canvas.bbox(rel_obj.id_num)
