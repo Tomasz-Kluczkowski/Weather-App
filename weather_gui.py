@@ -13,8 +13,7 @@ from weather_backend import Report
 from controller import Controller
 
 
-# TODO: Move data manipulations on time/date/deg to the backend(model).
-# TODO: See if autocompletion is possible in the entry field.
+# TO333DO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
 
