@@ -36,6 +36,7 @@ class Report(object):
 
         self.controller = controller
         self.v_link = self.controller.app_data
+        # Establish database connection.
         self.conn = sqlite3.connect("Data\\locations.db")
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations(location "
