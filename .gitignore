@@ -98,3 +98,4 @@ ENV/
 /Debug/time_zone
 /Debug/imperial_w_d_long
 /Debug/metric_w_d_long
+/test.db

@@ -31,6 +31,8 @@ class Report(object):
         
         :Attributes:
         :v_link (dict): Link to access variables in controller.
+        :conn (sqlite3.Connection): Database object
+        :cur (sqlite3.Cursor): Database cursor.
         
         """
 
@@ -39,8 +41,9 @@ class Report(object):
         # Establish database connection.
         self.conn = sqlite3.connect("Data\\locations.db")
         self.cur = self.conn.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS locations(location "
-                         "text, num_of_calls INTEGER)")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
+                         "Location TEXT NOT NULL UNIQUE, "
+                         "Num_of_calls INT NOT NULL)")
         self.conn.commit()
 
     def finish_get_timezone(self, lat, lon):
@@ -253,7 +256,7 @@ class Report(object):
             if interval[0] <= wind_dir_deg < interval[1]:
                 return wind_dir_cardinal
 
-    def insert(self, title, author, year, isbn):
+    def insert(self, location):
         self.cur.execute("INSERT INTO book VALUES (NULL, ?, ?, ?, ?)", (title, author, year, isbn))
         self.conn.commit()
 
