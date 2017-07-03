@@ -39,11 +39,11 @@ class Report(object):
         self.controller = controller
         self.v_link = self.controller.app_data
         # Establish database connection.
-        self.conn = sqlite3.connect("Data\\locations.db")
+        self.conn = sqlite3.connect("Database\\locations.db")
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
                          "Location TEXT NOT NULL UNIQUE, "
-                         "Num_of_calls INT NOT NULL)")
+                         "Num_of_calls INT NOT NULL DEFAULT 0)")
         self.conn.commit()
 
     def finish_get_timezone(self, lat, lon):
@@ -173,6 +173,30 @@ class Report(object):
                     with open("Debug\\" + unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
 
+        # # Store location name of a successful call to the API
+        # #  in api_calls.
+        # # Check if location called is a country. (Antarctic
+        # # is not).
+        # cw_link = self.controller.app_data["metric"]["w_d_cur"]
+        #
+        # try:
+        #     country = ", " + cw_link["sys"]["country"]
+        # except KeyError:
+        #     country = ""
+        # location = "{0}{1}".format(cw_link["name"], country)
+        # self.insert(location)
+        # if location not in self.controller.app_data["api_calls"]:
+        #     self.controller.app_data["api_calls"].append(location)
+        #
+        # # Current date & time.
+        # date = datetime.datetime.now()
+        # self.controller.app_data["time"] = date.strftime("%H:%M  %d/%m/%Y")
+        # local_date = date + datetime.timedelta(
+        #     hours=self.controller.app_data["timezone"]["rawOffset"])
+        # self.controller.app_data["local_time"] = local_date.strftime(
+        #     "%H:%M  %d/%m/%Y")
+        # # Now we are ready do display the report.
+
         status = (0, unit_dicts)
         return status
 
@@ -257,7 +281,13 @@ class Report(object):
                 return wind_dir_cardinal
 
     def insert(self, location):
-        self.cur.execute("INSERT INTO book VALUES (NULL, ?, ?, ?, ?)", (title, author, year, isbn))
+        try:
+            self.cur.execute("INSERT INTO locations (Location) VALUES (?)",
+                             (location,))
+        except sqlite3.IntegrityError:
+            print("already in the table") # remove after tests
+        self.cur.execute("UPDATE locations SET Num_of_calls"
+                         " = Num_of_calls + 1 WHERE Location = ?", (location,))
         self.conn.commit()
 
     def view(self):

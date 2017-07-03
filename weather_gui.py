@@ -5,8 +5,6 @@
 
 import tkinter as tk
 import tkinter.ttk as tkk
-import datetime
-import calendar
 # import PIL
 from PIL import Image, ImageTk
 from weather_backend import Report

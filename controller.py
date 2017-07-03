@@ -242,6 +242,7 @@ class Controller(object):
             except KeyError:
                 country = ""
             location = "{0}{1}".format(cw_link["name"], country)
+            self.model.insert(location)
             if location not in self.app_data["api_calls"]:
                 self.app_data["api_calls"].append(location)
 
