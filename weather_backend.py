@@ -172,6 +172,8 @@ class Report(object):
                 else:
                     with open("Debug\\" + unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
+        status = (0, unit_dicts)
+        return status
 
         # # Store location name of a successful call to the API
         # #  in api_calls.
@@ -197,8 +199,6 @@ class Report(object):
         #     "%H:%M  %d/%m/%Y")
         # # Now we are ready do display the report.
 
-        status = (0, unit_dicts)
-        return status
 
     def finish_get_time(self, unix_time, dst_offset):
         """Converts time from unix format to a human readable one.
