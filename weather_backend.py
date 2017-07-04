@@ -46,20 +46,96 @@ class Report(object):
                          "Num_of_calls INT NOT NULL DEFAULT 0)")
         self.conn.commit()
 
-    def finish_get_timezone(self, lat, lon):
-        """
+    def finish_get_report(self, location):
+        """Obtain data in json format from Open Weather and store it 
+        in appropriate dictionaries.
 
         Args:
-            lat (float): Latitude
-            lon (float): Longitude
+            location (str): String containing location typed into  
+            loc_entry by the user.
 
         Returns:
-             Status (tuple):, first item is the error status 
+            Status (tuple), first item is the error status 
                 (-1 means error / 0 means all ok).
-                Second item is an error message in case of an exception
-                or time_zone (dict) - Timezone data for geolocation 
-                after a successful call to the API.
+                Second item is an error message in case of an exception or
+                weather_dicts - list of dictionaries with all weather reports.
         """
+        v_link = self.controller.app_data
+        """:type : dict[str, any]"""
+        """Link to variables in controller."""
+
+        # We must remove any gibberish from location string before
+        # making a call to the API.
+        # For this translate function is the best tool.
+        punctuation = string.punctuation
+        translator = str.maketrans("", "", punctuation)
+        location = location.translate(translator)
+
+        # Get dictionaries.
+        data = self.open_weather_api(location)
+
+        # We expect a tuple returning from finish_get_report. Item 0
+        # contains error status.
+        v_link["error_status"] = data[0]
+
+        # Error handling.
+        if v_link["error_status"] == -1:
+            self.controller.display_error(data[1])
+        else:
+            # Clear any error status message upon successful
+            # response from API.
+            v_link["var_status"].set("")
+            v_link["error_message"] = ""
+
+            # Copy dictionaries from data into metric and imperial
+            # dictionary.
+            v_link["metric"] = data[1][0]["metric"]
+            v_link["imperial"] = data[1][1]["imperial"]
+
+            # Obtain timezone for geolocation.
+            cw_link = self.controller.app_data["metric"]["w_d_cur"]
+            """:type : dict"""
+            """Link to access current weather data in controller."""
+            lat = cw_link["coord"]["lat"]
+            lon = cw_link["coord"]["lon"]
+
+            # Get time zone data.
+            data = self.geonames_api(lat, lon)
+            # We expect a tuple returning from finish_get_report.
+            # Item 0 contains error status.
+            v_link["error_status"] = data[0]
+            # Error handling.
+            if v_link["error_status"] == -1:
+                self.controller.display_error(data[1])
+            else:
+                v_link["timezone"] = data[1]
+
+            self.controller.data_present = 1
+
+            # Store location name of a successful call to the API
+            #  in api_calls.
+            # Check if location called is a country. (Antarctic
+            # is not).
+            try:
+                country = ", " + cw_link["sys"]["country"]
+            except KeyError:
+                country = ""
+            location = "{0}{1}".format(cw_link["name"], country)
+            self.insert(location)
+            if location not in v_link["api_calls"]:
+                v_link["api_calls"].append(location)
+
+            # Current date & time.
+            date = datetime.datetime.now()
+            v_link["time"] = date.strftime("%H:%M  %d/%m/%Y")
+            local_date = date + datetime.timedelta(
+                hours=v_link["timezone"]["rawOffset"])
+            v_link["local_time"] = local_date.strftime(
+                "%H:%M  %d/%m/%Y")
+            # Now we are ready do display the report.
+
+    def geonames_api(self, lat, lon):
+
         base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
         # Please register your unique user name at:
         # www.geonames.org/login
@@ -94,20 +170,7 @@ class Report(object):
         status = (0, time_zone)
         return status
 
-    def finish_get_report(self, location):
-        """Obtain data in json format from Open Weather and store it 
-        in appropriate dictionaries.
-
-        Args:
-            location (str): String containing location typed into  
-            loc_entry by the user.
-
-        Returns:
-            Status (tuple), first item is the error status 
-                (-1 means error / 0 means all ok).
-                Second item is an error message in case of an exception or
-                weather_dicts - list of dictionaries with all weather reports.
-        """
+    def open_weather_api(self, location):
 
         # Key obtained from Open Weather. Required to make any calls
         # to their API.
@@ -121,13 +184,6 @@ class Report(object):
         # {2} - space for units.
 
         base_url = "http://api.openweathermap.org/data/2.5/{0}?q={1}{2}&APPID="
-
-        # We must remove any gibberish from location string before
-        # making a call to the API.
-        # For this translate function is the best tool.
-        punctuation = string.punctuation
-        translator = str.maketrans("", "", punctuation)
-        location = location.translate(translator)
 
         # Prefix required to let API know what units are requested by
         # the user.
@@ -174,31 +230,6 @@ class Report(object):
                         unit_dict[unit_type][key] = json.load(file)
         status = (0, unit_dicts)
         return status
-
-        # # Store location name of a successful call to the API
-        # #  in api_calls.
-        # # Check if location called is a country. (Antarctic
-        # # is not).
-        # cw_link = self.controller.app_data["metric"]["w_d_cur"]
-        #
-        # try:
-        #     country = ", " + cw_link["sys"]["country"]
-        # except KeyError:
-        #     country = ""
-        # location = "{0}{1}".format(cw_link["name"], country)
-        # self.insert(location)
-        # if location not in self.controller.app_data["api_calls"]:
-        #     self.controller.app_data["api_calls"].append(location)
-        #
-        # # Current date & time.
-        # date = datetime.datetime.now()
-        # self.controller.app_data["time"] = date.strftime("%H:%M  %d/%m/%Y")
-        # local_date = date + datetime.timedelta(
-        #     hours=self.controller.app_data["timezone"]["rawOffset"])
-        # self.controller.app_data["local_time"] = local_date.strftime(
-        #     "%H:%M  %d/%m/%Y")
-        # # Now we are ready do display the report.
-
 
     def finish_get_time(self, unix_time, dst_offset):
         """Converts time from unix format to a human readable one.

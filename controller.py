@@ -75,9 +75,9 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 1
+        self.debug = 0
         self.draw_lines = 0
-        # self.view = None
+        self.view = None
         self.model = None
         self.data_present = 0
 
@@ -106,28 +106,6 @@ class Controller(object):
         """
 
         self.view = view
-
-    def get_timezone(self, lat, lon):
-        """Obtains time zone data for the View to adjust the time 
-        received from Open Weather to correct offset.
-        
-        Args:
-            lat (float): Latitude
-            lon (float): Longitude
-
-        Returns:
-            None
-        """
-        # Get time zone data.
-        data = self.model.finish_get_timezone(lat, lon)
-        # We expect a tuple returning from finish_get_report.
-        # Item 0 contains error status.
-        self.app_data["error_status"] = data[0]
-        # Error handling.
-        if self.app_data["error_status"] == -1:
-            self.display_error(data[1])
-        else:
-            self.app_data["timezone"] = data[1]
 
     def get_time(self, unix_time, dst_offset):
         """Contacts model to obtain time converted from unix format to
@@ -203,54 +181,4 @@ class Controller(object):
             None
         """
 
-        # Get dictionaries.
-        data = self.model.finish_get_report(self.app_data["var_loc"].get())
-
-        # We expect a tuple returning from finish_get_report. Item 0
-        # contains error status.
-        self.app_data["error_status"] = data[0]
-
-        # Error handling.
-        if self.app_data["error_status"] == -1:
-            self.display_error(data[1])
-        else:
-            # Clear any error status message upon successful
-            # response from API.
-            self.app_data["var_status"].set("")
-            self.app_data["error_message"] = ""
-
-            # Copy dictionaries from data into metric and imperial
-            # dictionary.
-            self.app_data["metric"] = data[1][0]["metric"]
-            self.app_data["imperial"] = data[1][1]["imperial"]
-
-            # Obtain timezone for geolocation.
-            cw_link = self.app_data["metric"]["w_d_cur"]
-            """:type : dict"""
-            """Link to access current weather data in controller."""
-            lat = cw_link["coord"]["lat"]
-            lon = cw_link["coord"]["lon"]
-            self.get_timezone(lat, lon)
-            self.data_present = 1
-
-            # Store location name of a successful call to the API
-            #  in api_calls.
-            # Check if location called is a country. (Antarctic
-            # is not).
-            try:
-                country = ", " + cw_link["sys"]["country"]
-            except KeyError:
-                country = ""
-            location = "{0}{1}".format(cw_link["name"], country)
-            self.model.insert(location)
-            if location not in self.app_data["api_calls"]:
-                self.app_data["api_calls"].append(location)
-
-            # Current date & time.
-            date = datetime.datetime.now()
-            self.app_data["time"] = date.strftime("%H:%M  %d/%m/%Y")
-            local_date = date + datetime.timedelta(
-                hours=self.app_data["timezone"]["rawOffset"])
-            self.app_data["local_time"] = local_date.strftime(
-                "%H:%M  %d/%m/%Y")
-            # Now we are ready do display the report.
+        self.model.finish_get_report(self.app_data["var_loc"].get())
