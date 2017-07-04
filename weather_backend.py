@@ -47,8 +47,8 @@ class Report(object):
         self.conn.commit()
 
     def finish_get_report(self, location):
-        """Obtain data in json format from Open Weather and store it 
-        in appropriate dictionaries.
+        """Obtain data in json format from Open Weather / Geonames and 
+        store it in appropriate dictionaries / variables.
 
         Args:
             location (str): String containing location typed into  
@@ -113,7 +113,7 @@ class Report(object):
             self.controller.data_present = 1
 
             # Store location name of a successful call to the API
-            #  in api_calls.
+            # in api_calls.
             # Check if location called is a country. (Antarctic
             # is not).
             try:
@@ -122,6 +122,8 @@ class Report(object):
                 country = ""
             location = "{0}{1}".format(cw_link["name"], country)
             self.insert(location)
+            # TODO: call here to self.view to obtain whole database
+            # TODO: and get rid of adding the last call below?
             if location not in v_link["api_calls"]:
                 v_link["api_calls"].append(location)
 
@@ -135,6 +137,19 @@ class Report(object):
             # Now we are ready do display the report.
 
     def geonames_api(self, lat, lon):
+        """Contacts Geonames.com to get the timezone based on lat (latitude)
+        and lon (longitude) given.
+        
+        Args:
+            lat (float): Latitude for the location.
+            lon (float): Longitude for the location.
+
+        Returns:
+            Status (tuple[int, str | dict), first item is the error status 
+                (-1 means error / 0 means all ok).
+                Second item is an error message (str) in case of an 
+                exception or time_zone (dict).
+            """
 
         base_url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}"
         # Please register your unique user name at:
@@ -168,9 +183,28 @@ class Report(object):
                 time_zone = json.load(file)
 
         status = (0, time_zone)
+        print(type(lat))
+        print(type(lon))
+        print(type(status[1]))
+
         return status
 
+
+
     def open_weather_api(self, location):
+        """Contact open weather API to obtain data in json format.
+
+        Args:
+            location (str): String containing location typed into  
+            loc_entry by the user.
+
+        Returns:
+            Status (tuple[int, str | dict]), first item is the error status 
+                (-1 means error / 0 means all ok).
+                Second item is an error message (str) in case of an 
+                exception or weather_dicts - list of dictionaries with 
+                all weather reports.
+        """
 
         # Key obtained from Open Weather. Required to make any calls
         # to their API.
@@ -316,28 +350,29 @@ class Report(object):
             self.cur.execute("INSERT INTO locations (Location) VALUES (?)",
                              (location,))
         except sqlite3.IntegrityError:
-            print("already in the table") # remove after tests
+            pass
         self.cur.execute("UPDATE locations SET Num_of_calls"
                          " = Num_of_calls + 1 WHERE Location = ?", (location,))
         self.conn.commit()
 
     def view(self):
-        self.cur.execute("SELECT * FROM book")
+        self.cur.execute("SELECT Location FROM locations LIMIT 10 ORDER BY "
+                         "Num_of_calls")
         rows = self.cur.fetchall()
         return rows
 
-    def search(self, title="", author="", year="", isbn=""):
-        self.cur.execute("SELECT * FROM book WHERE title=? OR author=? OR year=? OR isbn=?", (title, author, year, isbn))
-        rows = self.cur.fetchall()
-        return rows
+    # def search(self, title="", author="", year="", isbn=""):
+    #     self.cur.execute("SELECT * FROM book WHERE title=? OR author=? OR year=? OR isbn=?", (title, author, year, isbn))
+    #     rows = self.cur.fetchall()
+    #     return rows
 
-    def delete(self, id):
-        self.cur.execute("DELETE FROM book WHERE id=?", (id,))
-        self.conn.commit()
+    # def delete(self, id):
+    #     self.cur.execute("DELETE FROM book WHERE id=?", (id,))
+    #     self.conn.commit()
 
-    def update(self, id, title, author, year, isbn):
-        self.cur.execute("UPDATE book SET title=?, author=?, year=?, isbn=? WHERE id=?", (title, author, year, isbn, id))
-        self.conn.commit()
+    # def update(self, id, title, author, year, isbn):
+    #     self.cur.execute("UPDATE book SET title=?, author=?, year=?, isbn=? WHERE id=?", (title, author, year, isbn, id))
+    #     self.conn.commit()
 
     def __del__(self):
         self.conn.close()

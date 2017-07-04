@@ -75,7 +75,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 0
+        self.debug = 1
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -175,7 +175,8 @@ class Controller(object):
         self.app_data["var_status"].set(self.app_data["error_message"])
 
     def get_report(self):
-        """Obtains data for the View to display the report.
+        """Contact model to obtain data for the View to display
+         the report.
 
         Returns:
             None
