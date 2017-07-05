@@ -11,19 +11,21 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
 
 base = None
+base = "Console"
 
-if sys.platform == "win32":
-    base = "Win32GUI"
+# if sys.platform == "win32":
+#     base = "Win32GUI"
 
 include_files = ["Database/", "Resources/", "Debug/",
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
                  ]
-includes = [] # ["weather_backend", "controller"]
+includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
-                                    icon="Resources\\Icons\\app_icon.ico")]
+                                    icon="app_icon.ico",
+                                    targetName="Weather App.exe")]
 
 cx_Freeze.setup(
     name='Weather App',
