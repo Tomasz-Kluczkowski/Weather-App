@@ -100,3 +100,4 @@ ENV/
 /Debug/metric_w_d_long
 /test.db
 /Database/locations.db
+/build/

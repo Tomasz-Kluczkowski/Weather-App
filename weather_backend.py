@@ -16,11 +16,6 @@ class Report(object):
 
     """
 
-    # TODO: Introduce database to store locations checked by the user
-    # TODO: in  the past
-    # TODO: This should only be passed to the database if the response
-    # TODO: from the API is 200 (valid location was entered)
-
     def __init__(self, controller):
         """Initialize Report class.
 
@@ -122,10 +117,12 @@ class Report(object):
                 country = ""
             location = "{0}{1}".format(cw_link["name"], country)
             self.insert(location)
-            # TODO: call here to self.view to obtain whole database
-            # TODO: and get rid of adding the last call below?
-            if location not in v_link["api_calls"]:
-                v_link["api_calls"].append(location)
+            # Build a list of locations for loc_combobox ordered by
+            #  amount of previous calls.
+            rows = self.view()
+            v_link["api_calls"] = []
+            for row in rows:
+                v_link["api_calls"].append(row[0])
 
             # Current date & time.
             date = datetime.datetime.now()
@@ -137,7 +134,7 @@ class Report(object):
             # Now we are ready do display the report.
 
     def geonames_api(self, lat, lon):
-        """Contacts Geonames.com to get the timezone based on lat (latitude)
+        """Contacts geonames.org to get the timezone based on lat (latitude)
         and lon (longitude) given.
         
         Args:
@@ -183,13 +180,8 @@ class Report(object):
                 time_zone = json.load(file)
 
         status = (0, time_zone)
-        print(type(lat))
-        print(type(lon))
-        print(type(status[1]))
 
         return status
-
-
 
     def open_weather_api(self, location):
         """Contact open weather API to obtain data in json format.
@@ -263,6 +255,8 @@ class Report(object):
                     with open("Debug\\" + unit_type + "_" + key, "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
         status = (0, unit_dicts)
+        print(status)
+
         return status
 
     def finish_get_time(self, unix_time, dst_offset):
@@ -346,6 +340,14 @@ class Report(object):
                 return wind_dir_cardinal
 
     def insert(self, location):
+        """Insert a row into locations.db.
+        
+        Args:
+            location (str): 
+
+        Returns:
+            None
+        """
         try:
             self.cur.execute("INSERT INTO locations (Location) VALUES (?)",
                              (location,))
@@ -356,9 +358,14 @@ class Report(object):
         self.conn.commit()
 
     def view(self):
-        self.cur.execute("SELECT Location FROM locations LIMIT 10 ORDER BY "
-                         "Num_of_calls")
+        """
+        
+        Returns:
+            rows (list[tuple])
+        """
+        self.cur.execute("SELECT Location FROM locations ORDER BY Num_of_calls DESC LIMIT 10")
         rows = self.cur.fetchall()
+
         return rows
 
     # def search(self, title="", author="", year="", isbn=""):
@@ -375,4 +382,10 @@ class Report(object):
     #     self.conn.commit()
 
     def __del__(self):
+        """Closes connection to locations.db when application is turned
+        off.
+        
+        Returns:
+            None
+        """
         self.conn.close()

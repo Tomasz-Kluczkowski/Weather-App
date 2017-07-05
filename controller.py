@@ -1,5 +1,4 @@
 import tkinter as tk
-import datetime
 
 
 class Controller(object):
@@ -75,7 +74,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 1
+        self.debug = 0
         self.draw_lines = 0
         self.view = None
         self.model = None
