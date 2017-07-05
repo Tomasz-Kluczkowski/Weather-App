@@ -11,10 +11,10 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
 
 base = None
-base = "Console"
+# base = "Console" # use for testing in deployed version
 
-# if sys.platform == "win32":
-#     base = "Win32GUI"
+if sys.platform == "win32":
+    base = "Win32GUI"
 
 include_files = ["Database/", "Resources/", "Debug/",
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),

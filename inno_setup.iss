@@ -22,12 +22,12 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=C:\Users\T Kluczlowski\Documents\GitHub\Weather-App\build
+OutputDir=build
 OutputBaseFilename=Weather App Setup
-SetupIconFile=C:\Users\T Kluczlowski\Documents\GitHub\Weather-App\app_icon.ico
+SetupIconFile=app_icon.ico
 Compression=lzma
 SolidCompression=yes
-UninstallDisplayIcon=C:\Users\T Kluczlowski\Documents\GitHub\Weather-App\app_icon.ico
+UninstallDisplayIcon=app_icon.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -37,8 +37,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Users\T Kluczlowski\Documents\GitHub\Weather-App\build\exe.win-amd64-3.6\Weather App.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\T Kluczlowski\Documents\GitHub\Weather-App\build\exe.win-amd64-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build\exe.win-amd64-3.6\Weather App.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\exe.win-amd64-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
