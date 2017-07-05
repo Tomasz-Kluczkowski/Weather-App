@@ -4,6 +4,8 @@ import string
 import datetime
 import json
 import calendar
+import appdirs
+import os
 
 
 class Report(object):
@@ -28,13 +30,28 @@ class Report(object):
         :v_link (dict): Link to access variables in controller.
         :conn (sqlite3.Connection): Database object
         :cur (sqlite3.Cursor): Database cursor.
+        :data_dirs (dict[str, str]): Data directories for the
+            application.
         
         """
 
         self.controller = controller
         self.v_link = self.controller.app_data
+
+        # Create necessary application folders in 
+        # C:\Users\User\AppData\Local
+        user_dirs = appdirs.AppDirs("Weather_App", "")
+        local_app_dir = user_dirs.user_data_dir
+        self.data_dirs = {"Database": "",
+                          "Debug": ""}
+        for sub_dir in self.data_dirs:
+            path = local_app_dir + "\\" + sub_dir
+            self.data_dirs[sub_dir] = path
+            os.makedirs(path, exist_ok=True)
+
         # Establish database connection.
-        self.conn = sqlite3.connect("Database\\locations.db")
+        self.conn = sqlite3.connect(
+            self.data_dirs["Database"] + "\\locations.db")
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
                          "Location TEXT NOT NULL UNIQUE, "
@@ -55,6 +72,7 @@ class Report(object):
                 Second item is an error message in case of an exception or
                 weather_dicts - list of dictionaries with all weather reports.
         """
+
         v_link = self.controller.app_data
         """:type : dict[str, any]"""
         """Link to variables in controller."""
@@ -173,10 +191,12 @@ class Report(object):
 
                 return status
             else:
-                with open("Debug\\time_zone", "w") as file:
+                with open(self.data_dirs["Debug"]
+                          + "\\time_zone.json", "w") as file:
                     json.dump(time_zone, file)
         else:
-            with open("Debug\\time_zone", "r") as file:
+            with open(self.data_dirs["Debug"]
+                      + "\\time_zone.json", "r") as file:
                 time_zone = json.load(file)
 
         status = (0, time_zone)
@@ -248,15 +268,14 @@ class Report(object):
                         return status
                     else:
                         unit_dict[unit_type][key] = weather_dict
-                        with open("Debug\\" + unit_type
-                                          + "_" + key, "w") as file:
+                        with open(self.data_dirs["Debug"] + "\\" + unit_type
+                                  + "_" + key + ".json", "w") as file:
                             json.dump(weather_dict, file)
                 else:
-                    with open("Debug\\" + unit_type + "_" + key, "r") as file:
+                    with open(self.data_dirs["Debug"] + "\\" + unit_type
+                              + "_" + key + ".json", "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
         status = (0, unit_dicts)
-        print(status)
-
         return status
 
     def finish_get_time(self, unix_time, dst_offset):
@@ -277,7 +296,6 @@ class Report(object):
             dst_offset = 0
         time = datetime.datetime.utcfromtimestamp(
             unix_time + dst_offset).strftime("%H:%M")
-
         return time
 
     def finish_get_date(self, unix_time, dst_offset):
@@ -302,7 +320,6 @@ class Report(object):
         date = datetime.datetime.utcfromtimestamp(unix_time + dst_offset)
         date_str = date.strftime("%d/%m/%Y")
         name_of_day = calendar.day_name[date.weekday()]
-
         return name_of_day, date_str
 
     @staticmethod
@@ -317,6 +334,7 @@ class Report(object):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
+
         directions = {(348.75, 360): "N",
                       (0, 11.25): "N",
                       (11.25, 33.75): "NNE",
@@ -348,6 +366,7 @@ class Report(object):
         Returns:
             None
         """
+
         try:
             self.cur.execute("INSERT INTO locations (Location) VALUES (?)",
                              (location,))
@@ -363,9 +382,10 @@ class Report(object):
         Returns:
             rows (list[tuple])
         """
-        self.cur.execute("SELECT Location FROM locations ORDER BY Num_of_calls DESC LIMIT 10")
-        rows = self.cur.fetchall()
 
+        self.cur.execute(
+            "SELECT Location FROM locations ORDER BY Num_of_calls DESC LIMIT 10")
+        rows = self.cur.fetchall()
         return rows
 
     # def search(self, title="", author="", year="", isbn=""):
@@ -388,4 +408,5 @@ class Report(object):
         Returns:
             None
         """
+
         self.conn.close()

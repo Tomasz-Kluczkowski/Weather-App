@@ -310,8 +310,8 @@ class WeatherApp(tk.Tk):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-        time = self.controller.get_time(unix_time, dst_offset)
 
+        time = self.controller.get_time(unix_time, dst_offset)
         return time
 
     def begin_get_date(self, unix_time, dst_offset=True):
@@ -329,7 +329,6 @@ class WeatherApp(tk.Tk):
         """
 
         name_of_day, date_str = self.controller.get_date(unix_time, dst_offset)
-
         return name_of_day, date_str
 
     @staticmethod
@@ -371,8 +370,8 @@ class WeatherApp(tk.Tk):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-        wind_dir_cardinal = self.controller.deg_conv(wind_dir_deg)
 
+        wind_dir_cardinal = self.controller.deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
     def begin_get_report(self):
@@ -383,6 +382,7 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
+
         # Do nothing if no location is entered.
         if self.v_link["var_loc"].get() == "":
             return
@@ -402,6 +402,7 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
+
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def move_canvas_up(self):
@@ -418,6 +419,7 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
+
         self.main_canvas.yview_scroll(1, "units")
 
     def loc_postcommand(self):
@@ -434,6 +436,7 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
+
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
@@ -461,7 +464,7 @@ class WeatherApp(tk.Tk):
         self.main_canvas.bind("<Return>",
                               lambda e: self.loc_combobox.focus_set())
         self.yscrollbar.bind("<Return>",
-                              lambda e: self.loc_combobox.focus_set())
+                             lambda e: self.loc_combobox.focus_set())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()
@@ -634,7 +637,8 @@ class WeatherApp(tk.Tk):
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4),
                                       **img_nw_cnf)
-        wind_dir_text = "{0}".format(self.begin_deg_conv(cw_link["wind"]["deg"]))
+        wind_dir_text = "{0}".format(
+            self.begin_deg_conv(cw_link["wind"]["deg"]))
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)
@@ -723,8 +727,9 @@ class WeatherApp(tk.Tk):
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 
-            day_text = "{0:.3}, {1:.5}".format(self.begin_get_date(item["dt"])[0],
-                                               self.begin_get_date(item["dt"])[1])
+            day_text = "{0:.3}, {1:.5}".format(
+                self.begin_get_date(item["dt"])[0],
+                self.begin_get_date(item["dt"])[1])
 
             if previous_day_text == day_text:
                 pass
@@ -881,7 +886,8 @@ class WeatherApp(tk.Tk):
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
 
             # Hourly wind direction.
-            hr_wind_dir_text = "{0}".format(self.begin_deg_conv(item["wind"]["deg"]))
+            hr_wind_dir_text = "{0}".format(
+                self.begin_deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
                                      rel_pos="BR",
                                      offset=(-1, 5),
@@ -1096,6 +1102,7 @@ class CanvasObject(object):
         :pos_y (int): Y coordinate for our object.
 
         """
+
         self.id_num = 0
         self.canvas = canvas
         pos_x = 0
@@ -1167,6 +1174,7 @@ class CanvasObject(object):
         Returns:
             None
         """
+
         # Find y coordinate of the center of rel_obj.
         r_x1, r_y1, r_x2, r_y2 = self.canvas.bbox(rel_obj.id_num)
         r_center_y = r_y2 - (r_y2 - r_y1) / 2
@@ -1235,6 +1243,7 @@ class CanvasText(CanvasObject):
             bounding boxes.
 
         """
+
         # Initialise base class. Get x-y coordinates for CanvasText
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
@@ -1298,6 +1307,7 @@ class CanvasImg(CanvasObject):
             :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
 
         """
+
         # Initialise base class. Get x-y coordinates for CanvasImg
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)

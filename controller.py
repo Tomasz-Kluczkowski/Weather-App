@@ -60,6 +60,7 @@ class Controller(object):
                 API.
 
         """
+
         self.app_data = {"var_units": tk.StringVar(value="metric"),
                          "var_status": tk.StringVar(value=""),
                          "var_loc": tk.StringVar(),
@@ -74,7 +75,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 0
+        self.debug = 1
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -119,8 +120,8 @@ class Controller(object):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-        time = self.model.finish_get_time(unix_time, dst_offset)
 
+        time = self.model.finish_get_time(unix_time, dst_offset)
         return time
 
     def get_date(self, unix_time, dst_offset):
@@ -136,9 +137,9 @@ class Controller(object):
                     name_of_day (str): Name of the day on date.
                     date_str (str): Date in string representation.
                 """
+
         name_of_day, date_str = self.model.finish_get_date(unix_time,
                                                            dst_offset)
-
         return name_of_day, date_str
 
     def deg_conv(self, wind_dir_deg):
@@ -153,8 +154,8 @@ class Controller(object):
                     wind_dir_cardinal (str): Wind direction in cardinal 
                         direction.
                 """
-        wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
 
+        wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
     def display_error(self, error):
