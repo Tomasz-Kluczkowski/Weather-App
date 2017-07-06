@@ -24,10 +24,10 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=build
 OutputBaseFilename=Weather App Setup
-SetupIconFile=app_icon.ico
+SetupIconFile=app_icon96x96.ico
 Compression=lzma
 SolidCompression=yes
-UninstallDisplayIcon=app_icon.ico
+UninstallDisplayIcon=app_icon96x96.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

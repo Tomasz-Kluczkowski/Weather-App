@@ -24,7 +24,7 @@ includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
-                                    icon="app_icon.ico",
+                                    icon="app_icon96x96.ico",
                                     targetName="Weather App.exe")]
 
 cx_Freeze.setup(
