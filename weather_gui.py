@@ -637,8 +637,14 @@ class WeatherApp(tk.Tk):
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4),
                                       **img_nw_cnf)
-        wind_dir_text = "{0}".format(
-            self.begin_deg_conv(cw_link["wind"]["deg"]))
+        # Noticed that sometimes Open Weather responds with no wind
+        # direction in the current weather report.
+        try:
+            wind_dir_text = "{0}".format(
+                self.begin_deg_conv(cw_link["wind"]["deg"]))
+        except KeyError:
+            wind_dir_text = ""
+
         wind_dir = CanvasText(self.main_canvas, rel_obj=self.wind_dir_img,
                               rel_pos="CR", offset=(5, 0),
                               text=wind_dir_text, font=h2, **cent_cnf)

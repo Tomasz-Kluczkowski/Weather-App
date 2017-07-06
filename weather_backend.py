@@ -57,6 +57,9 @@ class Report(object):
                          "Location TEXT NOT NULL UNIQUE, "
                          "Num_of_calls INT NOT NULL DEFAULT 0)")
         self.conn.commit()
+        # Initial list of locations from previous use of the app for
+        # loc_combobox ordered by amount of previous calls.
+        self.combo_drop_menu()
 
     def finish_get_report(self, location):
         """Obtain data in json format from Open Weather / Geonames and 
@@ -73,10 +76,6 @@ class Report(object):
                 weather_dicts - list of dictionaries with all weather reports.
         """
 
-        v_link = self.controller.app_data
-        """:type : dict[str, any]"""
-        """Link to variables in controller."""
-
         # We must remove any gibberish from location string before
         # making a call to the API.
         # For this translate function is the best tool.
@@ -89,21 +88,21 @@ class Report(object):
 
         # We expect a tuple returning from finish_get_report. Item 0
         # contains error status.
-        v_link["error_status"] = data[0]
+        self.v_link["error_status"] = data[0]
 
         # Error handling.
-        if v_link["error_status"] == -1:
+        if self.v_link["error_status"] == -1:
             self.controller.display_error(data[1])
         else:
             # Clear any error status message upon successful
             # response from API.
-            v_link["var_status"].set("")
-            v_link["error_message"] = ""
+            self.v_link["var_status"].set("")
+            self.v_link["error_message"] = ""
 
             # Copy dictionaries from data into metric and imperial
             # dictionary.
-            v_link["metric"] = data[1][0]["metric"]
-            v_link["imperial"] = data[1][1]["imperial"]
+            self.v_link["metric"] = data[1][0]["metric"]
+            self.v_link["imperial"] = data[1][1]["imperial"]
 
             # Obtain timezone for geolocation.
             cw_link = self.controller.app_data["metric"]["w_d_cur"]
@@ -116,12 +115,12 @@ class Report(object):
             data = self.geonames_api(lat, lon)
             # We expect a tuple returning from finish_get_report.
             # Item 0 contains error status.
-            v_link["error_status"] = data[0]
+            self.v_link["error_status"] = data[0]
             # Error handling.
-            if v_link["error_status"] == -1:
+            if self.v_link["error_status"] == -1:
                 self.controller.display_error(data[1])
             else:
-                v_link["timezone"] = data[1]
+                self.v_link["timezone"] = data[1]
 
             self.controller.data_present = 1
 
@@ -135,19 +134,16 @@ class Report(object):
                 country = ""
             location = "{0}{1}".format(cw_link["name"], country)
             self.insert(location)
-            # Build a list of locations for loc_combobox ordered by
-            #  amount of previous calls.
-            rows = self.view()
-            v_link["api_calls"] = []
-            for row in rows:
-                v_link["api_calls"].append(row[0])
+            # Build a current list of locations for loc_combobox
+            # ordered by amount of previous calls.
+            self.combo_drop_menu()
 
             # Current date & time.
             date = datetime.datetime.now()
-            v_link["time"] = date.strftime("%H:%M  %d/%m/%Y")
+            self.v_link["time"] = date.strftime("%H:%M  %d/%m/%Y")
             local_date = date + datetime.timedelta(
-                hours=v_link["timezone"]["rawOffset"])
-            v_link["local_time"] = local_date.strftime(
+                hours=self.v_link["timezone"]["rawOffset"])
+            self.v_link["local_time"] = local_date.strftime(
                 "%H:%M  %d/%m/%Y")
             # Now we are ready do display the report.
 
@@ -356,6 +352,19 @@ class Report(object):
         for interval, wind_dir_cardinal in directions.items():
             if interval[0] <= wind_dir_deg < interval[1]:
                 return wind_dir_cardinal
+
+    def combo_drop_menu(self):
+        """Build a list of locations for loc_combobox ordered by 
+        amount of previous calls.
+        
+        Returns:
+            None
+        """
+
+        rows = self.view()
+        self.v_link["api_calls"] = []
+        for row in rows:
+            self.v_link["api_calls"].append(row[0])
 
     def insert(self, location):
         """Insert a row into locations.db.
