@@ -227,17 +227,6 @@ class WeatherApp(tk.Tk):
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
 
-        # Some window application dimensions info below. Useful if altering
-        # shape of the app.
-        # self.update_idletasks()
-        # print("main window size:", self.winfo_geometry())
-        # print("canvas size:", self.main_canvas.winfo_geometry())
-        # print("top decoration:", self.winfo_rooty())
-        # print("left edge:", self.winfo_rootx())
-        # print("top decoration canvas:", self.main_canvas.winfo_rooty())
-        # print("left edge canvas:", self.main_canvas.winfo_rootx())
-        # print("main window required size:", self.winfo_reqwidth())
-
         # Error/Status Bar.
         status_bar_label = tk.Label(self,
                                     textvariable=self.v_link["var_status"],
@@ -245,6 +234,33 @@ class WeatherApp(tk.Tk):
         status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
                               sticky=tk.NSEW)
         status_bar_label.configure(relief="sunken")
+        self.update_geometry()
+
+    def update_geometry(self):
+        """Update and resize application window to use the maximum 
+        vertical space available
+        
+        Returns:
+            None
+        """
+        self.update()
+        s_width = self.winfo_screenwidth()
+        s_height = self.winfo_screenheight()
+        c_width = self.winfo_reqwidth()
+        c_height = s_height - self.main_canvas.winfo_rooty()*2 - 6
+        self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
+        self.main_canvas.config(height=c_height)
+        # Useful dimension info below.
+        # print("screen_width:", self.winfo_screenwidth())
+        # print("screen_height:", self.winfo_screenheight())
+        # print("main window size:", self.winfo_geometry())
+        # print("canvas size:", self.main_canvas.winfo_geometry())
+        # print("top decoration:", self.winfo_rooty())
+        # print("left edge:", self.winfo_rootx())
+        # print("top decoration canvas:", self.main_canvas.winfo_rooty())
+        # print("left edge canvas:", self.main_canvas.winfo_rootx())
+        # print("main window required width:", self.winfo_reqwidth())
+        # print("main window required height:", self.winfo_reqheight())
 
     def metric_pushed(self):
         """Activates metric units and changes the look of the units buttons.
@@ -430,6 +446,16 @@ class WeatherApp(tk.Tk):
         """
         self.loc_combobox["values"] = self.v_link["api_calls"]
 
+    def loc_key_focus(self):
+        """Set keyboard focus back to loc_combobox. Select any text
+        entered to allow easy deletion.
+        
+        Returns:
+            None
+        """
+        self.loc_combobox.focus_set()
+        self.loc_combobox.select_range(0, tk.END)
+
     def display_report(self):
         """Display results of the API call in the main_canvas.
 
@@ -462,9 +488,9 @@ class WeatherApp(tk.Tk):
         # Restore keyboard focus to loc_combobox when enter pressed in
         # main_canvas or yscrollbar.
         self.main_canvas.bind("<Return>",
-                              lambda e: self.loc_combobox.focus_set())
+                              lambda e: self.loc_key_focus())
         self.yscrollbar.bind("<Return>",
-                             lambda e: self.loc_combobox.focus_set())
+                             lambda e: self.loc_key_focus())
 
         # Units system to display report in.
         units = self.v_link["var_units"].get()
