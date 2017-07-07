@@ -6,6 +6,10 @@ GUI created using: tkinter v. 8.6.
 
 Internet communication library: requests v. 2.13.0.
 
+Main compiler: cx_Freeze v. 5.0.2
+
+Installer compiler: Inno setup compiler v. 5.5.9
+
 `Goal: To create a visual representation of a weather report obtained via Open Weather API. `
 
 The APIs used for this project:
