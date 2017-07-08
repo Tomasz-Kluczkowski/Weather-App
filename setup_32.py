@@ -22,7 +22,7 @@ include_files = ["Resources/",
                  ]
 includes = []
 excludes = ["PyQt5"]
-packages = ["tkinter"]
+packages = ["tkinter", "idna"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     icon="app_icon96x96.ico",
                                     targetName="Weather App 32bit.exe")]
