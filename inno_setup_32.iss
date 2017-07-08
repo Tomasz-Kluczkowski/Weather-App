@@ -5,7 +5,7 @@
 #define MyAppVersion "1.0"
 #define MyAppPublisher "Natural Materials"
 #define MyAppURL "https://github.com/Tomasz-Kluczkowski/Weather-App"
-#define MyAppExeName "Weather App.exe"
+#define MyAppExeName "Weather App 32bit.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.

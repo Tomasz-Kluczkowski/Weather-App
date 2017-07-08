@@ -8,8 +8,6 @@ import appdirs
 import os
 
 
-# TODO: in open weather api use os.path.join to make app dirs isntead of concatenating strings.
-
 class Report(object):
     """This class will be used to call APIs, gather 
     and modify data for displaying in the GUI.
@@ -47,7 +45,7 @@ class Report(object):
         self.data_dirs = {"Database": "",
                           "Debug": ""}
         for sub_dir in self.data_dirs:
-            path = local_app_dir + "\\" + sub_dir
+            path = os.path.join(local_app_dir, sub_dir)
             self.data_dirs[sub_dir] = path
             os.makedirs(path, exist_ok=True)
 

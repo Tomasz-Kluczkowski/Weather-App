@@ -16,7 +16,7 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Database/", "Resources/", "Debug/",
+include_files = ["Resources/",
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
                  ]
@@ -28,7 +28,7 @@ executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     targetName="Weather App 32bit.exe")]
 
 cx_Freeze.setup(
-    name='Weather App',
+    name='Weather App 32bit',
     version='1.0',
     description='Weather report application',
     author='Tomasz Kluczkowski',
