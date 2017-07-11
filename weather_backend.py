@@ -397,25 +397,28 @@ class Report(object):
         rows = self.cur.fetchall()
         return rows
 
-    # def search(self, title="", author="", year="", isbn=""):
-    #     self.cur.execute("SELECT * FROM book WHERE title=? OR author=? OR year=? OR isbn=?", (title, author, year, isbn))
-    #     rows = self.cur.fetchall()
-    #     return rows
-
-    # def delete(self, id):
-    #     self.cur.execute("DELETE FROM book WHERE id=?", (id,))
-    #     self.conn.commit()
-
-    # def update(self, id, title, author, year, isbn):
-    #     self.cur.execute("UPDATE book SET title=?, author=?, year=?, isbn=? WHERE id=?", (title, author, year, isbn, id))
-    #     self.conn.commit()
-
     def __del__(self):
         """Closes connection to locations.db when application is turned
         off.
-        
+
         Returns:
             None
         """
 
         self.conn.close()
+
+    # def search(self, location):
+    #     self.cur.execute("SELECT * FROM locations WHERE Location=?,
+    # (location))
+    #     rows = self.cur.fetchall()
+    #     return rows
+
+    # def delete(self, location):
+    #     self.cur.execute("DELETE FROM locations WHERE Location=?",
+    # (location,))
+    #     self.conn.commit()
+
+    # def update(self, location):
+    #     self.cur.execute("UPDATE locations SET Location=?, (location, ))
+    #     self.conn.commit()
+

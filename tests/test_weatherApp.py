@@ -1,5 +1,5 @@
 import unittest
-from weather_gui import  WeatherApp
+from weather_gui import WeatherApp
 
 
 class TestWeatherApp(unittest.TestCase):
