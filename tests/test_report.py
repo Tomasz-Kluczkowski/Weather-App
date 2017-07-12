@@ -15,7 +15,7 @@ class TestReport(unittest.TestCase):
     # def test_finish_get_report(self):
     #     self.fail()
     #
-    # def test_geonames_api(self):
+    # def test_geonames_api(self):ttt
     #     self.fail()
     #
     # def test_open_weather_api(self):

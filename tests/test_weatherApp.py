@@ -3,7 +3,7 @@ from weather_gui import WeatherApp
 
 
 class TestWeatherApp(unittest.TestCase):
-    def test_deg_conv(self):
+    def test_begin_deg_conv(self):
         app = WeatherApp()
         self.assertEqual(app.begin_deg_conv(348.75), "N")
         self.assertEqual(app.begin_deg_conv(0), "N")
