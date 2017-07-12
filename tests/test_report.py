@@ -7,6 +7,7 @@ c = Controller()
 app.controller = c
 r = Report(c)
 
+
 class TestReport(unittest.TestCase):
 
     def setUp(self):
@@ -30,6 +31,8 @@ class TestReport(unittest.TestCase):
     #     self.fail()
 
     def test_combo_drop_menu(self):
+        """Test if list of locations in controller.app_data["api_calls"] is
+        properly generated out of the database record."""
         r.combo_drop_menu()
         rows = r.view()
         view_list = [row[0] for row in rows]

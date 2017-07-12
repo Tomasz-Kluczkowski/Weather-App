@@ -237,6 +237,11 @@ class WeatherApp(tk.Tk):
         status_bar_label.configure(relief="sunken")
         self.update_geometry()
 
+        # Application icon.
+        self.iconbitmap("app_icon48x48.ico")
+        # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
+        # self.tk.call("wm", "iconphoto", self._w, img_icon)
+
     def update_geometry(self):
         """Update and resize application window to use the maximum 
         vertical space available
@@ -1007,7 +1012,6 @@ class WeatherApp(tk.Tk):
         self.main_canvas.config(
             scrollregion=self.main_canvas.bbox("main", "hourly"))
         self.yscrollbar.focus()
-
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display 
