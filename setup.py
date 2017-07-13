@@ -16,13 +16,13 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Resources/",
+include_files = ["Resources/", "app_icon48x48.ico",
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
                  ]
 includes = []
 excludes = ["PyQt5"]
-packages = ["tkinter"]
+packages = ["tkinter", "idna"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     icon="app_icon96x96.ico",
                                     targetName="Weather App.exe")]
