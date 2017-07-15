@@ -225,7 +225,7 @@ class WeatherApp(tk.Tk):
         self.yscrollbar.config(command=self.main_canvas.yview)
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        image = Image.open(r"Resources\Images\main_background.jpg")
+        image = Image.open("Resources/Images/main_background.jpg")
         # image = image.resize((image.size[0] * 2, image.size[1] * 2),
         # PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
@@ -577,7 +577,7 @@ class WeatherApp(tk.Tk):
                             **main_cnf)
 
         # Draw a current weather icon.
-        icon_path = "Resources\Icons\Weather\\" \
+        icon_path = "Resources/Icons/Weather/" \
                     + cw_link["weather"][0]["icon"] + ".png"
         # Images have to be added as attributes or otherwise they get
         # garbage collected and will not display at all.
@@ -869,7 +869,7 @@ class WeatherApp(tk.Tk):
                               **hr_w_cnf)
 
             # Hourly Weather icon.
-            icon_path = "Resources\Icons\Weather\\" \
+            icon_path = "Resources/Icons/Weather/" \
                         + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
