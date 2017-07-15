@@ -2,7 +2,7 @@
 # Author: Tomasz Kluczkowski
 # email: tomaszk1@hotmail.co.uk
 
-
+import platform
 import tkinter as tk
 import tkinter.ttk as tkk
 from PIL import Image, ImageTk
@@ -113,7 +113,12 @@ class WeatherApp(tk.Tk):
         # Themes: 'winnative', 'clam', 'alt', 'default',
         # 'classic', 'vista', 'xpnative'
         style = tkk.Style()
-        style.theme_use("vista")
+        system = platform.system()
+        if system == "Windows":
+            theme = "vista"
+        else:
+            theme = "clam"
+        style.theme_use(theme)
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
