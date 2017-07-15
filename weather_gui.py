@@ -1065,7 +1065,7 @@ class HoverButton(tk.Button):
         """
 
         super().__init__(master, cnf, **args)
-
+        self.cur_bg = self["bg"]
         self.controller = controller
         self.v_link = self.controller.app_data
         self.tip = tip
@@ -1081,7 +1081,7 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-
+        self.configure(background="DimGrey")
         self.v_link["var_status"].set(self.tip)
 
     def leave_button(self):
@@ -1090,7 +1090,7 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-
+        self.configure(background=self.cur_bg)
         if self.v_link["error_status"] == -1:
             self.v_link["var_status"].set(
                 self.v_link["error_message"])
