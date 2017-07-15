@@ -497,12 +497,11 @@ class WeatherApp(tk.Tk):
         self.yscrollbar.bind("<Up>", lambda e: self.move_canvas_up())
         self.yscrollbar.bind("<Down>", lambda e: self.move_canvas_down())
         self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
-        # mouse wheel scroll
-        self.main_canvas.bind('<4>', lambda event: self.main_canvas.yview_scroll(-1, 'units'))
-        self.main_canvas.bind('<5>',
-                              lambda event: self.main_canvas.yview_scroll(1,
-                                                                          'units'))
-
+        # Mouse wheel scroll for Linux.
+        self.main_canvas.bind(
+            '<4>', lambda e: self.main_canvas.yview_scroll(-1, 'units'))
+        self.main_canvas.bind(
+            '<5>', lambda e: self.main_canvas.yview_scroll(1, 'units'))
         self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
         self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
         # Restore keyboard focus to loc_combobox when enter pressed in
