@@ -244,8 +244,8 @@ class WeatherApp(tk.Tk):
 
         # Application icon.
         # self.iconbitmap("app_icon48x48.ico")
-        # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
-        # self.tk.call("wm", "iconphoto", self._w, img_icon)
+        img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
+        self.tk.call("wm", "iconphoto", self._w, img_icon)
 
     def update_geometry(self):
         """Update and resize application window to use the maximum 
