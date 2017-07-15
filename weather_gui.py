@@ -1055,6 +1055,7 @@ class HoverButton(tk.Button):
             
         :Attributes:
         
+        :cur_bg (str): Current background color of the button.
         :tip (str): Text to display in the status_bar_label of the app.
         :controller (Controller): controller object which will store all
             the data required by each segment of the application. 
