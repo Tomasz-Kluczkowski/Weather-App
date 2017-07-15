@@ -497,6 +497,8 @@ class WeatherApp(tk.Tk):
         self.yscrollbar.bind("<Up>", lambda e: self.move_canvas_up())
         self.yscrollbar.bind("<Down>", lambda e: self.move_canvas_down())
         self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind("<Button-4>", self.mouse_wheel)
+        self.main_canvas.bind("<Button-5>", self.mouse_wheel)
         self.main_canvas.bind("<Up>", lambda e: self.move_canvas_up())
         self.main_canvas.bind("<Down>", lambda e: self.move_canvas_down())
         # Restore keyboard focus to loc_combobox when enter pressed in
