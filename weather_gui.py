@@ -43,6 +43,7 @@ class WeatherApp(tk.Tk):
         """Initializes WeatherApp class.
         
         :Attributes:
+        :system (str): Platform on which application is run.
         :controller (Controller): Controller class object used for 
             passing data between the View (weather_gui) and the Model
             (weather_backend).
@@ -72,10 +73,12 @@ class WeatherApp(tk.Tk):
 
         super().__init__()
 
+        self.system = platform.system()
         # Add Controller to the WeatherApp class instance.
         controller = Controller()
         self.controller = controller
         self.v_link = self.controller.app_data
+
 
         # Add main application instance as a View to the Controller.
         # At this stage since we use self updating special tkinter
@@ -113,8 +116,7 @@ class WeatherApp(tk.Tk):
         # Themes: 'winnative', 'clam', 'alt', 'default',
         # 'classic', 'vista', 'xpnative'
         style = tkk.Style()
-        system = platform.system()
-        if system == "Windows":
+        if self.system == "Windows":
             theme = "vista"
         else:
             theme = "clam"
@@ -242,10 +244,11 @@ class WeatherApp(tk.Tk):
         status_bar_label.configure(relief="sunken")
         self.update_geometry()
 
-        # Application icon.
-        # self.iconbitmap("app_icon48x48.ico")
-        img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
-        self.tk.call("wm", "iconphoto", self._w, img_icon)
+        # Application icon. Linux does not display it at all.
+        if self.system == "Windows":
+            self.iconbitmap("app_icon48x48.ico")
+        # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
+        # self.tk.call("wm", "iconphoto", self._w, img_icon)
 
     def update_geometry(self):
         """Update and resize application window to use the maximum 
