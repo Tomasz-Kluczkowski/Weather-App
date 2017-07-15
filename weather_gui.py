@@ -177,7 +177,7 @@ class WeatherApp(tk.Tk):
 
         # Search button.
         self.search_img = tk.PhotoImage(
-            file=r"Resources\Buttons\magnifier-tool.png")
+            file="Resources/Buttons/magnifier-tool.png")
         search_button = HoverButton(loc_frame, controller,
                                     "Press to get a weather report.",
                                     clear_cnf, image=self.search_img,
