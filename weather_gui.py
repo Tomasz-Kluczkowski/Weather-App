@@ -139,14 +139,14 @@ class WeatherApp(tk.Tk):
                                     "activeforeground": self.paper, "bd": 2,
                                     "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                     "width": 2, "font": self.font,
-                                    "relief": "raised"}
+                                    "relief": "groove"}
 
         self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
                                   "activebackground": self.lavender,
                                   "activeforeground": "black", "bd": 2,
                                   "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                   "width": 2, "font": self.font,
-                                  "relief": "sunken"}
+                                  "relief": "groove"}
         canvas_cnf = {"bg": self.paper, "bd": 2, "width": 900, "height": 550,
                       "background": "darkblue",
                       "highlightbackground": self.paper,
