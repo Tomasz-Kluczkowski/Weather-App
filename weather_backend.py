@@ -51,8 +51,8 @@ class Report(object):
             os.makedirs(path, exist_ok=True)
 
         # Establish database connection.
-        self.conn = sqlite3.connect(
-            self.data_dirs["Database"] + "\\locations.db")
+        self.conn = sqlite3.connect(os.path.join(self.data_dirs["Database"],
+                                                 "locations.db"))
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
                          "Location TEXT NOT NULL UNIQUE, "
