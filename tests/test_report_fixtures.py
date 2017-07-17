@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 import shutil
 import appdirs
 import os
@@ -64,6 +65,13 @@ def report(app):
     _report = Report(app.controller)
     return _report
 
+def test_instantiation_report():
+    """Test if connection to the database is made on creating of a new 
+    instance of Report object. Test on local variables only."""
+    database = mock.Mock()
+    controller = Controller()
+    report = Report(controller)
+    
 
 def test_insert_new(report):
     """Insert new data into an empty database."""
@@ -77,9 +85,10 @@ def test_app_folders(app_directories):
         assert os.path.isdir(path) is True
 
 
-def test_new_exists(fetch_location):
+def test_new_exists(fetch_location, fetch_all):
     """Test if data was inserted properly into an empty database."""
     assert fetch_location[0] == "London, GB"
+    assert len(fetch_all) == 1
 
 
 @pytest.mark.parametrize("location", ["Szczecin, PL", "Krakow, PL",
@@ -91,7 +100,7 @@ def test_multi_insert(report, location):
 
 def test_multi_exists(fetch_location):
     """Test if all locations were inserted. Remember that we pull
-    them out (using fetch_location) in alphabetical order 
+    them out (using fetch_location) in an alphabetical order 
     (by default)."""
     assert fetch_location == ["Krakow, PL", "London, GB",
                               "Szczecin, PL", "Torun, PL",
@@ -147,6 +156,18 @@ def test_view_order(report):
     assert view_list == ['Torun, PL', 'London, GB', 'Wroclaw, PL',
                          'Szczecin, PL', 'Krakow, PL']
 
+test_deg_conv_data = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
+                      (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
+                      (140, "SE"), (146.25, "SSE"), (170, "S"),
+                      (191.25, "SSW"), (236.249999, "SW"), (236.25, "WSW"),
+                      (260, "W"), (303.749999, "WNW"), (304, "NW"),
+                      (348, "NNW")]
+
+
+@pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_data)
+def test_finish_deg_conv(report, wind_dir_deg, expected):
+    """Test degree to cardinal direction conversion."""
+    assert report.finish_deg_conv(wind_dir_deg) == expected
 
 if __name__ == "__main__":
     pytest.main()
