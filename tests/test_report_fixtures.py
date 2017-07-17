@@ -73,6 +73,7 @@ def test_instantiation_report():
     report = Report(controller)
     
 
+
 def test_insert_new(report):
     """Insert new data into an empty database."""
     report.insert("London, GB")
