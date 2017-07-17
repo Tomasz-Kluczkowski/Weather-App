@@ -65,19 +65,11 @@ def report(app):
     _report = Report(app.controller)
     return _report
 
-def test_instantiation_report():
-    """Test if connection to the database is made on creating of a new 
-    instance of Report object. Test on local variables only."""
-    database = mock.Mock()
-    controller = Controller()
-    report = Report(controller)
-    
-
-
 def test_insert_new(report):
     """Insert new data into an empty database."""
     report.insert("London, GB")
 
+    
 
 def test_app_folders(app_directories):
     """Test if application folders / files are present after creating
@@ -157,12 +149,24 @@ def test_view_order(report):
     assert view_list == ['Torun, PL', 'London, GB', 'Wroclaw, PL',
                          'Szczecin, PL', 'Krakow, PL']
 
+
 test_deg_conv_data = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
                       (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
                       (140, "SE"), (146.25, "SSE"), (170, "S"),
                       (191.25, "SSW"), (236.249999, "SW"), (236.25, "WSW"),
                       (260, "W"), (303.749999, "WNW"), (304, "NW"),
                       (348, "NNW")]
+
+
+def test_open_weather_API(monkeypatch, report):
+    """Test if connection to the database is made on creating of a new 
+    instance of Report object. Test on local variables only."""
+    mock_response = mock.Mock()
+    monkeypatch.setattr("weather_backend.requests.get", mock_response)
+    expected_dict = {"test": 1, "test2": {"test20": 2, "test3": [3, 4]}}
+    mock_response.json.return_value = expected_dict
+    response_dict = report.open_weather_api("London")
+    assert response_dict == expected_dict
 
 
 @pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_data)
