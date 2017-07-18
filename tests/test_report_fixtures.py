@@ -150,24 +150,26 @@ def test_view_order(report):
                          'Szczecin, PL', 'Krakow, PL']
 
 
+
+def test_open_weather_api(monkeypatch, report):
+    """Test contacting Open Weather API with a positive response 200."""
+    location = "London"
+    expected_dict = {"test": 1, "test2": {"test20": 2, "test3": [3, 4]}}
+    mock_response = mock.Mock()
+    mock_response.status_code.return_value = 200
+    mock_response.json.return_value = expected_dict
+
+    monkeypatch.setattr("weather_backend.requests.get", mock_response)
+    response_dict = report.open_weather_api(location)
+    assert response_dict == expected_dict
+    report.open_weather_api.assert_called_once_with(location)
+
 test_deg_conv_data = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
                       (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
                       (140, "SE"), (146.25, "SSE"), (170, "S"),
                       (191.25, "SSW"), (236.249999, "SW"), (236.25, "WSW"),
                       (260, "W"), (303.749999, "WNW"), (304, "NW"),
                       (348, "NNW")]
-
-
-def test_open_weather_API(monkeypatch, report):
-    """Test if connection to the database is made on creating of a new 
-    instance of Report object. Test on local variables only."""
-    mock_response = mock.Mock()
-    monkeypatch.setattr("weather_backend.requests.get", mock_response)
-    expected_dict = {"test": 1, "test2": {"test20": 2, "test3": [3, 4]}}
-    mock_response.json.return_value = expected_dict
-    response_dict = report.open_weather_api("London")
-    assert response_dict == expected_dict
-
 
 @pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_data)
 def test_finish_deg_conv(report, wind_dir_deg, expected):
