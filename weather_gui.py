@@ -11,8 +11,7 @@ from controller import Controller
 
 
 # TODO: See if autocompletion is possible in the entry field.
-# TODO: Add set to default location after successful call has been made.
-# TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
 
@@ -139,14 +138,14 @@ class WeatherApp(tk.Tk):
                                     "activeforeground": self.paper, "bd": 2,
                                     "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                     "width": 2, "font": self.font,
-                                    "relief": "raised"}
+                                    "relief": "groove"}
 
         self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
                                   "activebackground": self.lavender,
                                   "activeforeground": "black", "bd": 2,
                                   "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                   "width": 2, "font": self.font,
-                                  "relief": "sunken"}
+                                  "relief": "groove"}
         canvas_cnf = {"bg": self.paper, "bd": 2, "width": 900, "height": 550,
                       "background": "darkblue",
                       "highlightbackground": self.paper,
@@ -285,6 +284,9 @@ class WeatherApp(tk.Tk):
 
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
+        self.metric_button.update_bg_col()
+        self.imperial_button.update_bg_col()
+        self.metric_button.configure(background="DimGrey")
         # If button is pushed when there is a report already on the
         # screen and no errors registered - change units but don't call
         # the API.
@@ -305,6 +307,9 @@ class WeatherApp(tk.Tk):
 
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
+        self.metric_button.update_bg_col()
+        self.imperial_button.update_bg_col()
+        self.imperial_button.configure(background="DimGrey")
         # If button is pushed when there is a report already on the
         # screen and no errors registered - change units but don't call
         # the API.
@@ -1074,6 +1079,15 @@ class HoverButton(tk.Button):
         self.bind("<Enter>", lambda e: self.enter_button())
         # Action on leaving the button with mouse.
         self.bind("<Leave>", lambda e: self.leave_button())
+
+    def update_bg_col(self):
+        """Updates cur_bg attribute so that we can restore background
+         color for buttons.
+        
+        Returns:
+            None
+        """
+        self.cur_bg = self["bg"]
 
     def enter_button(self):
         """Displays information on button function to the user in the 

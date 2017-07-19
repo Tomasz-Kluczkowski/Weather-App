@@ -12,7 +12,7 @@ from controller import Controller
 
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add set to default location after successful call has been made.
-# TODO: Add mousewheel movement for MAC and LINUX. (needs testing)
+# TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
 
@@ -130,23 +130,26 @@ class WeatherApp(tk.Tk):
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
         clear_cnf = {"bg": self.lavender, "fg": "black",
-                     "activebackground": self.dusty,
-                     "activeforeground": self.paper, "padx": 2, "pady": 2,
+                     "highlightthickness": 0,
+                     "activebackground": "DimGrey",
+                     "activeforeground": "black", "padx": 2, "pady": 2,
                      "anchor": tk.CENTER, "font": self.font,
                      "relief": "groove"}
         self.button_released_cnf = {"fg": "black", "bg": self.lavender,
-                                    "activebackground": self.dusty,
-                                    "activeforeground": self.paper, "bd": 2,
+                                    "highlightthickness": 0,
+                                    "activebackground": "DimGrey",
+                                    "activeforeground": "black", "bd": 2,
                                     "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                     "width": 2, "font": self.font,
-                                    "relief": "raised"}
+                                    "relief": "groove"}
 
         self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
-                                  "activebackground": self.lavender,
-                                  "activeforeground": "black", "bd": 2,
+                                  "highlightthickness": 0,
+                                  "activebackground": "DimGrey",
+                                  "activeforeground": self.paper, "bd": 2,
                                   "padx": 2, "pady": 2, "anchor": tk.CENTER,
                                   "width": 2, "font": self.font,
-                                  "relief": "sunken"}
+                                  "relief": "groove"}
         canvas_cnf = {"bg": self.paper, "bd": 2, "width": 900, "height": 550,
                       "background": "darkblue",
                       "highlightbackground": self.paper,
@@ -188,7 +191,6 @@ class WeatherApp(tk.Tk):
                            pady=(4, 5))
         # Press Enter to get report.
         search_button.bind("<Return>", lambda e: self.begin_get_report())
-        search_button.bind("<Button-1>", lambda e: search_button.configure(activebackground="red"))
 
         # Metric units button.
         self.metric_button = HoverButton(loc_frame, controller,
@@ -283,7 +285,6 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
         # If button is pushed when there is a report already on the
@@ -1067,7 +1068,6 @@ class HoverButton(tk.Button):
         """
 
         super().__init__(master, cnf, **args)
-        self.cur_bg = self["bg"]
         self.controller = controller
         self.v_link = self.controller.app_data
         self.tip = tip
@@ -1083,7 +1083,6 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-        self.configure(background="DimGrey")
         self.v_link["var_status"].set(self.tip)
 
     def leave_button(self):
@@ -1092,7 +1091,6 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-        self.configure(background=self.cur_bg)
         if self.v_link["error_status"] == -1:
             self.v_link["var_status"].set(
                 self.v_link["error_message"])
