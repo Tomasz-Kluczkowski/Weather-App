@@ -11,7 +11,6 @@ from controller import Controller
 
 
 # TODO: See if autocompletion is possible in the entry field.
-# TODO: Add set to default location after successful call has been made.
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
