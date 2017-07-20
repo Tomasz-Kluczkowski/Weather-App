@@ -3,7 +3,6 @@
 # email: tomaszk1@hotmail.co.uk
 
 import platform
-import threading
 import tkinter as tk
 import tkinter.ttk as tkk
 from PIL import Image, ImageTk
