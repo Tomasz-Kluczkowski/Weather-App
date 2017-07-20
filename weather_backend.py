@@ -1,6 +1,6 @@
 import sqlite3
 import requests
-import multiprocessing #this is needed on Linux
+import multiprocessing  # this is needed on Linux
 import string
 import datetime
 import json
@@ -76,7 +76,6 @@ class Report(object):
                 Second item is an error message in case of an exception or
                 weather_dicts - list of dictionaries with all weather reports.
         """
-
         # We must remove any gibberish from location string before
         # making a call to the API.
         # For this translate function is the best tool.
@@ -97,7 +96,7 @@ class Report(object):
         else:
             # Clear any error status message upon successful
             # response from API.
-            self.v_link["var_status"].set("")
+            self.v_link["var_status"].set("Gathering data, please wait...")
             self.v_link["error_message"] = ""
 
             # Copy dictionaries from data into metric and imperial
@@ -146,6 +145,9 @@ class Report(object):
                 hours=self.v_link["timezone"]["rawOffset"])
             self.v_link["local_time"] = local_date.strftime(
                 "%H:%M  %d/%m/%Y")
+            if self.v_link["error_status"] == 0:
+                self.v_link["var_status"].set("")
+                self.controller.display_report()
             # Now we are ready do display the report.
 
     def geonames_api(self, lat, lon):
@@ -189,11 +191,11 @@ class Report(object):
                 return status
             else:
                 with open(self.data_dirs["Debug"]
-                          + "\\time_zone.json", "w") as file:
+                                  + "\\time_zone.json", "w") as file:
                     json.dump(time_zone, file)
         else:
             with open(self.data_dirs["Debug"]
-                      + "\\time_zone.json", "r") as file:
+                              + "\\time_zone.json", "r") as file:
                 time_zone = json.load(file)
 
         status = (0, time_zone)
@@ -266,11 +268,11 @@ class Report(object):
                     else:
                         unit_dict[unit_type][key] = weather_dict
                         with open(self.data_dirs["Debug"] + "\\" + unit_type
-                                  + "_" + key + ".json", "w") as file:
+                                          + "_" + key + ".json", "w") as file:
                             json.dump(weather_dict, file)
                 else:
                     with open(self.data_dirs["Debug"] + "\\" + unit_type
-                              + "_" + key + ".json", "r") as file:
+                                      + "_" + key + ".json", "r") as file:
                         unit_dict[unit_type][key] = json.load(file)
         status = (0, unit_dicts)
         return status
@@ -376,15 +378,20 @@ class Report(object):
         Returns:
             None
         """
+        local_conn = sqlite3.connect(os.path.join(self.data_dirs["Database"],
+                                                  "locations.db"))
+        local_cur = local_conn.cursor()
 
         try:
-            self.cur.execute("INSERT INTO locations (Location) VALUES (?)",
-                             (location,))
+            local_cur.execute("INSERT INTO locations (Location) VALUES (?)",
+                              (location,))
         except sqlite3.IntegrityError:
             pass
-        self.cur.execute("UPDATE locations SET Num_of_calls"
-                         " = Num_of_calls + 1 WHERE Location = ?", (location,))
-        self.conn.commit()
+        local_cur.execute("UPDATE locations SET Num_of_calls"
+                          " = Num_of_calls + 1 WHERE Location = ?",
+                          (location,))
+        local_conn.commit()
+        local_conn.close()
 
     def view(self):
         """
@@ -392,10 +399,14 @@ class Report(object):
         Returns:
             rows (list[tuple])
         """
+        local_conn = sqlite3.connect(os.path.join(self.data_dirs["Database"],
+                                                  "locations.db"))
+        local_cur = local_conn.cursor()
 
-        self.cur.execute(
+        local_cur.execute(
             "SELECT Location FROM locations ORDER BY Num_of_calls DESC LIMIT 10")
-        rows = self.cur.fetchall()
+        rows = local_cur.fetchall()
+        local_conn.close()
         return rows
 
     def __del__(self):
@@ -408,18 +419,17 @@ class Report(object):
 
         self.conn.close()
 
-    # def search(self, location):
-    #     self.cur.execute("SELECT * FROM locations WHERE Location=?,
-    # (location))
-    #     rows = self.cur.fetchall()
-    #     return rows
+        # def search(self, location):
+        #     self.cur.execute("SELECT * FROM locations WHERE Location=?,
+        # (location))
+        #     rows = self.cur.fetchall()
+        #     return rows
 
-    # def delete(self, location):
-    #     self.cur.execute("DELETE FROM locations WHERE Location=?",
-    # (location,))
-    #     self.conn.commit()
+        # def delete(self, location):
+        #     self.cur.execute("DELETE FROM locations WHERE Location=?",
+        # (location,))
+        #     self.conn.commit()
 
-    # def update(self, location):
-    #     self.cur.execute("UPDATE locations SET Location=?, (location, ))
-    #     self.conn.commit()
-
+        # def update(self, location):
+        #     self.cur.execute("UPDATE locations SET Location=?, (location, ))
+        #     self.conn.commit()

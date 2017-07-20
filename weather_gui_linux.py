@@ -1028,6 +1028,7 @@ class WeatherApp(tk.Tk):
             scrollregion=self.main_canvas.bbox("main", "hourly"))
         self.yscrollbar.focus()
 
+
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display 
     option.

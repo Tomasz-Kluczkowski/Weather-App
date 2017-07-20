@@ -1,4 +1,4 @@
-**Repository for developement of the Weather App.**
+**Repository for development of the Weather App.**
 
 Main language: Python 3.6
 
@@ -34,6 +34,9 @@ During the development I have found out that due to the construction of the tkin
 Since there can be only one active Tk() object at any time we launch our View class first which inherits from this object and then create Controller object inside the view class.
 
 Still the View is not aware in any way of the Model and vice versa.
+
+To prevent GUI from freezing when gathering data for the report a simple additional thread is created. This is done using threading module.
+Due to simplicity of the app no queuing policy is established but we rely on the thread to finish promptly or raise a handled exception.
 
 Architecture which I will try to implement: Model-View-Adapter (Mediating-Controller).
 
