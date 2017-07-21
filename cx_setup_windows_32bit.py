@@ -25,10 +25,10 @@ excludes = ["PyQt5"]
 packages = ["tkinter", "idna"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     icon="app_icon96x96.ico",
-                                    targetName="Weather App 32bit.exe")]
+                                    targetName="Weather_App_32bit.exe")]
 
 cx_Freeze.setup(
-    name='Weather App 32bit',
+    name='Weather_App_32bit',
     version='1.0',
     description='Weather report application',
     author='Tomasz Kluczkowski',
