@@ -82,7 +82,7 @@ class WeatherApp(tk.Tk):
         # Add main application instance as a View to the Controller.
         # At this stage since we use self updating special tkinter
         # variables we do not need to call on the view for updates.
-        # self.controller.add_view(self)
+        self.controller.add_view(self)
 
         # Create a Report object for backend operations.
         report = Report(self.controller)
@@ -128,24 +128,50 @@ class WeatherApp(tk.Tk):
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
         label_cnf = {"fg": "black", "bg": self.dusty, "bd": 2, "padx": 4,
                      "pady": 9, "font": self.font, "relief": "groove"}
-        clear_cnf = {"bg": self.lavender, "fg": "black",
-                     "activebackground": self.dusty,
-                     "activeforeground": self.paper, "padx": 2, "pady": 2,
-                     "anchor": tk.CENTER, "font": self.font,
-                     "relief": "groove"}
-        self.button_released_cnf = {"fg": "black", "bg": self.lavender,
-                                    "activebackground": self.dusty,
-                                    "activeforeground": self.paper, "bd": 2,
-                                    "padx": 2, "pady": 2, "anchor": tk.CENTER,
-                                    "width": 2, "font": self.font,
-                                    "relief": "groove"}
 
-        self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
-                                  "activebackground": self.lavender,
-                                  "activeforeground": "black", "bd": 2,
-                                  "padx": 2, "pady": 2, "anchor": tk.CENTER,
-                                  "width": 2, "font": self.font,
-                                  "relief": "groove"}
+        if self.system == "Windows":
+            clear_cnf = {"bg": self.lavender, "fg": "black",
+                         "activebackground": self.dusty,
+                         "activeforeground": self.paper, "padx": 2, "pady": 2,
+                         "anchor": tk.CENTER, "font": self.font,
+                         "relief": "groove"}
+            self.button_released_cnf = {"fg": "black", "bg": self.lavender,
+                                        "activebackground": self.dusty,
+                                        "activeforeground": self.paper, "bd": 2,
+                                        "padx": 2, "pady": 2, "anchor": tk.CENTER,
+                                        "width": 2, "font": self.font,
+                                        "relief": "groove"}
+
+            self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
+                                      "activebackground": self.lavender,
+                                      "activeforeground": "black", "bd": 2,
+                                      "padx": 2, "pady": 2, "anchor": tk.CENTER,
+                                      "width": 2, "font": self.font,
+                                      "relief": "groove"}
+        else:
+            clear_cnf = {"bg": self.lavender, "fg": "black",
+                         "highlightthickness": 0,
+                         "activebackground": "DimGrey",
+                         "activeforeground": "black", "padx": 2, "pady": 2,
+                         "anchor": tk.CENTER, "font": self.font,
+                         "relief": "groove"}
+            self.button_released_cnf = {"fg": "black", "bg": self.lavender,
+                                        "highlightthickness": 0,
+                                        "activebackground": "DimGrey",
+                                        "activeforeground": "black", "bd": 2,
+                                        "padx": 2, "pady": 2,
+                                        "anchor": tk.CENTER,
+                                        "width": 2, "font": self.font,
+                                        "relief": "groove"}
+
+            self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
+                                      "highlightthickness": 0,
+                                      "activebackground": "DimGrey",
+                                      "activeforeground": self.paper, "bd": 2,
+                                      "padx": 2, "pady": 2,
+                                      "anchor": tk.CENTER,
+                                      "width": 2, "font": self.font,
+                                      "relief": "groove"}
         canvas_cnf = {"bg": self.paper, "bd": 2, "width": 900, "height": 550,
                       "background": "darkblue",
                       "highlightbackground": self.paper,
@@ -284,9 +310,10 @@ class WeatherApp(tk.Tk):
 
         self.imperial_button.configure(**self.button_released_cnf)
         self.metric_button.configure(**self.button_pushed_cnf)
-        self.metric_button.update_bg_col()
-        self.imperial_button.update_bg_col()
-        self.metric_button.configure(background="DimGrey")
+        if self.system == "Windows":
+            self.metric_button.update_bg_col()
+            self.imperial_button.update_bg_col()
+            self.metric_button.configure(background="DimGrey")
         # If button is pushed when there is a report already on the
         # screen and no errors registered - change units but don't call
         # the API.
@@ -294,7 +321,8 @@ class WeatherApp(tk.Tk):
             self.v_link["var_units"].set("metric")
 
             if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0:
+                    and self.v_link["error_status"] == 0\
+                    and threading.active_count() < 2:
                 self.display_report()
 
     def imperial_pushed(self):
@@ -307,9 +335,10 @@ class WeatherApp(tk.Tk):
 
         self.metric_button.configure(**self.button_released_cnf)
         self.imperial_button.configure(**self.button_pushed_cnf)
-        self.metric_button.update_bg_col()
-        self.imperial_button.update_bg_col()
-        self.imperial_button.configure(background="DimGrey")
+        if self.system == "Windows":
+            self.metric_button.update_bg_col()
+            self.imperial_button.update_bg_col()
+            self.imperial_button.configure(background="DimGrey")
         # If button is pushed when there is a report already on the
         # screen and no errors registered - change units but don't call
         # the API.
@@ -317,7 +346,8 @@ class WeatherApp(tk.Tk):
             self.v_link["var_units"].set("imperial")
 
             if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0:
+                    and self.v_link["error_status"] == 0 \
+                    and threading.active_count() < 2:
                 self.display_report()
 
     def clear_error_message(self):
@@ -418,15 +448,14 @@ class WeatherApp(tk.Tk):
             None
         """
 
-        # Do nothing if no location is entered.
-        if self.v_link["var_loc"].get() == "":
+        # Do nothing if no location is entered or an active sub thread
+        # is running.
+        if (self.v_link["var_loc"].get() == "") \
+                or (threading.active_count() > 1):
             return
-        # Request a report using a Mediating Controller.
-        self.controller.get_report()
-        # Upon a successful contact with the API display the result in
-        # the GUI.
-        if self.v_link["error_status"] == 0:
-            self.display_report()
+        # Request a report using a Mediating Controller in a new thread.
+        report_thread = threading.Thread(target=self.controller.get_report)
+        report_thread.start()
 
     def mouse_wheel(self, event):
         """Allows movement of main_canvas using the mouse wheel.
@@ -1031,6 +1060,7 @@ class WeatherApp(tk.Tk):
             scrollregion=self.main_canvas.bbox("main", "hourly"))
         self.yscrollbar.focus()
 
+
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display 
     option.
@@ -1060,6 +1090,7 @@ class HoverButton(tk.Button):
             
         :Attributes:
         
+        :system (str): Platform on which application is run.
         :cur_bg (str): Current background color of the button.
         :tip (str): Text to display in the status_bar_label of the app.
         :controller (Controller): controller object which will store all
@@ -1071,6 +1102,7 @@ class HoverButton(tk.Button):
         """
 
         super().__init__(master, cnf, **args)
+        self.system = platform.system()
         self.cur_bg = self["bg"]
         self.controller = controller
         self.v_link = self.controller.app_data
@@ -1096,7 +1128,8 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-        self.configure(background="DimGrey")
+        if self.system == "Windows":
+            self.configure(background="DimGrey")
         self.v_link["var_status"].set(self.tip)
 
     def leave_button(self):
@@ -1105,10 +1138,10 @@ class HoverButton(tk.Button):
         Returns:
             None
         """
-        self.configure(background=self.cur_bg)
+        if self.system == "Windows":
+            self.configure(background=self.cur_bg)
         if self.v_link["error_status"] == -1:
-            self.v_link["var_status"].set(
-                self.v_link["error_message"])
+            self.v_link["var_status"].set(self.v_link["error_message"])
         else:
             self.v_link["var_status"].set("")
 

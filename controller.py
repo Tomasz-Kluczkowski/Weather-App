@@ -183,3 +183,11 @@ class Controller(object):
         """
 
         self.model.finish_get_report(self.app_data["var_loc"].get())
+
+    def display_report(self):
+        """Ask view to finalise displaying the report on main_canvas.
+        
+        Returns:
+            None
+        """
+        self.view.display_report()
