@@ -1142,8 +1142,7 @@ class HoverButton(tk.Button):
         if self.system == "Windows":
             self.configure(background=self.cur_bg)
         if self.v_link["error_status"] == -1:
-            self.v_link["var_status"].set(
-                self.v_link["error_message"])
+            self.v_link["var_status"].set(self.v_link["error_message"])
         else:
             self.v_link["var_status"].set("")
 
