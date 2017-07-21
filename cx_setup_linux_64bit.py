@@ -16,10 +16,7 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Resources/", "app_icon48x48.ico",
-                 # os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
-                 # os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
-                 ]
+include_files = ["Resources/", "app_icon48x48.ico", "README_Linux_64bit.txt"]
 includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter", "idna", "multiprocessing", "PIL"]

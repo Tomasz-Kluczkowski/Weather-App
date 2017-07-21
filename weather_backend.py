@@ -1,6 +1,5 @@
 import sqlite3
 import requests
-# import multiprocessing  # this is needed on Linux
 import string
 import datetime
 import json
