@@ -408,6 +408,8 @@ class Display(tk.Frame):
         s_height = self.master.winfo_screenheight()
         print("s_height:", s_height)
         c_width = self.master.winfo_reqwidth()
+        req_height = self.winfo_reqheight()
+        print("req_height:", req_height)
         l_height = self.status_bar_label.winfo_height()
         print("l_height:", l_height)
         c_height = s_height - 200
