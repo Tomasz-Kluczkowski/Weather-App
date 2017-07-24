@@ -99,10 +99,11 @@ class WeatherApp(tk.Tk):
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
-        self.display_1 = Display(self, "metric", controller)
-        self.display_1.grid(row=0, column=0, sticky=tk.NSEW)
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_columnconfigure(0, weight=1)
+        self.displays = {}
+        keys = ["metric", "imperial"]
+        for key in keys:
+            self.displays[key] = Display(self, controller)
+            self.displays[key].grid(row=0, column=0, sticky=tk.NSEW)
         self.update_geometry()
 
         # Application icon. Linux does not display it at all.
@@ -123,24 +124,29 @@ class WeatherApp(tk.Tk):
         # s_height = self.winfo_screenheight()
         c_width = self.winfo_reqwidth()
         # # c_height = s_height - self.main_canvas.winfo_rooty()*2 - 6
-        self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
-        # self.main_canvas.config(height=c_height)
+        self.geometry("+{0}+0".format(int(s_width/2) - int(c_width/2)))
+        self.update()
+        s_height = self.winfo_screenheight()
+        for key in self.displays:
+            top = self.displays[key].main_canvas.winfo_rooty()
+            self.displays[key].main_canvas.config(height=s_height - 2*top - 6)
         # Useful dimension info below.
-        print("screen_width:", self.winfo_screenwidth())
-        print("screen_height:", self.winfo_screenheight())
-        print("main window size:", self.winfo_geometry())
+        # print("screen_width:", self.winfo_screenwidth())
+        # print("screen_height:", self.winfo_screenheight())
+        # print("main window size:", self.winfo_geometry())
         # print("canvas size:", self.main_canvas.winfo_geometry())
-        print("top decoration:", self.winfo_rooty())
-        print("left edge:", self.winfo_rootx())
+        # print("top decoration:", self.display_1.main_canvas.winfo_rooty())
+        # print("left edge:", self.winfo_rootx())
         # print("top decoration canvas:", self.main_canvas.winfo_rooty())
         # print("left edge canvas:", self.main_canvas.winfo_rootx())
-        print("main window required width:", self.winfo_reqwidth())
-        print("main window required height:", self.winfo_reqheight())
+        # print("main window required width:", self.winfo_reqwidth())
+        # print("main window required height:", self.winfo_reqheight())
+
 
 class Display(tk.Frame):
     """Class to generate sub displays for metric and imperial report."""
 
-    def __init__(self, master, units, controller):
+    def __init__(self, master, controller):
         """
         
         Args:
@@ -390,44 +396,6 @@ class Display(tk.Frame):
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
                               sticky=tk.NSEW)
         self.status_bar_label.configure(relief="sunken")
-
-        self.update_geometry()
-
-    def update_geometry(self):
-        """Update and resize application window to use the maximum
-        vertical space available
-
-        Returns:
-            None
-        """
-
-        self.update()
-        frame_height = self.winfo_rooty()
-        print("frame_height:", frame_height)
-        s_width = self.master.winfo_screenwidth()
-        s_height = self.master.winfo_screenheight()
-        print("s_height:", s_height)
-        c_width = self.master.winfo_reqwidth()
-        req_height = self.winfo_reqheight()
-        print("req_height:", req_height)
-        l_height = self.status_bar_label.winfo_height()
-        print("l_height:", l_height)
-        c_height = s_height - 200
-        print("c_height:", c_height)
-        # self.master.geometry("+{0}+0".format(int(s_width / 2) - int(c_width /
-        #                                                           2)))
-        self.main_canvas.config(height=c_height)
-        # Useful dimension info below.
-        print("screen_width display:", self.winfo_screenwidth())
-        print("screen_height display:", self.winfo_screenheight())
-        print("main window size display:", self.winfo_geometry())
-        print("canvas size display:", self.main_canvas.winfo_geometry())
-        print("top decoration display:", self.winfo_rooty())
-        print("left edge display:", self.winfo_rootx())
-        print("top decoration canvas display:", self.main_canvas.winfo_rooty())
-        print("left edge canvas display:", self.main_canvas.winfo_rootx())
-        print("main window required width display:", self.winfo_reqwidth())
-        print("main window required height display:", self.winfo_reqheight())
 
     def metric_pushed(self):
         """Activates metric units and changes the look of the units buttons.
