@@ -40,37 +40,19 @@ class WeatherApp(tk.Tk):
     """
 
     def __init__(self):
-    #     """Initializes WeatherApp class.
-    #
-    #     :Attributes:
-    #     :system (str): Platform on which application is run.
-    #     :controller (Controller): Controller class object used for
-    #         passing data between the View (weather_gui) and the Model
-    #         (weather_backend).
-    #     :v_link (dict): Link to access variables in controller.
-    #     :dusty (str): color definition in hex number.
-    #     :lavender (str): color definition in hex number.
-    #     :overcast (str): color definition in hex number.
-    #     :paper (str): color definition in hex number.
-    #     :font (str): font definition.
-    #     :title (str): Main window title displayed when using
-    #         application.
-    #     :loc_frame (tk.Frame): Location frame, parent of all top bar
-    #         objects.
-    #     :loc_label (tk.Label): Location label.
-    #     :loc_entry (tk.Entry): Location entry object. Here user can
-    #         input data which will be passed to var_loc.
-    #     :search_button (HoverButton): Search for weather report button.
-    #     :metric_button (HoverButton): Metric units (degC, m/s) selection
-    #         button.
-    #     :imperial_button (HoverButton): Imperial units (degF / mile/hr)
-    #         selection button.
-    #     :main_canvas (tk.Canvas): Main canvas on which all of the
-    #         weather report will be visualised.
-    #     :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background
-    #         image. It is a conversion of a .jpg image using PIL module.
-    #     """
-    #
+        """Initializes WeatherApp class.
+
+        :Attributes:
+        :system (str): Platform on which application is run.
+        :controller (Controller): Controller class object used for
+            passing data between the View (weather_gui) and the Model
+            (weather_backend).
+        :v_link (dict): Link to access variables in controller.
+        :paper (str): color definition in hex number.
+        :title (str): Main window title displayed when using
+            application.
+        """
+
         super().__init__()
 
         self.system = platform.system()
@@ -90,15 +72,11 @@ class WeatherApp(tk.Tk):
 
         # Configure main window.
         self.title("The Weather App")
-        self.config(bg=self.paper, bd=2, relief="groove")
-        # Get screen size.
-        # s_width = self.winfo_screenwidth()
-        # s_height = self.winfo_screenheight()
-        # Center application window.
-        # self.geometry("+{0}+0".format(int(s_width / 2) - 400))
+        self.config(bg=self.paper, bd=2, relief="flat")
         # Prevent resizing.
         self.resizable(width=tk.FALSE, height=tk.FALSE)
 
+        # Create set of displays.
         self.displays = {}
         keys = ["metric", "imperial"]
         for key in keys:
