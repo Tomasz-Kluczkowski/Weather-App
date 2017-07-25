@@ -10,11 +10,12 @@ from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
 
-
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
+# TODO: stick all stylling / color definitions into style module and
+# TODO: import *.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -68,9 +69,9 @@ class WeatherApp(tk.Tk):
         # Add it as a Model to the Controller class object.
         self.controller.add_model(report)
 
-        self.paper = "#D5D5D5"
 
         # Configure main window.
+        self.paper = "#D5D5D5"
         self.title("The Weather App")
         self.config(bg=self.paper, bd=2, relief="flat")
         # Prevent resizing.
@@ -78,9 +79,10 @@ class WeatherApp(tk.Tk):
 
         # Create set of displays.
         self.displays = {}
-        keys = ["metric", "imperial"]
+        """:type : dict[str: DisplayShort]"""
+        keys = ["title", "metric", "imperial"]
         for key in keys:
-            self.displays[key] = Display(self, controller)
+            self.displays[key] = DisplayShort(self, controller)
             self.displays[key].grid(row=0, column=0, sticky=tk.NSEW)
         self.update_geometry()
 
@@ -89,6 +91,8 @@ class WeatherApp(tk.Tk):
             self.iconbitmap("app_icon48x48.ico")
         # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
         # self.tk.call("wm", "iconphoto", self._w, img_icon)
+        self.show_display("title")
+
 
     def update_geometry(self):
         """Update and resize application window to use the maximum
@@ -120,9 +124,46 @@ class WeatherApp(tk.Tk):
         # print("main window required width:", self.winfo_reqwidth())
         # print("main window required height:", self.winfo_reqheight())
 
+    def show_display(self, display):
+        """
+        
+        Args:
+            display (): 
 
-class Display(tk.Frame):
-    """Class to generate sub displays for metric and imperial report."""
+        Returns:
+
+        """
+        if display == "metric":
+            self.displays[display].metric_pushed()
+            self.displays[display].metric_button.leave_button()
+        else:
+            self.displays[display].imperial_pushed()
+            self.displays[display].imperial_button.leave_button()
+        lo, hi = self.v_link["scrollbar_offset"]
+        self.displays[display].main_canvas.yview_moveto(lo)
+        self.displays[display].yscrollbar.focus()
+        self.displays[display].tkraise()
+
+    def display_report(self):
+        """
+        
+        Returns:
+
+        """
+        self.show_display("title")
+        selected_units = self.v_link["var_units"].get()
+        self.v_link["scrollbar_offset"] = (0, 0)
+        for key in self.displays:
+            self.v_link["var_units"].set(key)
+            if key != "title":
+                self.displays[key].display_report()
+        self.v_link["var_units"].set(selected_units)
+        self.show_display(selected_units)
+
+
+class DisplayShort(tk.Frame):
+    """Class to generate sub displays for 5 day metric and imperial 
+    report."""
 
     def __init__(self, master, controller):
         """
@@ -397,7 +438,8 @@ class Display(tk.Frame):
             if self.controller.data_present == 1 \
                     and self.v_link["error_status"] == 0 \
                     and threading.active_count() < 2:
-                self.display_report()
+                self.v_link["scrollbar_offset"] = self.yscrollbar.get()
+                self.controller.show_display("metric")
 
     def imperial_pushed(self):
         """Activates imperial units and changes the look of the units
@@ -422,7 +464,7 @@ class Display(tk.Frame):
             if self.controller.data_present == 1 \
                     and self.v_link["error_status"] == 0 \
                     and threading.active_count() < 2:
-                self.display_report()
+                self.controller.show_display("imperial")
 
     def clear_error_message(self):
         """Clears error messages from status_bar_label after user starts
@@ -588,7 +630,7 @@ class Display(tk.Frame):
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
-        self.main_canvas.yview_moveto(0.0)
+        # self.main_canvas.yview_moveto(0.0)
         # Take keyboard focus from loc_combobox if left mouse button
         # clicked on yscrollbar or main_canvas or if escape pressed
         #  when entering text in loc_combobox.

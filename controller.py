@@ -27,6 +27,8 @@ class Controller(object):
                         be displayed in the status bar.
                     :var_loc (tk.StringVar): Current text entered into
                         loc_entry field by the user. 
+                    :scrollbar_offset (tuple): Tuple of int values 
+                    representing scrollbar's offset.
                     :error_message (str): Last error message.
                     :error_status (int): Value -1 means an error 
                         occurred and was not cleared. 0 means all ok.
@@ -64,6 +66,7 @@ class Controller(object):
         self.app_data = {"var_units": tk.StringVar(value="metric"),
                          "var_status": tk.StringVar(value=""),
                          "var_loc": tk.StringVar(),
+                         "scrollbar_offset": (0, 0),
                          "error_message": "",
                          "error_status": 0,
                          "time": "",
@@ -75,7 +78,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 1
+        self.debug = 0
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -191,3 +194,11 @@ class Controller(object):
             None
         """
         self.view.display_report()
+
+    def show_display(self, display):
+        """
+        
+        Returns:
+
+        """
+        self.view.show_display(display)
