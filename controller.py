@@ -27,7 +27,7 @@ class Controller(object):
                         be displayed in the status bar.
                     :var_loc (tk.StringVar): Current text entered into
                         loc_entry field by the user. 
-                    :scrollbar_offset (tuple): Tuple of int values 
+                    :scrollbar_offset (tuple): Tuple of float values 
                     representing scrollbar's offset.
                     :error_message (str): Last error message.
                     :error_status (int): Value -1 means an error 
@@ -78,7 +78,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 0
+        self.debug = 1
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -161,6 +161,16 @@ class Controller(object):
         wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
+    def get_report(self):
+        """Contact model to obtain data for the View to display
+         the report.
+
+        Returns:
+            None
+        """
+
+        self.model.finish_get_report(self.app_data["var_loc"].get())
+
     def display_error(self, error):
         """Updates the View to display error.
         
@@ -177,16 +187,6 @@ class Controller(object):
         # status_bar_label.
         self.app_data["var_status"].set(self.app_data["error_message"])
 
-    def get_report(self):
-        """Contact model to obtain data for the View to display
-         the report.
-
-        Returns:
-            None
-        """
-
-        self.model.finish_get_report(self.app_data["var_loc"].get())
-
     def display_report(self):
         """Ask view to finalise displaying the report on main_canvas.
         
@@ -196,9 +196,17 @@ class Controller(object):
         self.view.display_report()
 
     def show_display(self, display):
-        """
-        
-        Returns:
+        """Call to the view to bring forward currently selected display.
 
+        Returns:
+            None
         """
         self.view.show_display(display)
+
+    def update_buttons(self):
+        """Call to the view to synchronise buttons across all displays.
+        
+        Returns:
+            None
+        """
+        self.view.update_buttons()

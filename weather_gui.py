@@ -14,8 +14,10 @@ from controller import Controller
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
-# TODO: stick all stylling / color definitions into style module and
+# TODO: stick all styling / color definitions into style module and
 # TODO: import *.
+# TODO: remember last units used in the database so that user does not have to
+# TODO: change them all the time.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -52,6 +54,7 @@ class WeatherApp(tk.Tk):
         :paper (str): color definition in hex number.
         :title (str): Main window title displayed when using
             application.
+        :displays (dict) dictionary storing all displays.
         """
 
         super().__init__()
@@ -79,7 +82,7 @@ class WeatherApp(tk.Tk):
 
         # Create set of displays.
         self.displays = {}
-        """:type : dict[str: DisplayShort]"""
+        """:type : dict[str, DisplayShort]"""
         keys = ["title", "metric", "imperial"]
         for key in keys:
             self.displays[key] = DisplayShort(self, controller)
@@ -92,11 +95,11 @@ class WeatherApp(tk.Tk):
         # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
         # self.tk.call("wm", "iconphoto", self._w, img_icon)
         self.show_display("title")
-
+        self.displays["title"].loc_combobox.focus()
 
     def update_geometry(self):
         """Update and resize application window to use the maximum
-        vertical space available
+        vertical space available.
 
         Returns:
             None
@@ -123,35 +126,62 @@ class WeatherApp(tk.Tk):
         # print("left edge canvas:", self.main_canvas.winfo_rootx())
         # print("main window required width:", self.winfo_reqwidth())
         # print("main window required height:", self.winfo_reqheight())
+            
+    def update_buttons(self):
+        """Update buttons in all displays to synchronise them across.
+        
+        Returns:
+            None
+        """
+        for key in self.displays:
+            if self.v_link["var_units"].get() == "metric":
+                self.displays[key].imperial_button.configure(
+                    **self.displays[key].button_released_cnf)
+                self.displays[key].metric_button.configure(
+                    **self.displays[key].button_pushed_cnf)
+
+                if self.system == "Windows":
+                    self.displays[key].metric_button.update_bg_col()
+                    self.displays[key].imperial_button.update_bg_col()
+                    self.displays[key].metric_button.configure(
+                        background="DimGrey")
+                    self.displays[key].metric_button.leave_button()
+            else:
+                self.displays[key].metric_button.configure(
+                    **self.displays[key].button_released_cnf)
+                self.displays[key].imperial_button.configure(
+                    **self.displays[key].button_pushed_cnf)
+                if self.system == "Windows":
+                    self.displays[key].metric_button.update_bg_col()
+                    self.displays[key].imperial_button.update_bg_col()
+                    self.displays[key].imperial_button.configure(
+                        background="DimGrey")
+                    self.displays[key].imperial_button.leave_button()
 
     def show_display(self, display):
-        """
+        """Bring currently selected display to the front of the 
+        application.
         
         Args:
-            display (): 
+            display (str): currently selected display type. 
 
         Returns:
-
+            None
         """
-        if display == "metric":
-            self.displays[display].metric_pushed()
-            self.displays[display].metric_button.leave_button()
-        else:
-            self.displays[display].imperial_pushed()
-            self.displays[display].imperial_button.leave_button()
         lo, hi = self.v_link["scrollbar_offset"]
         self.displays[display].main_canvas.yview_moveto(lo)
-        self.displays[display].yscrollbar.focus()
+        self.displays[display].yscrollbar.focus_set()
         self.displays[display].tkraise()
 
     def display_report(self):
-        """
+        """Generate all available reports and bring selected one to the
+        front of the application.
         
         Returns:
-
+            None
         """
-        self.show_display("title")
         selected_units = self.v_link["var_units"].get()
+        self.show_display("title")
         self.v_link["scrollbar_offset"] = (0, 0)
         for key in self.displays:
             self.v_link["var_units"].set(key)
@@ -162,77 +192,55 @@ class WeatherApp(tk.Tk):
 
 
 class DisplayShort(tk.Frame):
-    """Class to generate sub displays for 5 day metric and imperial 
-    report."""
+    """Class to generate sub displays.
+    
+    Currently used to create a "title" page and a 5 day "metric" and 
+    "imperial" report.
+    
+    Args:
+        tk.Frame (tk.Frame): inherits from tkinter Frame object.
+    """
 
     def __init__(self, master, controller):
-        """
+        """Initialise class.
         
         Args:
-            units (): 
-            controller (): 
+            :controller (Controller): Controller class object used for
+                passing data between the View (weather_gui) and the Model
+                (weather_backend).
+            :master (tk.Tk): master widget for the class to draw on.
+            :system (str): Platform on which application is run.
+            :v_link (dict): Link to access variables in controller.
+            :dusty (str): color definition in hex number.
+            :lavender (str): color definition in hex number.
+            :overcast (str): color definition in hex number.
+            :paper (str): color definition in hex number.
+            :font (str): font definition.
+            :title (str): Main window title displayed when using 
+                application.
+            :loc_frame (tk.Frame): Location frame, parent of all top bar 
+                objects.
+            :loc_label (tk.Label): Location label.
+            :loc_entry (tk.Entry): Location entry object. Here user can 
+                input data which will be passed to var_loc.
+            :search_button (HoverButton): Search for weather report button.
+            :metric_button (HoverButton): Metric units (degC, m/s) selection
+                button.
+            :imperial_button (HoverButton): Imperial units (degF / mile/hr) 
+                selection button.
+            :main_canvas (tk.Canvas): Main canvas on which all of the 
+                weather report will be visualised.
+            :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
+                image. It is a conversion of a .jpg image using PIL module.
         """
 
-        super().__init__(master)
+        super().__init__()
         self.controller = controller
         self.master = master
-
-        # put drawing of the empty app here in the init section
-        # then copy display_report method which will be called by the
-        # WeatherApp in its method with a call to the current display object
-        #  selected by the user (from the dictionary). Display report will
-        # cause all displays to update themselves. Metric and imperial
-        # buttons will cause raising of the selected display to the top.
-        # This method will be in the WeatherApp class. Displays will have
-        # access to the same controller as the WeatherApp class so they can
-        # get data easily.
-
-        """Initializes WeatherApp class.
-
-                :Attributes:
-                :system (str): Platform on which application is run.
-                :controller (Controller): Controller class object used for 
-                    passing data between the View (weather_gui) and the Model
-                    (weather_backend).
-                :v_link (dict): Link to access variables in controller.
-                :dusty (str): color definition in hex number.
-                :lavender (str): color definition in hex number.
-                :overcast (str): color definition in hex number.
-                :paper (str): color definition in hex number.
-                :font (str): font definition.
-                :title (str): Main window title displayed when using 
-                    application.
-                :loc_frame (tk.Frame): Location frame, parent of all top bar 
-                    objects.
-                :loc_label (tk.Label): Location label.
-                :loc_entry (tk.Entry): Location entry object. Here user can 
-                    input data which will be passed to var_loc.
-                :search_button (HoverButton): Search for weather report button.
-                :metric_button (HoverButton): Metric units (degC, m/s) selection
-                    button.
-                :imperial_button (HoverButton): Imperial units (degF / mile/hr) 
-                    selection button.
-                :main_canvas (tk.Canvas): Main canvas on which all of the 
-                    weather report will be visualised.
-                :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
-                    image. It is a conversion of a .jpg image using PIL module.
-                """
-
-        super().__init__()
-
         self.system = platform.system()
         # Add Controller to the WeatherApp class instance.
         # controller = Controller()
-        self.controller = controller
         self.v_link = self.controller.app_data
-
-        # # Add main application instance as a View to the Controller.
-        # self.controller.add_view(self)
-
-        # # Create a Report object for backend operations.
-        # report = Report(self.controller)
-        # # Add it as a Model to the Controller class object.
-        # self.controller.add_model(report)
 
         # Color palette used:
         self.dusty = "#96858F"
@@ -242,17 +250,6 @@ class DisplayShort(tk.Frame):
         # Icon color: #a0cff1 (light blue)
         # #00d3ff (true blue)
         self.font = ("Arial", -18)
-
-        # # Configure main window.
-        # self.title("The Weather App")
-        # self.config(bg=self.paper, bd=2, relief="groove")
-        # # Get screen size.
-        # s_width = self.winfo_screenwidth()
-        # # s_height = self.winfo_screenheight()
-        # # Center application window.
-        # self.geometry("+{0}+0".format(int(s_width / 2) - 400))
-        # # Prevent resizing.
-        # self.resizable(width=tk.FALSE, height=tk.FALSE)
 
         # GUI style definitions.
 
@@ -268,6 +265,9 @@ class DisplayShort(tk.Frame):
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
+                        insertwidth=2,
+                        insertcolor="black",
+                        selectbackground=self.dusty
                         )
         self.option_add("*TCombobox*Listbox.font", self.font)
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
@@ -344,7 +344,7 @@ class DisplayShort(tk.Frame):
                                          style="my.TCombobox",
                                          postcommand=self.loc_postcommand,
                                          )
-        self.loc_combobox.focus()
+        # self.loc_combobox.focus()
         self.loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                                sticky=tk.NSEW)
         self.loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
@@ -423,17 +423,9 @@ class DisplayShort(tk.Frame):
             None
         """
 
-        self.imperial_button.configure(**self.button_released_cnf)
-        self.metric_button.configure(**self.button_pushed_cnf)
-        if self.system == "Windows":
-            self.metric_button.update_bg_col()
-            self.imperial_button.update_bg_col()
-            self.metric_button.configure(background="DimGrey")
-        # If button is pushed when there is a report already on the
-        # screen and no errors registered - change units but don't call
-        # the API.
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
+            self.controller.update_buttons()
 
             if self.controller.data_present == 1 \
                     and self.v_link["error_status"] == 0 \
@@ -449,21 +441,14 @@ class DisplayShort(tk.Frame):
             None
         """
 
-        self.metric_button.configure(**self.button_released_cnf)
-        self.imperial_button.configure(**self.button_pushed_cnf)
-        if self.system == "Windows":
-            self.metric_button.update_bg_col()
-            self.imperial_button.update_bg_col()
-            self.imperial_button.configure(background="DimGrey")
-        # If button is pushed when there is a report already on the
-        # screen and no errors registered - change units but don't call
-        # the API.
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
+            self.controller.update_buttons()
 
             if self.controller.data_present == 1 \
                     and self.v_link["error_status"] == 0 \
                     and threading.active_count() < 2:
+                self.v_link["scrollbar_offset"] = self.yscrollbar.get()
                 self.controller.show_display("imperial")
 
     def clear_error_message(self):
@@ -619,6 +604,7 @@ class DisplayShort(tk.Frame):
         """
         self.loc_combobox.focus_set()
         self.loc_combobox.select_range(0, tk.END)
+        self.loc_combobox.icursor(tk.END)
 
     def display_report(self):
         """Display results of the API call in the main_canvas.
@@ -634,19 +620,19 @@ class DisplayShort(tk.Frame):
         # Take keyboard focus from loc_combobox if left mouse button
         # clicked on yscrollbar or main_canvas or if escape pressed
         #  when entering text in loc_combobox.
-        self.yscrollbar.bind("<Button-1>",
-                             lambda e: self.yscrollbar.focus_set())
-        self.main_canvas.bind("<Button-1>",
-                              lambda e: self.main_canvas.focus_set())
+        # self.yscrollbar.bind("<Button-1>",
+        #                      lambda e: self.yscrollbar.focus_set())
+        # self.main_canvas.bind("<Button-1>",
+        #                       lambda e: self.main_canvas.focus_set())
         self.loc_combobox.bind("<Escape>",
-                               lambda e: self.main_canvas.focus_set())
+                               lambda e: self.yscrollbar.focus_set())
 
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
         self.yscrollbar.bind("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
         self.yscrollbar.bind("<Up>", lambda e: self.move_canvas_up())
         self.yscrollbar.bind("<Down>", lambda e: self.move_canvas_down())
-        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
         # Mouse wheel scroll for Linux.
         self.main_canvas.bind(
             '<4>', lambda e: self.main_canvas.yview_scroll(-1, 'units'))
@@ -695,7 +681,7 @@ class DisplayShort(tk.Frame):
         # Display location information.
         # Start coordinates in pixels of the report title.
         x1 = 10
-        y1 = 4
+        y1 = 0
 
         if self.controller.draw_lines == 1:
             # Draw coordinate lines to help in item placement.
