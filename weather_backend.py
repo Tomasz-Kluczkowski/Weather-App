@@ -121,7 +121,7 @@ class Report(object):
             else:
                 self.v_link["timezone"] = data[1]
 
-            self.controller.data_present = 1
+            self.controller.data_present = True
 
             # Store location name of a successful call to the API
             # in api_calls.

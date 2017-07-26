@@ -78,11 +78,11 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 1
+        self.debug = 0
         self.draw_lines = 0
         self.view = None
         self.model = None
-        self.data_present = 0
+        self.data_present = False
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.

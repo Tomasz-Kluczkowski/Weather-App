@@ -99,16 +99,14 @@ class WeatherApp(tk.Tk):
 
     def update_geometry(self):
         """Update and resize application window to use the maximum
-        vertical space available.
+        vertical space available. Center window on the screen.
 
         Returns:
             None
         """
         self.update()
         s_width = self.winfo_screenwidth()
-        # s_height = self.winfo_screenheight()
         c_width = self.winfo_reqwidth()
-        # # c_height = s_height - self.main_canvas.winfo_rooty()*2 - 6
         self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
         self.update()
         s_height = self.winfo_screenheight()
@@ -121,7 +119,7 @@ class WeatherApp(tk.Tk):
             # print("screen_height:", self.winfo_screenheight())
             # print("main window size:", self.winfo_geometry())
             # print("canvas size:", self.main_canvas.winfo_geometry())
-            # print("top decoration:", self.display_1.main_canvas.winfo_rooty())
+            # print("top decoration:", self.main_canvas.winfo_rooty())
             # print("left edge:", self.winfo_rootx())
             # print("top decoration canvas:", self.main_canvas.winfo_rooty())
             # print("left edge canvas:", self.main_canvas.winfo_rootx())
@@ -195,7 +193,7 @@ class WeatherApp(tk.Tk):
 class DisplayShort(tk.Frame):
     """Class to generate sub displays.
     
-    Currently used to create a "title" page and a 5 day "metric" and 
+    Used to create a "title" page and a 5 day "metric" and 
     "imperial" report.
     
     Args:
@@ -207,8 +205,8 @@ class DisplayShort(tk.Frame):
         
         Args:
             :controller (Controller): Controller class object used for
-                passing data between the View (weather_gui) and the Model
-                (weather_backend).
+                passing data between the View (weather_gui) and the 
+                Model (weather_backend).
             :master (tk.Tk): master widget for the class to draw on.
             :system (str): Platform on which application is run.
             :v_link (dict): Link to access variables in controller.
@@ -219,23 +217,25 @@ class DisplayShort(tk.Frame):
             :font (str): font definition.
             :title (str): Main window title displayed when using 
                 application.
-            :loc_frame (tk.Frame): Location frame, parent of all top bar 
-                objects.
+            :loc_frame (tk.Frame): Location frame, parent of all top
+                bar objects.
             :loc_label (tk.Label): Location label.
             :loc_entry (tk.Entry): Location entry object. Here user can 
                 input data which will be passed to var_loc.
-            :search_button (HoverButton): Search for weather report button.
-            :metric_button (HoverButton): Metric units (degC, m/s) selection
+            :search_button (HoverButton): Search for weather report 
                 button.
-            :imperial_button (HoverButton): Imperial units (degF / mile/hr) 
+            :metric_button (HoverButton): Metric units (degC, m/s) 
                 selection button.
+            :imperial_button (HoverButton): Imperial units 
+                (degF / mile/hr) selection button.
             :main_canvas (tk.Canvas): Main canvas on which all of the 
                 weather report will be visualised.
-            :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
-                image. It is a conversion of a .jpg image using PIL module.
-            :hr_start_color (bool): declares if we should use start 
-                color for displaying the values of weather report or 
-                not.
+            :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas 
+                background image. It is a conversion of a .jpg image 
+                using PIL module.
+            :hr_start_color (bool): declares if we should use 
+                start_color for displaying the values of weather report
+                or not.
         """
 
         super().__init__()
@@ -408,8 +408,6 @@ class DisplayShort(tk.Frame):
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
         image = Image.open("Resources/Images/main_background.jpg")
-        # image = image.resize((image.size[0] * 2, image.size[1] * 2),
-        # PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
@@ -435,9 +433,9 @@ class DisplayShort(tk.Frame):
             self.v_link["var_units"].set("metric")
             self.controller.update_buttons()
 
-            if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0 \
-                    and threading.active_count() < 2:
+            if all([self.controller.data_present,
+                    self.v_link["error_status"] == 0,
+                    threading.active_count() < 2]):
                 self.v_link["scrollbar_offset"] = self.yscrollbar.get()
                 self.controller.show_display("metric")
 
@@ -453,9 +451,9 @@ class DisplayShort(tk.Frame):
             self.v_link["var_units"].set("imperial")
             self.controller.update_buttons()
 
-            if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0 \
-                    and threading.active_count() < 2:
+            if all([self.controller.data_present,
+                    self.v_link["error_status"] == 0,
+                    threading.active_count() < 2]):
                 self.v_link["scrollbar_offset"] = self.yscrollbar.get()
                 self.controller.show_display("imperial")
 
@@ -615,8 +613,13 @@ class DisplayShort(tk.Frame):
         self.loc_combobox.icursor(tk.END)
 
     def get_color(self):
-        """Allows color switching for the thext elements of the hourly 
-        report."""
+        """Allows color switching for the thet elements of the hourly 
+        report.
+        
+        Returns:
+            start_color | alt_color (str)
+        """
+
         start_color = self.paper
         alt_color = self.lavender
         if self.hr_start_color:
