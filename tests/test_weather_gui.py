@@ -25,4 +25,4 @@ test_hr_x_offset_data = [("01:10", 0), ("03:00", 1), ("06:00", 2),
 def test_calculate_hr_x_offset(app, text_time, expected):
     """Test offset for widgets gets calculated from time in text form."""
 
-    assert app.calculate_hr_x_offset(text_time) == expected
+    assert app.get_hr_x_offset(text_time) == expected

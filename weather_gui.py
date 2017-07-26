@@ -10,6 +10,7 @@ from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
 
+
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
@@ -72,7 +73,6 @@ class WeatherApp(tk.Tk):
         # Add it as a Model to the Controller class object.
         self.controller.add_model(report)
 
-
         # Configure main window.
         self.paper = "#D5D5D5"
         self.title("The Weather App")
@@ -109,24 +109,25 @@ class WeatherApp(tk.Tk):
         # s_height = self.winfo_screenheight()
         c_width = self.winfo_reqwidth()
         # # c_height = s_height - self.main_canvas.winfo_rooty()*2 - 6
-        self.geometry("+{0}+0".format(int(s_width/2) - int(c_width/2)))
+        self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
         self.update()
         s_height = self.winfo_screenheight()
         for key in self.displays:
             top = self.displays[key].main_canvas.winfo_rooty()
-            self.displays[key].main_canvas.config(height=s_height - 2*top - 6)
-        # Useful dimension info below.
-        # print("screen_width:", self.winfo_screenwidth())
-        # print("screen_height:", self.winfo_screenheight())
-        # print("main window size:", self.winfo_geometry())
-        # print("canvas size:", self.main_canvas.winfo_geometry())
-        # print("top decoration:", self.display_1.main_canvas.winfo_rooty())
-        # print("left edge:", self.winfo_rootx())
-        # print("top decoration canvas:", self.main_canvas.winfo_rooty())
-        # print("left edge canvas:", self.main_canvas.winfo_rootx())
-        # print("main window required width:", self.winfo_reqwidth())
-        # print("main window required height:", self.winfo_reqheight())
-            
+            self.displays[key].main_canvas.config(
+                height=s_height - 2 * top - 6)
+            # Useful dimension info below.
+            # print("screen_width:", self.winfo_screenwidth())
+            # print("screen_height:", self.winfo_screenheight())
+            # print("main window size:", self.winfo_geometry())
+            # print("canvas size:", self.main_canvas.winfo_geometry())
+            # print("top decoration:", self.display_1.main_canvas.winfo_rooty())
+            # print("left edge:", self.winfo_rootx())
+            # print("top decoration canvas:", self.main_canvas.winfo_rooty())
+            # print("left edge canvas:", self.main_canvas.winfo_rootx())
+            # print("main window required width:", self.winfo_reqwidth())
+            # print("main window required height:", self.winfo_reqheight())
+
     def update_buttons(self):
         """Update buttons in all displays to synchronise them across.
         
@@ -232,6 +233,9 @@ class DisplayShort(tk.Frame):
                 weather report will be visualised.
             :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
                 image. It is a conversion of a .jpg image using PIL module.
+            :hr_start_color (bool): declares if we should use start 
+                color for displaying the values of weather report or 
+                not.
         """
 
         super().__init__()
@@ -250,6 +254,9 @@ class DisplayShort(tk.Frame):
         # Icon color: #a0cff1 (light blue)
         # #00d3ff (true blue)
         self.font = ("Arial", -18)
+        self.hr_start_color = True
+        self.last_color = None
+
 
         # GUI style definitions.
 
@@ -410,10 +417,11 @@ class DisplayShort(tk.Frame):
 
         # Error/Status Bar.
         self.status_bar_label = tk.Label(self,
-                                    textvariable=self.v_link["var_status"],
-                                    **label_cnf)
+                                         textvariable=self.v_link[
+                                             "var_status"],
+                                         **label_cnf)
         self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
-                              sticky=tk.NSEW)
+                                   sticky=tk.NSEW)
         self.status_bar_label.configure(relief="sunken")
 
     def metric_pushed(self):
@@ -498,7 +506,7 @@ class DisplayShort(tk.Frame):
         return name_of_day, date_str
 
     @staticmethod
-    def calculate_hr_x_offset(text_time):
+    def get_hr_x_offset(text_time):
         """
 
         Args:
@@ -606,7 +614,25 @@ class DisplayShort(tk.Frame):
         self.loc_combobox.select_range(0, tk.END)
         self.loc_combobox.icursor(tk.END)
 
+    def get_color(self):
+        """Allows color switching for the thext elements of the hourly 
+        report."""
+        start_color = self.paper
+        alt_color = self.lavender
+        if self.hr_start_color:
+            self.hr_start_color = False
+            self.last_color = start_color
+            return start_color
+        else:
+            if self.last_color == start_color:
+                self.last_color = alt_color
+                return alt_color
+            else:
+                self.last_color = start_color
+                return start_color
+
     def display_report(self):
+
         """Display results of the API call in the main_canvas.
 
         Returns:
@@ -616,7 +642,6 @@ class DisplayShort(tk.Frame):
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
-        # self.main_canvas.yview_moveto(0.0)
         # Take keyboard focus from loc_combobox if left mouse button
         # clicked on yscrollbar or main_canvas or if escape pressed
         #  when entering text in loc_combobox.
@@ -658,8 +683,8 @@ class DisplayShort(tk.Frame):
         # Config parameters for hourly section.
         hr_w_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
         # hr_n_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
-        hr_ne_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NE}
         hr_nw_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
+        hr_ne_cnf = {"tags": "hourly", "anchor": tk.NE}
         # hr_center_cnf = {"tags": "hourly", "fill": self.paper,
         #                  "anchor": tk.CENTER}
         hr_img_n_cnf = {"tags": "hourly", "anchor": tk.N}
@@ -1006,7 +1031,7 @@ class DisplayShort(tk.Frame):
 
             # Hour.
             hour_text = self.begin_get_time(item["dt"])
-            hr_x_offset = self.calculate_hr_x_offset(hour_text)
+            hr_x_offset = self.get_hr_x_offset(hour_text)
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(130 + hr_x_offset * 115, 0),
                               text=hour_text, justify=tk.CENTER, font=h3,
@@ -1026,7 +1051,7 @@ class DisplayShort(tk.Frame):
             hr_temp = CanvasText(self.main_canvas,
                                  rel_obj=hour,
                                  rel_pos="BR",
-                                 offset=(-1, 40),
+                                 offset=(-1, 40), fill=self.get_color(),
                                  text=hr_temp_text, font=h3, **hr_ne_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
             self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
@@ -1035,7 +1060,7 @@ class DisplayShort(tk.Frame):
             hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
             hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp,
                                      rel_pos="BR",
-                                     offset=(-2, 5),
+                                     offset=(-2, 5), fill=self.get_color(),
                                      text=hr_pressure_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_pressure_icon y coordinate to center of
@@ -1046,7 +1071,7 @@ class DisplayShort(tk.Frame):
             hr_cloud_text = "{0}%".format(item["clouds"]["all"])
             hr_cloud = CanvasText(self.main_canvas, rel_obj=hr_pressure,
                                   rel_pos="BR",
-                                  offset=(0, 5),
+                                  offset=(0, 5), fill=self.get_color(),
                                   text=hr_cloud_text, font=h4, **hr_ne_cnf)
             # Update hr_cloud_icon y coordinate to center of hr_cloud.
             self.hr_cloud_icons[-1].move_rel_to_obj_y(hr_cloud)
@@ -1055,7 +1080,7 @@ class DisplayShort(tk.Frame):
             hr_humidity_text = "{0}%".format(item["main"]["humidity"])
             hr_humidity = CanvasText(self.main_canvas, rel_obj=hr_cloud,
                                      rel_pos="BR",
-                                     offset=(-1, 5),
+                                     offset=(-1, 5), fill=self.get_color(),
                                      text=hr_humidity_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_humidity_icon y coordinate to center of
@@ -1067,7 +1092,7 @@ class DisplayShort(tk.Frame):
                                                 speed_unit)
             hr_wind = CanvasText(self.main_canvas, rel_obj=hr_humidity,
                                  rel_pos="BR",
-                                 offset=(-1, 5),
+                                 offset=(-1, 5), fill=self.get_color(),
                                  text=hr_wind_text, font=h4, **hr_ne_cnf)
             # Update hr_wind_icon y coordinate to center of hr_wind.
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
@@ -1077,7 +1102,7 @@ class DisplayShort(tk.Frame):
                 self.begin_deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
                                      rel_pos="BR",
-                                     offset=(-1, 5),
+                                     offset=(-1, 5), fill=self.get_color(),
                                      text=hr_wind_dir_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_wind_dir_icon y coordinate to center of
@@ -1095,7 +1120,7 @@ class DisplayShort(tk.Frame):
                 hr_rain = CanvasText(self.main_canvas,
                                      rel_obj=hr_wind_dir,
                                      rel_pos="BR",
-                                     offset=(-1, 10),
+                                     offset=(-1, 10), fill=self.get_color(),
                                      text=rain_text, font=h4,
                                      **hr_ne_cnf)
                 # Update hr_rain_icon y coordinate to center of
@@ -1129,7 +1154,7 @@ class DisplayShort(tk.Frame):
                 hr_snow = CanvasText(self.main_canvas,
                                      rel_obj=rel_obj_text,
                                      rel_pos="BR",
-                                     offset=offset,
+                                     offset=offset, fill=self.get_color(),
                                      text=snow_text, font=h4,
                                      **hr_ne_cnf)
                 # Update hr_snow_icon y coordinate to center of
@@ -1156,11 +1181,13 @@ class DisplayShort(tk.Frame):
 
             hr_snow_present = False
             hr_rain_present = False
+            self.hr_start_color = True
 
         # self.update()
         self.main_canvas.config(
             scrollregion=self.main_canvas.bbox("main", "hourly"))
         self.yscrollbar.focus()
+
 
 class HoverButton(tk.Button):
     """Improves upon the standard button by adding status bar display 
