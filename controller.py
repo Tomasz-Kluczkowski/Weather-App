@@ -94,7 +94,6 @@ class Controller(object):
         Returns:
             None
         """
-
         self.model = model
 
     def add_view(self, view):
@@ -107,7 +106,6 @@ class Controller(object):
         Returns:
             None
         """
-
         self.view = view
 
     def get_time(self, unix_time, dst_offset):
@@ -123,7 +121,6 @@ class Controller(object):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-
         time = self.model.finish_get_time(unix_time, dst_offset)
         return time
 
@@ -140,35 +137,32 @@ class Controller(object):
                     name_of_day (str): Name of the day on date.
                     date_str (str): Date in string representation.
                 """
-
         name_of_day, date_str = self.model.finish_get_date(unix_time,
                                                            dst_offset)
         return name_of_day, date_str
 
     def deg_conv(self, wind_dir_deg):
         """Contacts model to convert meteorological degrees to
-                cardinal directions.
+        cardinal directions.
 
-                Args:
-                    wind_dir_deg (float): Wind direction in meteorological 
-                        degrees.
+        Args:
+            wind_dir_deg (float): Wind direction in meteorological 
+                degrees.
 
-                Returns:
-                    wind_dir_cardinal (str): Wind direction in cardinal 
-                        direction.
-                """
-
+        Returns:
+            wind_dir_cardinal (str): Wind direction in cardinal 
+                direction.
+        """
         wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
     def get_report(self):
         """Contact model to obtain data for the View to display
-         the report.
+        the report.
 
         Returns:
             None
         """
-
         self.model.finish_get_report(self.app_data["var_loc"].get())
 
     def display_error(self, error):
@@ -180,7 +174,6 @@ class Controller(object):
         Returns:
             None
         """
-
         # Error handling.
         self.app_data["error_message"] = error
         # Return to the view and display only the error in the

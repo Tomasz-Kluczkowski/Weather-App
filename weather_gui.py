@@ -236,8 +236,26 @@ class DisplayShort(tk.Frame):
             :hr_start_color (bool): declares if we should use 
                 start_color for displaying the values of weather report
                 or not.
+            :hr_weather_icons (CanvasImg): list of weather icons for
+                the hourly report.
+            :hr_temp_icons (CanvasImg): list of temperature icons for 
+                the hourly report.
+            :hr_pressure_icons (CanvasImg): list of pressure icons for 
+                the hourly report.
+            :hr_rain_icons (CanvasImg): list of rain icons for the 
+                hourly report.
+            :hr_snow_icons (CanvasImg): list of snow icons for the 
+                hourly report.
+            :hr_cloud_icons (CanvasImg): list of cloud icons for the 
+                hourly report.
+            :hr_humidity_icons (CanvasImg): list of humidity icons for 
+                the hourly report.
+            :hr_wind_icons (CanvasImg): list of wind icons for  the 
+                hourly report.
+            :hr_wind_dir_icons (CanvasImg): list of wind direction 
+                icons for the hourly report.
+            :cur_icon (CanvasImg): current weather icon.
         """
-
         super().__init__()
         self.controller = controller
         self.master = master
@@ -257,6 +275,28 @@ class DisplayShort(tk.Frame):
         self.hr_start_color = True
         self.last_color = None
 
+        self.cur_icon = None
+        """:type : CanvasImg"""
+
+        # Lists which will hold hourly report canvas objects.
+        self.hr_weather_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_temp_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_pressure_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_rain_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_snow_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_cloud_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_humidity_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_wind_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_wind_dir_icons = []
+        """:type : list[CanvasImg]"""
 
         # GUI style definitions.
 
@@ -428,7 +468,6 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
             self.controller.update_buttons()
@@ -446,7 +485,6 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
             self.controller.update_buttons()
@@ -464,7 +502,6 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         if self.v_link["error_status"] == -1:
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
@@ -482,7 +519,6 @@ class DisplayShort(tk.Frame):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-
         time = self.controller.get_time(unix_time, dst_offset)
         return time
 
@@ -499,7 +535,6 @@ class DisplayShort(tk.Frame):
             name_of_day (str): Name of the day on date.
             date_str (str): Date in string representation.
         """
-
         name_of_day, date_str = self.controller.get_date(unix_time, dst_offset)
         return name_of_day, date_str
 
@@ -514,7 +549,6 @@ class DisplayShort(tk.Frame):
             hr_x_offset (int): Offset value necessary to display the 
             next column of text.
         """
-
         hours = int(text_time.split(":")[0])
 
         hr_intervals = {(0, 3): 0,
@@ -542,7 +576,6 @@ class DisplayShort(tk.Frame):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-
         wind_dir_cardinal = self.controller.deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
@@ -554,12 +587,14 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         # Do nothing if no location is entered or an active sub thread
         # is running.
         if (self.v_link["var_loc"].get() == "") \
                 or (threading.active_count() > 1):
             return
+        # Clear any error status message.
+        self.v_link["error_message"] = ""
+        self.v_link["var_status"].set("Gathering data, please wait...")
         # Request a report using a Mediating Controller in a new thread.
         report_thread = threading.Thread(target=self.controller.get_report)
         report_thread.start()
@@ -573,7 +608,6 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def move_canvas_up(self):
@@ -590,7 +624,6 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         self.main_canvas.yview_scroll(1, "units")
 
     def loc_postcommand(self):
@@ -613,13 +646,12 @@ class DisplayShort(tk.Frame):
         self.loc_combobox.icursor(tk.END)
 
     def get_color(self):
-        """Allows color switching for the thet elements of the hourly 
+        """Allows color switching for the the elements of the hourly 
         report.
         
         Returns:
             start_color | alt_color (str)
         """
-
         start_color = self.paper
         alt_color = self.lavender
         if self.hr_start_color:
@@ -641,17 +673,11 @@ class DisplayShort(tk.Frame):
         Returns:
             None
         """
-
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
-        # Take keyboard focus from loc_combobox if left mouse button
-        # clicked on yscrollbar or main_canvas or if escape pressed
-        #  when entering text in loc_combobox.
-        # self.yscrollbar.bind("<Button-1>",
-        #                      lambda e: self.yscrollbar.focus_set())
-        # self.main_canvas.bind("<Button-1>",
-        #                       lambda e: self.main_canvas.focus_set())
+        # Give scrollbar keyboard focus to enable scrolling of the
+        # main_canvas on laptops without mouse wheel.
         self.loc_combobox.bind("<Escape>",
                                lambda e: self.yscrollbar.focus_set())
 
@@ -922,23 +948,23 @@ class DisplayShort(tk.Frame):
         hr_rain_present = False
         hr_snow_present = False
         hr_snow = None
-        self.hr_weather_icons = []
-        self.hr_temp_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_pressure_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_rain_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_snow_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_cloud_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_humidity_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_wind_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_wind_dir_icons = []
-        """:type : list[CanvasImg]"""
+        # self.hr_weather_icons = []
+        # self.hr_temp_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_pressure_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_rain_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_snow_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_cloud_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_humidity_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_wind_icons = []
+        # """:type : list[CanvasImg]"""
+        # self.hr_wind_dir_icons = []
+        # """:type : list[CanvasImg]"""
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 

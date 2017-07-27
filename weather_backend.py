@@ -9,11 +9,12 @@ import os
 
 
 class Report(object):
-    """This class will be used to call APIs, gather 
-    and modify data for displaying in the GUI.
-       
-    Inherits from Python base object. This is our Model. 
-    Model is allowed to directly communicate only with the Controller. 
+    """Model class for application.
+    
+    This class will be used to call APIs, gather and modify data for
+    displaying in the GUI.
+    Inherits from Python base object. Model is allowed to directly 
+    communicate only with the Controller. 
     All the backend (business logic) will be carried out here.
 
     """
@@ -34,7 +35,6 @@ class Report(object):
             application.
         
         """
-
         self.controller = controller
         self.v_link = self.controller.app_data
 
@@ -93,11 +93,6 @@ class Report(object):
         if self.v_link["error_status"] == -1:
             self.controller.display_error(data[1])
         else:
-            # Clear any error status message upon successful
-            # response from API.
-            self.v_link["var_status"].set("Gathering data, please wait...")
-            self.v_link["error_message"] = ""
-
             # Copy dictionaries from data into metric and imperial
             # dictionary.
             self.v_link["metric"] = data[1][0]["metric"]
@@ -147,7 +142,7 @@ class Report(object):
             if self.v_link["error_status"] == 0:
                 self.v_link["var_status"].set("")
                 self.controller.display_report()
-            # Now we are ready do display the report.
+                # Now we are ready do display the report.
 
     def geonames_api(self, lat, lon):
         """Contacts geonames.org to get the timezone based on lat (latitude)
@@ -309,7 +304,6 @@ class Report(object):
             name_of_day (str): Name of the day on date.
             date_str (str): Date in string representation.
         """
-
         if dst_offset:
             dst_offset = self.v_link["timezone"]["dstOffset"] * 3600
         else:
@@ -332,7 +326,6 @@ class Report(object):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-
         directions = {(348.75, 360): "N",
                       (0, 11.25): "N",
                       (11.25, 33.75): "NNE",
@@ -362,7 +355,6 @@ class Report(object):
         Returns:
             None
         """
-
         rows = self.view()
         self.v_link["api_calls"] = []
         for row in rows:
@@ -415,9 +407,10 @@ class Report(object):
         Returns:
             None
         """
-
         self.conn.close()
 
+        # More database  methods which can be used in the future should
+        # the need arise.
         # def search(self, location):
         #     self.cur.execute("SELECT * FROM locations WHERE Location=?,
         # (location))
