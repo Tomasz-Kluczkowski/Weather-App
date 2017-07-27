@@ -15,7 +15,7 @@ if [ -d build ] ; then
     rm -rf build
 fi
 echo Running cx_Freeze script.
-python cx_setup_linux_64bit.py build &
+python cx_setup_linux_32bit.py build &
 wait
 if [ -d build ] ; then
     success
