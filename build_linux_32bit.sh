@@ -5,7 +5,7 @@ clear
 
 function success {
 echo Cx_Freeze build completed successfully.
-pause
+read -rsp $'Press any key to continue...\n' -n 1 key
 }
 
 
