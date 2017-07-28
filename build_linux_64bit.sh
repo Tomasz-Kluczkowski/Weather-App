@@ -6,6 +6,7 @@ function success {
 echo Cx_Freeze build completed successfully.
 #cd build/exe.linux-x86_64-3.5
 # gvfs-set-attribute -t string Weather_App_64bit_launcher.sh metadata::custom-icon file:///app_icon96x96.ico
+
 echo Creating archive for deployment.
 #cd ../..
 mv build/exe.linux-x86_64-3.5 build/Weather_App_Linux_64bit
