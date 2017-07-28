@@ -12,7 +12,7 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Resources/", "app_icon48x48.ico", "README_Linux_64bit.txt"]
+include_files = ["Resources/", "app_icon48x48.ico", "README_Linux_64bit.txt", "Weather_App_64bit_launcher.sh"]
 includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter", "idna", "multiprocessing", "PIL"]
