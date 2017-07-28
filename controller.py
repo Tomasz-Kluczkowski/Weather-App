@@ -58,7 +58,7 @@ class Controller(object):
                 main_canvas.
             :model (Report): Report class object which will handle all
                 the backend operations.
-            :data_present (int): Confirms presence of all data from
+            :data_present (bool): Confirms presence of all data from
                 API.
 
         """
@@ -78,7 +78,7 @@ class Controller(object):
                          }
         """:type : dict[str, any]"""
 
-        self.debug = 0
+        self.debug = 1
         self.draw_lines = 0
         self.view = None
         self.model = None
@@ -113,7 +113,7 @@ class Controller(object):
         human readable one. 
         
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -128,10 +128,10 @@ class Controller(object):
         """Contact model to convert date from unix time to string.
 
                 Args:
-                    dst_offset: (bool) Set to True to offset time received from
+                    dst_offset (bool): Set to True to offset time received from
                         open weather API by daylight savings time.
-                    unix_time (int): Time given in seconds from beginning of the
-                        epoch as on unix machines.
+                    unix_time (int): Time given in seconds from beginning of
+                        the epoch as on unix machines.
 
                 Returns:
                     name_of_day (str): Name of the day on date.

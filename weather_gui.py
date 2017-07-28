@@ -57,7 +57,6 @@ class WeatherApp(tk.Tk):
             application.
         :displays (dict) dictionary storing all displays.
         """
-
         super().__init__()
 
         self.system = platform.system()
@@ -204,10 +203,12 @@ class DisplayShort(tk.Frame):
         """Initialise class.
         
         Args:
-            :controller (Controller): Controller class object used for
+            controller (Controller): Controller class object used for
                 passing data between the View (weather_gui) and the 
-                Model (weather_backend).
-            :master (tk.Tk): master widget for the class to draw on.
+                model (weather_backend).
+            master (tk.Tk): master widget for the class to draw on.
+            
+        :Attributes:
             :system (str): Platform on which application is run.
             :v_link (dict): Link to access variables in controller.
             :dusty (str): color definition in hex number.
@@ -231,30 +232,38 @@ class DisplayShort(tk.Frame):
             :main_canvas (tk.Canvas): Main canvas on which all of the 
                 weather report will be visualised.
             :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas 
-                background image. It is a conversion of a .jpg image 
+                background image. It is a conversion of a .jpg image
                 using PIL module.
             :hr_start_color (bool): declares if we should use 
                 start_color for displaying the values of weather report
                 or not.
-            :hr_weather_icons (CanvasImg): list of weather icons for
-                the hourly report.
-            :hr_temp_icons (CanvasImg): list of temperature icons for 
-                the hourly report.
-            :hr_pressure_icons (CanvasImg): list of pressure icons for 
-                the hourly report.
-            :hr_rain_icons (CanvasImg): list of rain icons for the 
+            :hr_weather_icons list[CanvasImg]: list of weather icons
+                for the hourly report.
+            :hr_temp_icons list[CanvasImg]: list of temperature icons 
+                for the hourly report.
+            :hr_pressure_icons list[CanvasImg]: list of pressure icons 
+                for the hourly report.
+            :hr_rain_icons list[CanvasImg]: list of rain icons for the 
                 hourly report.
-            :hr_snow_icons (CanvasImg): list of snow icons for the 
+            :hr_snow_icons list[CanvasImg]: list of snow icons for the 
                 hourly report.
-            :hr_cloud_icons (CanvasImg): list of cloud icons for the 
-                hourly report.
-            :hr_humidity_icons (CanvasImg): list of humidity icons for 
+            :hr_cloud_icons list[CanvasImg]: list of cloud icons for 
                 the hourly report.
-            :hr_wind_icons (CanvasImg): list of wind icons for  the 
+            :hr_humidity_icons list[CanvasImg]: list of humidity icons
+                for the hourly report.
+            :hr_wind_icons list[CanvasImg]: list of wind icons for  the 
                 hourly report.
-            :hr_wind_dir_icons (CanvasImg): list of wind direction 
+            :hr_wind_dir_icons list[CanvasImg]: list of wind direction
                 icons for the hourly report.
             :cur_icon (CanvasImg): current weather icon.
+            :pressure_img (CanvasImg): current weather pressure icon.
+            :clouds_img (CanvasImg): current weather clouds icon.
+            :humidity_img (CanvasImg): current weather humidity icon.
+            :wind_img (CanvasImg): current weather wind icon.
+            :wind_dir_img (CanvasImg): current weather wind direction
+                icon.
+            :sunrise_img (CanvasImg): current weather sunrise icon.
+            :sunset_img (CanvasImg): current weather sunset icon.
         """
         super().__init__()
         self.controller = controller
@@ -274,8 +283,23 @@ class DisplayShort(tk.Frame):
         self.font = ("Arial", -18)
         self.hr_start_color = True
         self.last_color = None
-
+        # Canvas image objects need to be attributes or they get 
+        # garbage collected otherwise...
         self.cur_icon = None
+        """:type : CanvasImg"""
+        self.pressure_img = None
+        """:type : CanvasImg"""
+        self.clouds_img = None
+        """:type : CanvasImg"""
+        self.humidity_img = None
+        """:type : CanvasImg"""
+        self.wind_img = None
+        """:type : CanvasImg"""
+        self.wind_dir_img = None
+        """:type : CanvasImg"""
+        self.sunrise_img = None
+        """:type : CanvasImg"""
+        self.sunset_img = None
         """:type : CanvasImg"""
 
         # Lists which will hold hourly report canvas objects.
@@ -391,7 +415,6 @@ class DisplayShort(tk.Frame):
                                          style="my.TCombobox",
                                          postcommand=self.loc_postcommand,
                                          )
-        # self.loc_combobox.focus()
         self.loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                                sticky=tk.NSEW)
         self.loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
@@ -511,7 +534,7 @@ class DisplayShort(tk.Frame):
         readable one.
 
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -526,7 +549,7 @@ class DisplayShort(tk.Frame):
         """Contact controller to convert date from unix time to string.
 
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -650,7 +673,7 @@ class DisplayShort(tk.Frame):
         report.
         
         Returns:
-            start_color | alt_color (str)
+            start_color (str) | alt_color (str): color of the widget's text.
         """
         start_color = self.paper
         alt_color = self.lavender
@@ -948,23 +971,6 @@ class DisplayShort(tk.Frame):
         hr_rain_present = False
         hr_snow_present = False
         hr_snow = None
-        # self.hr_weather_icons = []
-        # self.hr_temp_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_pressure_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_rain_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_snow_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_cloud_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_humidity_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_wind_icons = []
-        # """:type : list[CanvasImg]"""
-        # self.hr_wind_dir_icons = []
-        # """:type : list[CanvasImg]"""
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 
@@ -1246,7 +1252,6 @@ class HoverButton(tk.Button):
             **args: Keyword arguments to further initialise the button.
             
         :Attributes:
-        
         :system (str): Platform on which application is run.
         :cur_bg (str): Current background color of the button.
         :tip (str): Text to display in the status_bar_label of the app.
@@ -1254,10 +1259,7 @@ class HoverButton(tk.Button):
             the data required by each segment of the application. 
             This has to be the same Controller as for the WeatherApp.
         :v_link (dict): Link to access variables in controller.
-
-        
         """
-
         super().__init__(master, cnf, **args)
         self.system = platform.system()
         self.cur_bg = self["bg"]
@@ -1355,9 +1357,7 @@ class CanvasObject(object):
         :canvas (tk.Canvas): tkinter Canvas object.
         :pos_x (int): X coordinate for our object.
         :pos_y (int): Y coordinate for our object.
-
         """
-
         self.id_num = 0
         self.canvas = canvas
         pos_x = 0
@@ -1429,7 +1429,6 @@ class CanvasObject(object):
         Returns:
             None
         """
-
         # Find y coordinate of the center of rel_obj.
         r_x1, r_y1, r_x2, r_y2 = self.canvas.bbox(rel_obj.id_num)
         r_center_y = r_y2 - (r_y2 - r_y1) / 2
@@ -1496,9 +1495,7 @@ class CanvasText(CanvasObject):
         :id_num (int): Unique Id number returned by create_text method 
             which will help us identify objects and obtain their 
             bounding boxes.
-
         """
-
         # Initialise base class. Get x-y coordinates for CanvasText
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
@@ -1556,13 +1553,11 @@ class CanvasImg(CanvasObject):
                 create_text method.
 
         :Attributes:
-            :id_num (int): Unique Id number returned by create_image 
-                method which will help us identify objects and 
-                obtain their bounding boxes.
-            :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
-
+        :id_num (int): Unique Id number returned by create_image 
+            method which will help us identify objects and 
+            obtain their bounding boxes.
+        :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
         """
-
         # Initialise base class. Get x-y coordinates for CanvasImg
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
@@ -1574,7 +1569,6 @@ class CanvasImg(CanvasObject):
         id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img,
                                      **args)
         self.id_num = id_num
-
 
 # Launch application.
 if __name__ == "__main__":
