@@ -15,6 +15,10 @@ from controller import Controller
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
+# TODO: stick all styling / color definitions into style module and
+# TODO: import *.
+# TODO: remember last units used in the database so that user does not have to
+# TODO: change them all the time.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -41,36 +45,18 @@ class WeatherApp(tk.Tk):
 
     def __init__(self):
         """Initializes WeatherApp class.
-        
+
         :Attributes:
         :system (str): Platform on which application is run.
-        :controller (Controller): Controller class object used for 
+        :controller (Controller): Controller class object used for
             passing data between the View (weather_gui) and the Model
             (weather_backend).
         :v_link (dict): Link to access variables in controller.
-        :dusty (str): color definition in hex number.
-        :lavender (str): color definition in hex number.
-        :overcast (str): color definition in hex number.
         :paper (str): color definition in hex number.
-        :font (str): font definition.
-        :title (str): Main window title displayed when using 
+        :title (str): Main window title displayed when using
             application.
-        :loc_frame (tk.Frame): Location frame, parent of all top bar 
-            objects.
-        :loc_label (tk.Label): Location label.
-        :loc_entry (tk.Entry): Location entry object. Here user can 
-            input data which will be passed to var_loc.
-        :search_button (HoverButton): Search for weather report button.
-        :metric_button (HoverButton): Metric units (degC, m/s) selection
-            button.
-        :imperial_button (HoverButton): Imperial units (degF / mile/hr) 
-            selection button.
-        :main_canvas (tk.Canvas): Main canvas on which all of the 
-            weather report will be visualised.
-        :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas background 
-            image. It is a conversion of a .jpg image using PIL module.
+        :displays (dict) dictionary storing all displays.
         """
-
         super().__init__()
 
         self.system = platform.system()
@@ -78,17 +64,214 @@ class WeatherApp(tk.Tk):
         controller = Controller()
         self.controller = controller
         self.v_link = self.controller.app_data
-
-
         # Add main application instance as a View to the Controller.
-        # At this stage since we use self updating special tkinter
-        # variables we do not need to call on the view for updates.
         self.controller.add_view(self)
 
         # Create a Report object for backend operations.
         report = Report(self.controller)
         # Add it as a Model to the Controller class object.
         self.controller.add_model(report)
+
+        # Configure main window.
+        self.paper = "#D5D5D5"
+        self.title("The Weather App")
+        self.config(bg=self.paper, bd=2, relief="flat")
+        # Prevent resizing.
+        self.resizable(width=tk.FALSE, height=tk.FALSE)
+
+        # Create set of displays.
+        self.displays = {}
+        """:type : dict[str, DisplayShort]"""
+        keys = ["title", "metric", "imperial"]
+        for key in keys:
+            self.displays[key] = DisplayShort(self, controller)
+            self.displays[key].grid(row=0, column=0, sticky=tk.NSEW)
+        self.update_geometry()
+
+        # Application icon. Linux does not display it at all.
+        if self.system == "Windows":
+            self.iconbitmap("app_icon48x48.ico")
+        # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
+        # self.tk.call("wm", "iconphoto", self._w, img_icon)
+        self.show_display("title")
+        self.displays["title"].loc_combobox.focus()
+
+    def update_geometry(self):
+        """Update and resize application window to use the maximum
+        vertical space available. Center window on the screen.
+
+        Returns:
+            None
+        """
+        self.update()
+        s_width = self.winfo_screenwidth()
+        c_width = self.winfo_reqwidth()
+        self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
+        self.update()
+        s_height = self.winfo_screenheight()
+        for key in self.displays:
+            top = self.displays[key].main_canvas.winfo_rooty()
+            self.displays[key].main_canvas.config(
+                height=s_height - 2 * top - 6)
+            # Useful dimension info below.
+            # print("screen_width:", self.winfo_screenwidth())
+            # print("screen_height:", self.winfo_screenheight())
+            # print("main window size:", self.winfo_geometry())
+            # print("canvas size:", self.main_canvas.winfo_geometry())
+            # print("top decoration:", self.main_canvas.winfo_rooty())
+            # print("left edge:", self.winfo_rootx())
+            # print("top decoration canvas:", self.main_canvas.winfo_rooty())
+            # print("left edge canvas:", self.main_canvas.winfo_rootx())
+            # print("main window required width:", self.winfo_reqwidth())
+            # print("main window required height:", self.winfo_reqheight())
+
+    def update_buttons(self):
+        """Update buttons in all displays to synchronise them across.
+        
+        Returns:
+            None
+        """
+        for key in self.displays:
+            if self.v_link["var_units"].get() == "metric":
+                self.displays[key].imperial_button.configure(
+                    **self.displays[key].button_released_cnf)
+                self.displays[key].metric_button.configure(
+                    **self.displays[key].button_pushed_cnf)
+
+                if self.system == "Windows":
+                    self.displays[key].metric_button.update_bg_col()
+                    self.displays[key].imperial_button.update_bg_col()
+                    self.displays[key].metric_button.configure(
+                        background="DimGrey")
+                    self.displays[key].metric_button.leave_button()
+            else:
+                self.displays[key].metric_button.configure(
+                    **self.displays[key].button_released_cnf)
+                self.displays[key].imperial_button.configure(
+                    **self.displays[key].button_pushed_cnf)
+                if self.system == "Windows":
+                    self.displays[key].metric_button.update_bg_col()
+                    self.displays[key].imperial_button.update_bg_col()
+                    self.displays[key].imperial_button.configure(
+                        background="DimGrey")
+                    self.displays[key].imperial_button.leave_button()
+
+    def show_display(self, display):
+        """Bring currently selected display to the front of the 
+        application.
+        
+        Args:
+            display (str): currently selected display type. 
+
+        Returns:
+            None
+        """
+        lo, hi = self.v_link["scrollbar_offset"]
+        self.displays[display].main_canvas.yview_moveto(lo)
+        self.displays[display].yscrollbar.focus_set()
+        self.displays[display].tkraise()
+
+    def display_report(self):
+        """Generate all available reports and bring selected one to the
+        front of the application.
+        
+        Returns:
+            None
+        """
+        selected_units = self.v_link["var_units"].get()
+        self.show_display("title")
+        self.v_link["scrollbar_offset"] = (0, 0)
+        for key in self.displays:
+            self.v_link["var_units"].set(key)
+            if key != "title":
+                self.displays[key].display_report()
+        self.v_link["var_units"].set(selected_units)
+        self.show_display(selected_units)
+
+
+class DisplayShort(tk.Frame):
+    """Class to generate sub displays.
+    
+    Used to create a "title" page and a 5 day "metric" and 
+    "imperial" report.
+    
+    Args:
+        tk.Frame (tk.Frame): inherits from tkinter Frame object.
+    """
+
+    def __init__(self, master, controller):
+        """Initialise class.
+        
+        Args:
+            controller (Controller): Controller class object used for
+                passing data between the View (weather_gui) and the 
+                model (weather_backend).
+            master (tk.Tk): master widget for the class to draw on.
+            
+        :Attributes:
+            :system (str): Platform on which application is run.
+            :v_link (dict): Link to access variables in controller.
+            :dusty (str): color definition in hex number.
+            :lavender (str): color definition in hex number.
+            :overcast (str): color definition in hex number.
+            :paper (str): color definition in hex number.
+            :font (str): font definition.
+            :title (str): Main window title displayed when using 
+                application.
+            :loc_frame (tk.Frame): Location frame, parent of all top
+                bar objects.
+            :loc_label (tk.Label): Location label.
+            :loc_entry (tk.Entry): Location entry object. Here user can 
+                input data which will be passed to var_loc.
+            :search_button (HoverButton): Search for weather report 
+                button.
+            :metric_button (HoverButton): Metric units (degC, m/s) 
+                selection button.
+            :imperial_button (HoverButton): Imperial units 
+                (degF / mile/hr) selection button.
+            :main_canvas (tk.Canvas): Main canvas on which all of the 
+                weather report will be visualised.
+            :canvas_bg_img (PIL.ImageTk.PhotoImage): Main canvas 
+                background image. It is a conversion of a .jpg image
+                using PIL module.
+            :hr_start_color (bool): declares if we should use 
+                start_color for displaying the values of weather report
+                or not.
+            :hr_weather_icons list[CanvasImg]: list of weather icons
+                for the hourly report.
+            :hr_temp_icons list[CanvasImg]: list of temperature icons 
+                for the hourly report.
+            :hr_pressure_icons list[CanvasImg]: list of pressure icons 
+                for the hourly report.
+            :hr_rain_icons list[CanvasImg]: list of rain icons for the 
+                hourly report.
+            :hr_snow_icons list[CanvasImg]: list of snow icons for the 
+                hourly report.
+            :hr_cloud_icons list[CanvasImg]: list of cloud icons for 
+                the hourly report.
+            :hr_humidity_icons list[CanvasImg]: list of humidity icons
+                for the hourly report.
+            :hr_wind_icons list[CanvasImg]: list of wind icons for  the 
+                hourly report.
+            :hr_wind_dir_icons list[CanvasImg]: list of wind direction
+                icons for the hourly report.
+            :cur_icon (CanvasImg): current weather icon.
+            :pressure_img (CanvasImg): current weather pressure icon.
+            :clouds_img (CanvasImg): current weather clouds icon.
+            :humidity_img (CanvasImg): current weather humidity icon.
+            :wind_img (CanvasImg): current weather wind icon.
+            :wind_dir_img (CanvasImg): current weather wind direction
+                icon.
+            :sunrise_img (CanvasImg): current weather sunrise icon.
+            :sunset_img (CanvasImg): current weather sunset icon.
+        """
+        super().__init__()
+        self.controller = controller
+        self.master = master
+        self.system = platform.system()
+        # Add Controller to the WeatherApp class instance.
+        # controller = Controller()
+        self.v_link = self.controller.app_data
 
         # Color palette used:
         self.dusty = "#96858F"
@@ -98,17 +281,46 @@ class WeatherApp(tk.Tk):
         # Icon color: #a0cff1 (light blue)
         # #00d3ff (true blue)
         self.font = ("Arial", -18)
+        self.hr_start_color = True
+        self.last_color = None
+        # Canvas image objects need to be attributes or they get 
+        # garbage collected otherwise...
+        self.cur_icon = None
+        """:type : CanvasImg"""
+        self.pressure_img = None
+        """:type : CanvasImg"""
+        self.clouds_img = None
+        """:type : CanvasImg"""
+        self.humidity_img = None
+        """:type : CanvasImg"""
+        self.wind_img = None
+        """:type : CanvasImg"""
+        self.wind_dir_img = None
+        """:type : CanvasImg"""
+        self.sunrise_img = None
+        """:type : CanvasImg"""
+        self.sunset_img = None
+        """:type : CanvasImg"""
 
-        # Configure main window.
-        self.title("The Weather App")
-        self.config(bg=self.paper, bd=2, relief="groove")
-        # Get screen size.
-        s_width = self.winfo_screenwidth()
-        # s_height = self.winfo_screenheight()
-        # Center application window.
-        self.geometry("+{0}+0".format(int(s_width / 2) - 400))
-        # Prevent resizing.
-        self.resizable(width=tk.FALSE, height=tk.FALSE)
+        # Lists which will hold hourly report canvas objects.
+        self.hr_weather_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_temp_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_pressure_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_rain_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_snow_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_cloud_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_humidity_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_wind_icons = []
+        """:type : list[CanvasImg]"""
+        self.hr_wind_dir_icons = []
+        """:type : list[CanvasImg]"""
 
         # GUI style definitions.
 
@@ -124,6 +336,9 @@ class WeatherApp(tk.Tk):
         style.configure("my.TCombobox",
                         fieldbackground=self.paper,
                         foreground="black",
+                        insertwidth=2,
+                        insertcolor="black",
+                        selectbackground=self.dusty
                         )
         self.option_add("*TCombobox*Listbox.font", self.font)
         frame_cnf = {"bg": self.overcast, "bd": 2, "relief": "groove"}
@@ -138,15 +353,18 @@ class WeatherApp(tk.Tk):
                          "relief": "groove"}
             self.button_released_cnf = {"fg": "black", "bg": self.lavender,
                                         "activebackground": self.dusty,
-                                        "activeforeground": self.paper, "bd": 2,
-                                        "padx": 2, "pady": 2, "anchor": tk.CENTER,
+                                        "activeforeground": self.paper,
+                                        "bd": 2,
+                                        "padx": 2, "pady": 2,
+                                        "anchor": tk.CENTER,
                                         "width": 2, "font": self.font,
                                         "relief": "groove"}
 
             self.button_pushed_cnf = {"fg": self.paper, "bg": self.dusty,
                                       "activebackground": self.lavender,
                                       "activeforeground": "black", "bd": 2,
-                                      "padx": 2, "pady": 2, "anchor": tk.CENTER,
+                                      "padx": 2, "pady": 2,
+                                      "anchor": tk.CENTER,
                                       "width": 2, "font": self.font,
                                       "relief": "groove"}
         else:
@@ -197,7 +415,6 @@ class WeatherApp(tk.Tk):
                                          style="my.TCombobox",
                                          postcommand=self.loc_postcommand,
                                          )
-        self.loc_combobox.focus()
         self.loc_combobox.grid(row=0, column=1, padx=(0, 0), pady=(4, 5),
                                sticky=tk.NSEW)
         self.loc_combobox.bind("<Return>", lambda e: self.begin_get_report())
@@ -254,53 +471,19 @@ class WeatherApp(tk.Tk):
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
         image = Image.open("Resources/Images/main_background.jpg")
-        # image = image.resize((image.size[0] * 2, image.size[1] * 2),
-        # PIL.Image.ANTIALIAS)
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
                                       anchor=tk.NW)
 
         # Error/Status Bar.
-        status_bar_label = tk.Label(self,
-                                    textvariable=self.v_link["var_status"],
-                                    **label_cnf)
-        status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
-                              sticky=tk.NSEW)
-        status_bar_label.configure(relief="sunken")
-        self.update_geometry()
-
-        # Application icon. Linux does not display it at all.
-        if self.system == "Windows":
-            self.iconbitmap("app_icon48x48.ico")
-        # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
-        # self.tk.call("wm", "iconphoto", self._w, img_icon)
-
-    def update_geometry(self):
-        """Update and resize application window to use the maximum 
-        vertical space available
-        
-        Returns:
-            None
-        """
-        self.update()
-        s_width = self.winfo_screenwidth()
-        s_height = self.winfo_screenheight()
-        c_width = self.winfo_reqwidth()
-        c_height = s_height - self.main_canvas.winfo_rooty()*2 - 6
-        self.geometry("+{0}+0".format(int(s_width / 2) - int(c_width / 2)))
-        self.main_canvas.config(height=c_height)
-        # Useful dimension info below.
-        # print("screen_width:", self.winfo_screenwidth())
-        # print("screen_height:", self.winfo_screenheight())
-        # print("main window size:", self.winfo_geometry())
-        # print("canvas size:", self.main_canvas.winfo_geometry())
-        # print("top decoration:", self.winfo_rooty())
-        # print("left edge:", self.winfo_rootx())
-        # print("top decoration canvas:", self.main_canvas.winfo_rooty())
-        # print("left edge canvas:", self.main_canvas.winfo_rootx())
-        # print("main window required width:", self.winfo_reqwidth())
-        # print("main window required height:", self.winfo_reqheight())
+        self.status_bar_label = tk.Label(self,
+                                         textvariable=self.v_link[
+                                             "var_status"],
+                                         **label_cnf)
+        self.status_bar_label.grid(row=2, column=0, padx=(2, 2), pady=(0, 2),
+                                   sticky=tk.NSEW)
+        self.status_bar_label.configure(relief="sunken")
 
     def metric_pushed(self):
         """Activates metric units and changes the look of the units buttons.
@@ -308,23 +491,15 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
-        self.imperial_button.configure(**self.button_released_cnf)
-        self.metric_button.configure(**self.button_pushed_cnf)
-        if self.system == "Windows":
-            self.metric_button.update_bg_col()
-            self.imperial_button.update_bg_col()
-            self.metric_button.configure(background="DimGrey")
-        # If button is pushed when there is a report already on the
-        # screen and no errors registered - change units but don't call
-        # the API.
         if self.v_link["var_units"].get() == "imperial":
             self.v_link["var_units"].set("metric")
+            self.controller.update_buttons()
 
-            if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0\
-                    and threading.active_count() < 2:
-                self.display_report()
+            if all([self.controller.data_present,
+                    self.v_link["error_status"] == 0,
+                    threading.active_count() < 2]):
+                self.v_link["scrollbar_offset"] = self.yscrollbar.get()
+                self.controller.show_display("metric")
 
     def imperial_pushed(self):
         """Activates imperial units and changes the look of the units
@@ -333,23 +508,15 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
-        self.metric_button.configure(**self.button_released_cnf)
-        self.imperial_button.configure(**self.button_pushed_cnf)
-        if self.system == "Windows":
-            self.metric_button.update_bg_col()
-            self.imperial_button.update_bg_col()
-            self.imperial_button.configure(background="DimGrey")
-        # If button is pushed when there is a report already on the
-        # screen and no errors registered - change units but don't call
-        # the API.
         if self.v_link["var_units"].get() == "metric":
             self.v_link["var_units"].set("imperial")
+            self.controller.update_buttons()
 
-            if self.controller.data_present == 1 \
-                    and self.v_link["error_status"] == 0 \
-                    and threading.active_count() < 2:
-                self.display_report()
+            if all([self.controller.data_present,
+                    self.v_link["error_status"] == 0,
+                    threading.active_count() < 2]):
+                self.v_link["scrollbar_offset"] = self.yscrollbar.get()
+                self.controller.show_display("imperial")
 
     def clear_error_message(self):
         """Clears error messages from status_bar_label after user starts
@@ -358,7 +525,6 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         if self.v_link["error_status"] == -1:
             self.v_link["var_status"].set("")
             self.v_link["error_status"] = 0
@@ -368,7 +534,7 @@ class WeatherApp(tk.Tk):
         readable one.
 
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -376,7 +542,6 @@ class WeatherApp(tk.Tk):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-
         time = self.controller.get_time(unix_time, dst_offset)
         return time
 
@@ -384,7 +549,7 @@ class WeatherApp(tk.Tk):
         """Contact controller to convert date from unix time to string.
 
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -393,14 +558,13 @@ class WeatherApp(tk.Tk):
             name_of_day (str): Name of the day on date.
             date_str (str): Date in string representation.
         """
-
         name_of_day, date_str = self.controller.get_date(unix_time, dst_offset)
         return name_of_day, date_str
 
     @staticmethod
-    def calculate_hr_x_offset(text_time):
+    def get_hr_x_offset(text_time):
         """
-        
+
         Args:
             text_time (str): Time in text form.
 
@@ -408,7 +572,6 @@ class WeatherApp(tk.Tk):
             hr_x_offset (int): Offset value necessary to display the 
             next column of text.
         """
-
         hours = int(text_time.split(":")[0])
 
         hr_intervals = {(0, 3): 0,
@@ -427,7 +590,7 @@ class WeatherApp(tk.Tk):
     def begin_deg_conv(self, wind_dir_deg):
         """Contacts controller to convert meteorological degrees to
         cardinal directions.
-        
+
         Args:
             wind_dir_deg (float): Wind direction in meteorological 
                 degrees.
@@ -436,7 +599,6 @@ class WeatherApp(tk.Tk):
             wind_dir_cardinal (str): Wind direction in cardinal 
                 direction.
         """
-
         wind_dir_cardinal = self.controller.deg_conv(wind_dir_deg)
         return wind_dir_cardinal
 
@@ -448,31 +610,32 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         # Do nothing if no location is entered or an active sub thread
         # is running.
         if (self.v_link["var_loc"].get() == "") \
                 or (threading.active_count() > 1):
             return
+        # Clear any error status message.
+        self.v_link["error_message"] = ""
+        self.v_link["var_status"].set("Gathering data, please wait...")
         # Request a report using a Mediating Controller in a new thread.
         report_thread = threading.Thread(target=self.controller.get_report)
         report_thread.start()
 
     def mouse_wheel(self, event):
         """Allows movement of main_canvas using the mouse wheel.
-        
+
         Args:
             event (tkinter.event): Tkinter event object.   
 
         Returns:
             None
         """
-
         self.main_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def move_canvas_up(self):
         """Scroll main_canvas when Up arrow key is pressed.
-        
+
         Returns:
             None
         """
@@ -484,12 +647,11 @@ class WeatherApp(tk.Tk):
         Returns:
             None
         """
-
         self.main_canvas.yview_scroll(1, "units")
 
     def loc_postcommand(self):
         """Updates the list of items to display in the loc_combobox.
-        
+
         Returns:
             None
         """
@@ -498,40 +660,56 @@ class WeatherApp(tk.Tk):
     def loc_key_focus(self):
         """Set keyboard focus back to loc_combobox. Select any text
         entered to allow easy deletion.
-        
+
         Returns:
             None
         """
         self.loc_combobox.focus_set()
         self.loc_combobox.select_range(0, tk.END)
+        self.loc_combobox.icursor(tk.END)
+
+    def get_color(self):
+        """Allows color switching for the the elements of the hourly 
+        report.
+        
+        Returns:
+            start_color (str) | alt_color (str): color of the widget's text.
+        """
+        start_color = self.paper
+        alt_color = self.lavender
+        if self.hr_start_color:
+            self.hr_start_color = False
+            self.last_color = start_color
+            return start_color
+        else:
+            if self.last_color == start_color:
+                self.last_color = alt_color
+                return alt_color
+            else:
+                self.last_color = start_color
+                return start_color
 
     def display_report(self):
+
         """Display results of the API call in the main_canvas.
 
         Returns:
             None
         """
-
         # Initial setup.
         # Delete a previous report if existing on canvas.
         self.main_canvas.delete("main", "hourly")
-        self.main_canvas.yview_moveto(0.0)
-        # Take keyboard focus from loc_combobox if left mouse button
-        # clicked on yscrollbar or main_canvas or if escape pressed
-        #  when entering text in loc_combobox.
-        self.yscrollbar.bind("<Button-1>",
-                             lambda e: self.yscrollbar.focus_set())
-        self.main_canvas.bind("<Button-1>",
-                              lambda e: self.main_canvas.focus_set())
+        # Give scrollbar keyboard focus to enable scrolling of the
+        # main_canvas on laptops without mouse wheel.
         self.loc_combobox.bind("<Escape>",
-                               lambda e: self.main_canvas.focus_set())
+                               lambda e: self.yscrollbar.focus_set())
 
         # Set mouse wheel and arrow keys up / down to control canvas
         # scrolling.
         self.yscrollbar.bind("<MouseWheel>", self.mouse_wheel)
+        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
         self.yscrollbar.bind("<Up>", lambda e: self.move_canvas_up())
         self.yscrollbar.bind("<Down>", lambda e: self.move_canvas_down())
-        self.main_canvas.bind("<MouseWheel>", self.mouse_wheel)
         # Mouse wheel scroll for Linux.
         self.main_canvas.bind(
             '<4>', lambda e: self.main_canvas.yview_scroll(-1, 'units'))
@@ -557,8 +735,8 @@ class WeatherApp(tk.Tk):
         # Config parameters for hourly section.
         hr_w_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.W}
         # hr_n_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.N}
-        hr_ne_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NE}
         hr_nw_cnf = {"tags": "hourly", "fill": self.paper, "anchor": tk.NW}
+        hr_ne_cnf = {"tags": "hourly", "anchor": tk.NE}
         # hr_center_cnf = {"tags": "hourly", "fill": self.paper,
         #                  "anchor": tk.CENTER}
         hr_img_n_cnf = {"tags": "hourly", "anchor": tk.N}
@@ -580,7 +758,7 @@ class WeatherApp(tk.Tk):
         # Display location information.
         # Start coordinates in pixels of the report title.
         x1 = 10
-        y1 = 4
+        y1 = 0
 
         if self.controller.draw_lines == 1:
             # Draw coordinate lines to help in item placement.
@@ -793,23 +971,6 @@ class WeatherApp(tk.Tk):
         hr_rain_present = False
         hr_snow_present = False
         hr_snow = None
-        self.hr_weather_icons = []
-        self.hr_temp_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_pressure_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_rain_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_snow_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_cloud_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_humidity_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_wind_icons = []
-        """:type : list[CanvasImg]"""
-        self.hr_wind_dir_icons = []
-        """:type : list[CanvasImg]"""
 
         for item in self.v_link[units]["w_d_short"]["list"]:
 
@@ -905,7 +1066,7 @@ class WeatherApp(tk.Tk):
 
             # Hour.
             hour_text = self.begin_get_time(item["dt"])
-            hr_x_offset = self.calculate_hr_x_offset(hour_text)
+            hr_x_offset = self.get_hr_x_offset(hour_text)
             hour = CanvasText(self.main_canvas, rel_obj=day, rel_pos="CL",
                               offset=(130 + hr_x_offset * 115, 0),
                               text=hour_text, justify=tk.CENTER, font=h3,
@@ -925,7 +1086,7 @@ class WeatherApp(tk.Tk):
             hr_temp = CanvasText(self.main_canvas,
                                  rel_obj=hour,
                                  rel_pos="BR",
-                                 offset=(-1, 40),
+                                 offset=(-1, 40), fill=self.get_color(),
                                  text=hr_temp_text, font=h3, **hr_ne_cnf)
             # Update hr_temp_icon y coordinate to center of hr_temp.
             self.hr_temp_icons[-1].move_rel_to_obj_y(hr_temp)
@@ -934,7 +1095,7 @@ class WeatherApp(tk.Tk):
             hr_pressure_text = "{0:.1f} hPa".format(item["main"]["pressure"])
             hr_pressure = CanvasText(self.main_canvas, rel_obj=hr_temp,
                                      rel_pos="BR",
-                                     offset=(-2, 5),
+                                     offset=(-2, 5), fill=self.get_color(),
                                      text=hr_pressure_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_pressure_icon y coordinate to center of
@@ -945,7 +1106,7 @@ class WeatherApp(tk.Tk):
             hr_cloud_text = "{0}%".format(item["clouds"]["all"])
             hr_cloud = CanvasText(self.main_canvas, rel_obj=hr_pressure,
                                   rel_pos="BR",
-                                  offset=(0, 5),
+                                  offset=(0, 5), fill=self.get_color(),
                                   text=hr_cloud_text, font=h4, **hr_ne_cnf)
             # Update hr_cloud_icon y coordinate to center of hr_cloud.
             self.hr_cloud_icons[-1].move_rel_to_obj_y(hr_cloud)
@@ -954,7 +1115,7 @@ class WeatherApp(tk.Tk):
             hr_humidity_text = "{0}%".format(item["main"]["humidity"])
             hr_humidity = CanvasText(self.main_canvas, rel_obj=hr_cloud,
                                      rel_pos="BR",
-                                     offset=(-1, 5),
+                                     offset=(-1, 5), fill=self.get_color(),
                                      text=hr_humidity_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_humidity_icon y coordinate to center of
@@ -966,7 +1127,7 @@ class WeatherApp(tk.Tk):
                                                 speed_unit)
             hr_wind = CanvasText(self.main_canvas, rel_obj=hr_humidity,
                                  rel_pos="BR",
-                                 offset=(-1, 5),
+                                 offset=(-1, 5), fill=self.get_color(),
                                  text=hr_wind_text, font=h4, **hr_ne_cnf)
             # Update hr_wind_icon y coordinate to center of hr_wind.
             self.hr_wind_icons[-1].move_rel_to_obj_y(hr_wind)
@@ -976,7 +1137,7 @@ class WeatherApp(tk.Tk):
                 self.begin_deg_conv(item["wind"]["deg"]))
             hr_wind_dir = CanvasText(self.main_canvas, rel_obj=hr_wind,
                                      rel_pos="BR",
-                                     offset=(-1, 5),
+                                     offset=(-1, 5), fill=self.get_color(),
                                      text=hr_wind_dir_text, font=h4,
                                      **hr_ne_cnf)
             # Update hr_wind_dir_icon y coordinate to center of
@@ -994,7 +1155,7 @@ class WeatherApp(tk.Tk):
                 hr_rain = CanvasText(self.main_canvas,
                                      rel_obj=hr_wind_dir,
                                      rel_pos="BR",
-                                     offset=(-1, 10),
+                                     offset=(-1, 10), fill=self.get_color(),
                                      text=rain_text, font=h4,
                                      **hr_ne_cnf)
                 # Update hr_rain_icon y coordinate to center of
@@ -1028,7 +1189,7 @@ class WeatherApp(tk.Tk):
                 hr_snow = CanvasText(self.main_canvas,
                                      rel_obj=rel_obj_text,
                                      rel_pos="BR",
-                                     offset=offset,
+                                     offset=offset, fill=self.get_color(),
                                      text=snow_text, font=h4,
                                      **hr_ne_cnf)
                 # Update hr_snow_icon y coordinate to center of
@@ -1055,8 +1216,9 @@ class WeatherApp(tk.Tk):
 
             hr_snow_present = False
             hr_rain_present = False
+            self.hr_start_color = True
 
-        self.update()
+        # self.update()
         self.main_canvas.config(
             scrollregion=self.main_canvas.bbox("main", "hourly"))
         self.yscrollbar.focus()
@@ -1090,7 +1252,6 @@ class HoverButton(tk.Button):
             **args: Keyword arguments to further initialise the button.
             
         :Attributes:
-        
         :system (str): Platform on which application is run.
         :cur_bg (str): Current background color of the button.
         :tip (str): Text to display in the status_bar_label of the app.
@@ -1098,10 +1259,7 @@ class HoverButton(tk.Button):
             the data required by each segment of the application. 
             This has to be the same Controller as for the WeatherApp.
         :v_link (dict): Link to access variables in controller.
-
-        
         """
-
         super().__init__(master, cnf, **args)
         self.system = platform.system()
         self.cur_bg = self["bg"]
@@ -1199,9 +1357,7 @@ class CanvasObject(object):
         :canvas (tk.Canvas): tkinter Canvas object.
         :pos_x (int): X coordinate for our object.
         :pos_y (int): Y coordinate for our object.
-
         """
-
         self.id_num = 0
         self.canvas = canvas
         pos_x = 0
@@ -1273,7 +1429,6 @@ class CanvasObject(object):
         Returns:
             None
         """
-
         # Find y coordinate of the center of rel_obj.
         r_x1, r_y1, r_x2, r_y2 = self.canvas.bbox(rel_obj.id_num)
         r_center_y = r_y2 - (r_y2 - r_y1) / 2
@@ -1340,9 +1495,7 @@ class CanvasText(CanvasObject):
         :id_num (int): Unique Id number returned by create_text method 
             which will help us identify objects and obtain their 
             bounding boxes.
-
         """
-
         # Initialise base class. Get x-y coordinates for CanvasText
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
@@ -1400,13 +1553,11 @@ class CanvasImg(CanvasObject):
                 create_text method.
 
         :Attributes:
-            :id_num (int): Unique Id number returned by create_image 
-                method which will help us identify objects and 
-                obtain their bounding boxes.
-            :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
-
+        :id_num (int): Unique Id number returned by create_image 
+            method which will help us identify objects and 
+            obtain their bounding boxes.
+        :img (PIL.ImageTk.PhotoImage): Image to display on canvas.
         """
-
         # Initialise base class. Get x-y coordinates for CanvasImg
         # object.
         super().__init__(canvas, coordinates, rel_obj, rel_pos, offset)
@@ -1418,7 +1569,6 @@ class CanvasImg(CanvasObject):
         id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img,
                                      **args)
         self.id_num = id_num
-
 
 # Launch application.
 if __name__ == "__main__":
