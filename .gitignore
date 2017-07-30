@@ -106,3 +106,5 @@ Python3_Virtual_Env/
 /virtual_envs/
 /build_32bit/
 /build_64bit/
+/build_linux_64bit/
+/build_linux_632bit/
