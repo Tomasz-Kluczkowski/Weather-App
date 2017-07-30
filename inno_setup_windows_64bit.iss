@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=build
+OutputDir=build_64bit
 OutputBaseFilename=Weather_App_Win_64bit_Setup
 SetupIconFile=app_icon96x96.ico
 Compression=lzma
@@ -37,8 +37,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "build\exe.win-amd64-3.6\Weather_App_64bit.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win-amd64-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build_64bit\exe.win-amd64-3.6\Weather_App_64bit.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build_64bit\exe.win-amd64-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

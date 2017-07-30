@@ -104,3 +104,5 @@ Python3_Virtual_Env/
 /build/
 /~$_winfo.doc
 /virtual_envs/
+/build_32bit/
+/build_64bit/
