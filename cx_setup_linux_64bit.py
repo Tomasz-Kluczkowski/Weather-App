@@ -22,7 +22,7 @@ executables = [cx_Freeze.Executable("weather_gui.py", base=base,
 
 cx_Freeze.setup(
     name='Weather App 64bit',
-    version='1.0',
+    version='1.01',
     description='Weather report application',
     author='Tomasz Kluczkowski',
     author_email='tomaszk1@hotmail.co.uk',
