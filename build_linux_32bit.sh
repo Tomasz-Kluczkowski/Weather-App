@@ -20,6 +20,7 @@ if [ -d build_linux_32bit ] ; then
     echo Deleting build directory.
     rm -rf build_linux_32bit
 fi
+source virtual_envs/python353-32bit/bin/activate
 echo Running cx_Freeze script.
 python cx_setup_linux_32bit.py build -b build_linux_32bit &
 wait
