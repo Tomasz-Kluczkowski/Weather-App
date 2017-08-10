@@ -323,7 +323,6 @@ class DisplayShort(tk.Frame):
         """:type : list[CanvasImg]"""
 
         # GUI style definitions.
-
         # Widget styles.
         # Themes: 'winnative', 'clam', 'alt', 'default',
         # 'classic', 'vista', 'xpnative'

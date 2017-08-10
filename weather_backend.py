@@ -55,10 +55,22 @@ class Report(object):
                                                  "locations.db"))
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
+                         "Id INT NOT NULL PRIMARY KEY, "
                          "Location TEXT NOT NULL UNIQUE, "
                          "Num_of_calls INT NOT NULL DEFAULT 0, "
-                         "Units TEXT DEFAULT 'metric')")
+                         "Units TEXT)")
         self.conn.commit()
+        # Read the last used units from the database and set in
+        # controller.
+        try:
+            self.cur.execute("SELECT Units FROM locations WHERE Id=1")
+            last_units = self.cur.fetchall()[0]
+            if last_units != "":
+                self.v_link["var_units"].set(last_units)
+        # In case of the initial run with an empty database, default
+        # units are metric.
+        except IndexError:
+            self.v_link["var_units"].set("metric")
         # Initial list of locations from previous use of the app for
         # loc_combobox ordered by amount of previous calls.
         self.combo_drop_menu()
@@ -455,7 +467,7 @@ class Report(object):
         local_conn = sqlite3.connect(os.path.join(self.data_dirs["Database"],
                                                   "locations.db"))
         local_cur = local_conn.cursor()
-        local_cur.execute("UPDATE locations SET Units=? WHERE ROWID=1",
+        local_cur.execute("UPDATE locations SET Units=? WHERE Id=1",
                           (current_units, ))
         self.conn.commit()
         self.conn.close()
