@@ -37,7 +37,7 @@ class Report(object):
         """
         self.controller = controller
         self.v_link = self.controller.app_data
-        """:type : dict"""
+        """:type : dict[str, any]"""
 
         # Create necessary application folders in 
         # C:\Users\User\AppData\Local
@@ -419,12 +419,12 @@ class Report(object):
 
         try:
             local_cur.execute("INSERT INTO locations (Location) VALUES (?)",
-                              (location,))
+                              (location, ))
         except sqlite3.IntegrityError:
             pass
         local_cur.execute("UPDATE locations SET Num_of_calls"
                           " = Num_of_calls + 1 WHERE Location = ?",
-                          (location,))
+                          (location, ))
         local_conn.commit()
         local_conn.close()
 
@@ -446,11 +446,18 @@ class Report(object):
 
     def __del__(self):
         """Closes connection to locations.db when application is turned
-        off.
+        off and stores last units used.
 
         Returns:
             None
         """
+        current_units = self.v_link["var_units"].get()
+        local_conn = sqlite3.connect(os.path.join(self.data_dirs["Database"],
+                                                  "locations.db"))
+        local_cur = local_conn.cursor()
+        local_cur.execute("UPDATE locations SET Units=? WHERE ROWID=1",
+                          (current_units, ))
+        self.conn.commit()
         self.conn.close()
 
         # More database  methods which can be used in the future should
