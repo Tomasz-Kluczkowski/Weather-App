@@ -27,6 +27,8 @@ class Controller(object):
                         be displayed in the status bar.
                     :var_loc (tk.StringVar): Current text entered into
                         loc_entry field by the user. 
+                    :scrollbar_offset (tuple): Tuple of float values 
+                    representing scrollbar's offset.
                     :error_message (str): Last error message.
                     :error_status (int): Value -1 means an error 
                         occurred and was not cleared. 0 means all ok.
@@ -56,14 +58,14 @@ class Controller(object):
                 main_canvas.
             :model (Report): Report class object which will handle all
                 the backend operations.
-            :data_present (int): Confirms presence of all data from
+            :data_present (bool): Confirms presence of all data from
                 API.
 
         """
-
-        self.app_data = {"var_units": tk.StringVar(value="metric"),
+        self.app_data = {"var_units": tk.StringVar(value=""),
                          "var_status": tk.StringVar(value=""),
                          "var_loc": tk.StringVar(),
+                         "scrollbar_offset": (0, 0),
                          "error_message": "",
                          "error_status": 0,
                          "time": "",
@@ -79,7 +81,7 @@ class Controller(object):
         self.draw_lines = 0
         self.view = None
         self.model = None
-        self.data_present = 0
+        self.data_present = False
 
     def add_model(self, model):
         """Adds a model (business logic) to the Controller.
@@ -91,7 +93,6 @@ class Controller(object):
         Returns:
             None
         """
-
         self.model = model
 
     def add_view(self, view):
@@ -104,7 +105,6 @@ class Controller(object):
         Returns:
             None
         """
-
         self.view = view
 
     def get_time(self, unix_time, dst_offset):
@@ -112,7 +112,7 @@ class Controller(object):
         human readable one. 
         
         Args:
-            dst_offset: (bool) Set to True to offset time received from
+            dst_offset (bool): Set to True to offset time received from
                 open weather API by daylight savings time.
             unix_time (int): Time given in seconds from beginning of the
                 epoch as on unix machines.
@@ -120,7 +120,6 @@ class Controller(object):
         Returns:
             time (str): Time in Hour:Minute format.
         """
-
         time = self.model.finish_get_time(unix_time, dst_offset)
         return time
 
@@ -128,35 +127,42 @@ class Controller(object):
         """Contact model to convert date from unix time to string.
 
                 Args:
-                    dst_offset: (bool) Set to True to offset time received from
+                    dst_offset (bool): Set to True to offset time received from
                         open weather API by daylight savings time.
-                    unix_time (int): Time given in seconds from beginning of the
-                        epoch as on unix machines.
+                    unix_time (int): Time given in seconds from beginning of
+                        the epoch as on unix machines.
 
                 Returns:
                     name_of_day (str): Name of the day on date.
                     date_str (str): Date in string representation.
                 """
-
         name_of_day, date_str = self.model.finish_get_date(unix_time,
                                                            dst_offset)
         return name_of_day, date_str
 
     def deg_conv(self, wind_dir_deg):
         """Contacts model to convert meteorological degrees to
-                cardinal directions.
+        cardinal directions.
 
-                Args:
-                    wind_dir_deg (float): Wind direction in meteorological 
-                        degrees.
+        Args:
+            wind_dir_deg (float): Wind direction in meteorological 
+                degrees.
 
-                Returns:
-                    wind_dir_cardinal (str): Wind direction in cardinal 
-                        direction.
-                """
-
+        Returns:
+            wind_dir_cardinal (str): Wind direction in cardinal 
+                direction.
+        """
         wind_dir_cardinal = self.model.finish_deg_conv(wind_dir_deg)
         return wind_dir_cardinal
+
+    def get_report(self):
+        """Contact model to obtain data for the View to display
+        the report.
+
+        Returns:
+            None
+        """
+        self.model.finish_get_report(self.app_data["var_loc"].get())
 
     def display_error(self, error):
         """Updates the View to display error.
@@ -167,19 +173,32 @@ class Controller(object):
         Returns:
             None
         """
-
         # Error handling.
         self.app_data["error_message"] = error
         # Return to the view and display only the error in the
         # status_bar_label.
         self.app_data["var_status"].set(self.app_data["error_message"])
 
-    def get_report(self):
-        """Contact model to obtain data for the View to display
-         the report.
+    def display_report(self):
+        """Ask view to finalise displaying the report on main_canvas.
+        
+        Returns:
+            None
+        """
+        self.view.display_report()
+
+    def show_display(self, display):
+        """Call to the view to bring forward currently selected display.
 
         Returns:
             None
         """
+        self.view.show_display(display)
 
-        self.model.finish_get_report(self.app_data["var_loc"].get())
+    def update_buttons(self):
+        """Call to the view to synchronise buttons across all displays.
+        
+        Returns:
+            None
+        """
+        self.view.update_buttons()

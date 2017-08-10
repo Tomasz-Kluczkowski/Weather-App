@@ -3,6 +3,7 @@ import sys
 import os.path
 
 PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
+# PYTHON_INSTALL_DIR = r"C:\Users\Kilthar\AppData\Local\Programs\Python\Python362-64"
 os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
 os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
@@ -16,7 +17,7 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Resources/",
+include_files = ["Resources/", "app_icon48x48.ico",
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
                  os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
                  ]
@@ -25,11 +26,11 @@ excludes = ["PyQt5"]
 packages = ["tkinter", "idna"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     icon="app_icon96x96.ico",
-                                    targetName="Weather App 32bit.exe")]
+                                    targetName="Weather_App_64bit.exe")]
 
 cx_Freeze.setup(
-    name='Weather App 32bit',
-    version='1.0',
+    name='Weather_App_64bit',
+    version='1.01',
     description='Weather report application',
     author='Tomasz Kluczkowski',
     author_email='tomaszk1@hotmail.co.uk',

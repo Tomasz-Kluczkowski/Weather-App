@@ -85,6 +85,7 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
+Python3_Virtual_Env/
 
 # Spyder project settings
 .spyderproject
@@ -102,8 +103,8 @@ ENV/
 /Database/locations.db
 /build/
 /~$_winfo.doc
+/virtual_envs/
+/build_32bit/
+/build_64bit/
 /build_linux_64bit/
 /build_linux_32bit/
-/build_64bit/
-/build_32bit/
-/virtual_envs/

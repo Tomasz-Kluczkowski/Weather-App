@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Weather App"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.01"
 #define MyAppPublisher "Natural Materials"
 #define MyAppURL "https://github.com/Tomasz-Kluczkowski/Weather-App"
-#define MyAppExeName "Weather App 32bit.exe"
+#define MyAppExeName "Weather_App_32bit.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -22,8 +22,8 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=build
-OutputBaseFilename=Weather_App_Setup_32bit
+OutputDir=build_32bit
+OutputBaseFilename=Weather_App_Win_32bit_Setup
 SetupIconFile=app_icon96x96.ico
 Compression=lzma
 SolidCompression=yes
@@ -37,8 +37,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "build\exe.win32-3.6\Weather App 32bit.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win32-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build_32bit\exe.win32-3.6\Weather_App_32bit.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build_32bit\exe.win32-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

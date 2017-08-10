@@ -3,12 +3,8 @@ import sys
 import os.path
 
 PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
-os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
-os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
-
-# os.environ['TCL_LIBRARY'] = "K:\\PYTHON\\Python36\\tcl\\tcl8.6"
-# os.environ['TK_LIBRARY'] = "K:\\PYTHON\\Python36\\tcl\\tk8.6"
-
+# os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
+# os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
 base = None
 # base = "Console" # use for testing in deployed version
@@ -16,20 +12,17 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["Resources/",
-                 os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
-                 os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
-                 ]
+include_files = ["Resources/", "app_icon48x48.ico", "README_Linux_64bit.txt", "Weather_App_64bit_launcher.sh"]
 includes = []
 excludes = ["PyQt5"]
-packages = ["tkinter"]
+packages = ["tkinter", "idna", "multiprocessing", "PIL"]
 executables = [cx_Freeze.Executable("weather_gui.py", base=base,
                                     icon="app_icon96x96.ico",
-                                    targetName="Weather App.exe")]
+                                    targetName="Weather_App_64bit")]
 
 cx_Freeze.setup(
-    name='Weather App',
-    version='1.0',
+    name='Weather App 64bit',
+    version='1.01',
     description='Weather report application',
     author='Tomasz Kluczkowski',
     author_email='tomaszk1@hotmail.co.uk',
