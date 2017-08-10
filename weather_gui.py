@@ -86,6 +86,7 @@ class WeatherApp(tk.Tk):
         for key in keys:
             self.displays[key] = DisplayShort(self, controller)
             self.displays[key].grid(row=0, column=0, sticky=tk.NSEW)
+        self.update_buttons()
         self.update_geometry()
 
         # Application icon. Linux does not display it at all.
@@ -323,7 +324,6 @@ class DisplayShort(tk.Frame):
         """:type : list[CanvasImg]"""
 
         # GUI style definitions.
-
         # Widget styles.
         # Themes: 'winnative', 'clam', 'alt', 'default',
         # 'classic', 'vista', 'xpnative'
