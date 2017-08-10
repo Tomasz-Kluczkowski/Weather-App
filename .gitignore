@@ -101,3 +101,9 @@ ENV/
 /test.db
 /Database/locations.db
 /build/
+/~$_winfo.doc
+/build_linux_64bit/
+/build_linux_32bit/
+/build_64bit/
+/build_32bit/
+/virtual_envs/
