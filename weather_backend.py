@@ -55,22 +55,22 @@ class Report(object):
                                                  "locations.db"))
         self.cur = self.conn.cursor()
         self.cur.execute("CREATE TABLE IF NOT EXISTS locations("
-                         "Id INT NOT NULL PRIMARY KEY, "
+                         "Id INTEGER NOT NULL PRIMARY KEY , "
                          "Location TEXT NOT NULL UNIQUE, "
-                         "Num_of_calls INT NOT NULL DEFAULT 0, "
+                         "Num_of_calls INTEGER NOT NULL DEFAULT 0, "
                          "Units TEXT)")
-        self.conn.commit()
         # Read the last used units from the database and set in
         # controller.
         try:
             self.cur.execute("SELECT Units FROM locations WHERE Id=1")
-            last_units = self.cur.fetchall()[0]
+            last_units = self.cur.fetchall()[0][0]
             if last_units != "":
                 self.v_link["var_units"].set(last_units)
         # In case of the initial run with an empty database, default
         # units are metric.
         except IndexError:
             self.v_link["var_units"].set("metric")
+        self.conn.commit()
         # Initial list of locations from previous use of the app for
         # loc_combobox ordered by amount of previous calls.
         self.combo_drop_menu()
@@ -435,7 +435,7 @@ class Report(object):
         except sqlite3.IntegrityError:
             pass
         local_cur.execute("UPDATE locations SET Num_of_calls"
-                          " = Num_of_calls + 1 WHERE Location = ?",
+                          " = Num_of_calls + 1 WHERE Location=?",
                           (location, ))
         local_conn.commit()
         local_conn.close()
@@ -469,7 +469,8 @@ class Report(object):
         local_cur = local_conn.cursor()
         local_cur.execute("UPDATE locations SET Units=? WHERE Id=1",
                           (current_units, ))
-        self.conn.commit()
+        local_conn.commit()
+        local_conn.close()
         self.conn.close()
 
         # More database  methods which can be used in the future should
