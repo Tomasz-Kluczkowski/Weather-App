@@ -62,9 +62,6 @@ class Controller(object):
                 API.
 
         """
-
-        # self.app_data = {"var_units": tk.StringVar(value="metric"),
-        #TODO: set var_units in backend.
         self.app_data = {"var_units": tk.StringVar(value=""),
                          "var_status": tk.StringVar(value=""),
                          "var_loc": tk.StringVar(),

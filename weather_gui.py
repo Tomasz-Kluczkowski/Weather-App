@@ -17,8 +17,6 @@ from controller import Controller
 # TODO: Add 16 day daily report.
 # TODO: stick all styling / color definitions into style module and
 # TODO: import *.
-# TODO: remember last units used in the database so that user does not have to
-# TODO: change them all the time.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
