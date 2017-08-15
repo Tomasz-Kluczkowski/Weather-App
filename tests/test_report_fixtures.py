@@ -45,7 +45,7 @@ def fetch_location(report):
 def fetch_all(report):
     report.cur.execute("SELECT * FROM locations")
     rows = report.cur.fetchall()
-    rows = {row[0]: row[1] for row in rows}
+    rows = {row[1]: row[2] for row in rows}
     return rows
 
 
@@ -186,27 +186,21 @@ def test_open_weather_api_bad_response(monkeypatch, report):
         expected_dict["cod"], expected_dict["message"])
 
 
-# def test_open_weather_api_connection_error(monkeypatch, report):
-#     """Test contacting Open Weather API with a response 400."""
-#     import socket
-#     with pytest.raises(report.requests.exceptions.ConnectionError) as exc_info:
-#
-#     location = "London"
-#     expected_dict = {"cod": 400, "message": "error_test"}
-#     mock_response = mock.Mock()
-#     mock_response.return_value.status_code = 400
-#     mock_response.return_value.json.return_value = expected_dict
-#     monkeypatch.setattr("weather_backend.requests.get", mock_response)
-#     returned = report.open_weather_api(location)
-#
-#     exception_raised = exc_info.value
-#
-#     assert type(returned) == tuple
-#     assert mock_response.call_count == 1
-#     assert returned[0] == -1
-#     assert returned[1] == "Error: {0}, {1}".format(
-#         expected_dict["cod"], expected_dict["message"])
+def test_open_weather_api_connection_error(monkeypatch, report):
+    """Test contacting Open Weather API with a response 400."""
+    location = "London"
+    expected_dict = {"cod": 400, "message": "error_test"}
+    mock_response = mock.Mock()
+    mock_response.return_value.status_code = 400
+    mock_response.return_value.json.return_value = expected_dict
+    monkeypatch.setattr("weather_backend.requests.get", mock_response)
+    returned = report.open_weather_api(location)
 
+    assert type(returned) == tuple
+    assert mock_response.call_count == 1
+    assert returned[0] == -1
+    assert returned[1] == "Error: {0}, {1}".format(
+        expected_dict["cod"], expected_dict["message"])
 
 def test_geonames_api(monkeypatch, report):
     """Test contacting Open Weather API with a positive response 200."""
