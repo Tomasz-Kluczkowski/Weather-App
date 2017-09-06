@@ -65,9 +65,9 @@ class WeatherApp(Tk):
         self.loc_frame.grid(row=0, column=0, padx=(25, 4), pady=(25, 4), sticky=W)
 
         # location label
-        self.location_img = PhotoImage(file=r"Resources\Labels\location.png")
-        self.l1 = Label(self.loc_frame, text="Location name", style="my.TLabel", image=self.location_img,
-                        compound=CENTER)
+        #self.location_img = PhotoImage(#file=r"Resources\Labels\location.png")
+        self.l1 = Label(self.loc_frame, text="Location name", style="my.TLabel")#, image=self.location_img,
+                     #   compound=CENTER)
         self.l1.grid(row=0, column=0, padx=4, pady=4, sticky=W)
 
         # location entry
@@ -78,10 +78,11 @@ class WeatherApp(Tk):
         self.e1.grid(row=0, column=1, padx=0, pady=4, sticky=NSEW)
 
         # clear location text button
-        self.button_clear_normal_img = PhotoImage(file=r"Resources\Buttons\clear_entry_normal.png")
-        self.button_clear_hover_img = PhotoImage(file=r"Resources\Buttons\clear_entry_hover.png")
-        self.b3 = Button(self.loc_frame, text="X", image=self.button_clear_normal_img, compound=CENTER,
-                         command=self.clear_loc_entry, style="clear.TButton")
+        #self.button_clear_normal_img = PhotoImage(#file=r"Resources\Buttons\clear_entry_normal.png")
+#        self.button_clear_hover_img = PhotoImage(#file=r"Resources\Buttons\clear_entry_hover.png")
+        self.b3 = Button(self.loc_frame, text="X",
+                         command=self.clear_loc_entry,#image=self.button_clear_normal_img, compound=CENTER,
+                          style="clear.TButton")
         self.b3.grid(row=0, column=2, sticky=W, padx=0, pady=0)
         self.b3.bind("<Return>", self.clear_loc_entry)
         self.b3.bind("<Enter>", self.hover_clear_button)
