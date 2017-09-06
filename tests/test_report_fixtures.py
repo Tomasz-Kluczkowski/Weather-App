@@ -194,6 +194,7 @@ def test_open_weather_api_connection_error(report):
     assert returned[1] == "Unable to establish internet connection." \
                           " Please connect to the internet."
 
+
 def test_geonames_api(monkeypatch, report):
     """Test contacting Open Weather API with a positive response 200."""
     lat = 50
@@ -237,18 +238,51 @@ def test_geonames_api_no_internet_connection(report):
     assert returned[1] == "Unable to establish internet connection. Please " \
                           "connect to the internet."
 
-test_deg_conv_data = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
-                      (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
-                      (140, "SE"), (146.25, "SSE"), (170, "S"),
-                      (191.25, "SSW"), (236.249999, "SW"), (236.25, "WSW"),
-                      (260, "W"), (303.749999, "WNW"), (304, "NW"),
-                      (348, "NNW")]
+
+test_deg_conv_parameters = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
+                            (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
+                            (140, "SE"), (146.25, "SSE"), (170, "S"),
+                            (191.25, "SSW"), (236.249999, "SW"),
+                            (236.25, "WSW"),
+                            (260, "W"), (303.749999, "WNW"), (304, "NW"),
+                            (348, "NNW")]
 
 
-@pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_data)
+@pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_parameters)
 def test_finish_deg_conv(report, wind_dir_deg, expected):
     """Test degree to cardinal direction conversion."""
     assert report.finish_deg_conv(wind_dir_deg) == expected
+
+
+# Parameters: unix time, dst offset bool, dst offset value, expected day of
+# the week and date
+test_finish_get_date_parameters = {(1504697560, True, 1, ("Wednesday",
+                                                          "06/09/2017")),
+                                   (1504656000, False, 10, ("Wednesday",
+                                                            "06/09/2017")),
+                                   (1504655999, False, 0, ("Tuesday",
+                                                           "05/09/2017")),
+                                   (1504652400, True, 1, ("Wednesday",
+                                                          "06/09/2017")),
+                                   (1504652399, True, 1, ("Tuesday",
+                                                          '05/09/2017')),
+                                   (1504648800, True, 1, ("Tuesday",
+                                                          "05/09/2017")),
+                                   (1504648800, True, 2, ("Wednesday",
+                                                          "06/09/2017")),
+                                   (1504569600, True, -1, ("Monday",
+                                                           "04/09/2017"))
+                                   }
+
+
+@pytest.mark.parametrize("unix_time, dst_offset_bool, dst_offset_value, "
+                         "expected",
+                         test_finish_get_date_parameters)
+def test_finish_get_date(report, unix_time, dst_offset_bool,
+                         dst_offset_value, expected):
+    """Test converting unix time to date and day of the week"""
+    report.v_link["timezone"]["dstOffset"] = dst_offset_value
+    assert report.finish_get_date(unix_time, dst_offset_bool) == expected
 
 
 if __name__ == "__main__":
