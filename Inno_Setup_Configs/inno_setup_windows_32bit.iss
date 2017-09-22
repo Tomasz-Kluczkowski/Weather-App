@@ -3,7 +3,7 @@
 
 #define MyAppName "Weather App"
 #define MyAppVersion "1.01"
-#define MyAppPublisher "Natural Materials"
+#define MyAppPublisher "Tomasz Kluczkowski"
 #define MyAppURL "https://github.com/Tomasz-Kluczkowski/Weather-App"
 #define MyAppExeName "Weather_App_32bit.exe"
 
@@ -22,12 +22,12 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputDir=build_32bit
+OutputDir=..\build_32bit
 OutputBaseFilename=Weather_App_Win_32bit_Setup
-SetupIconFile=app_icon96x96.ico
+SetupIconFile=..\Data\Icons\app_icon\app_icon96x96.ico
 Compression=lzma
 SolidCompression=yes
-UninstallDisplayIcon=app_icon96x96.ico
+UninstallDisplayIcon=..\Data\Icons\app_icon\app_icon96x96.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -37,8 +37,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "build_32bit\exe.win32-3.6\Weather_App_32bit.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build_32bit\exe.win32-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\build_32bit\exe.win32-3.6\Weather_App_32bit.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\build_32bit\exe.win32-3.6\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -50,4 +50,3 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Fil
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
