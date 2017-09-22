@@ -2,14 +2,10 @@ import cx_Freeze
 import sys
 import os.path
 
+# This is needed for Cx_Freeze to find path to tcl and tk libraries.
 PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
-# PYTHON_INSTALL_DIR = r"C:\Users\Kilthar\AppData\Local\Programs\Python\Python362-32"
 os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
 os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
-
-# os.environ['TCL_LIBRARY'] = "K:\\PYTHON\\Python36\\tcl\\tcl8.6"
-# os.environ['TK_LIBRARY'] = "K:\\PYTHON\\Python36\\tcl\\tk8.6"
-
 
 base = None
 # base = "Console" # use for testing in deployed version
@@ -18,8 +14,8 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 include_files = ["../Data/", "../Data/Icons/app_icon/app_icon48x48.ico",
-                 os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
-                 os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll'),
+                 os.path.join("../Data/DLLs/32bit", 'tk86t.dll'),
+                 os.path.join("../Data/DLLs/32bit", 'tcl86t.dll'),
                  ]
 includes = []
 excludes = ["PyQt5"]
