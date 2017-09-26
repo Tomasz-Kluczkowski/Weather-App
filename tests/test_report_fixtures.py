@@ -3,9 +3,9 @@ from unittest import mock
 import shutil
 import appdirs
 import os
-from weather_backend import Report
-from controller import Controller
-from weather_gui import WeatherApp
+from weather_app.weather_backend import Report
+from weather_app.controller import Controller
+from weather_app.weather_gui import WeatherApp
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -45,7 +45,7 @@ def fetch_location(report):
 def fetch_all(report):
     report.cur.execute("SELECT * FROM locations")
     rows = report.cur.fetchall()
-    rows = {row[1]: row[2] for row in rows}
+    rows = {row[0]: row[1] for row in rows}
     return rows
 
 
@@ -186,13 +186,26 @@ def test_open_weather_api_bad_response(monkeypatch, report):
         expected_dict["cod"], expected_dict["message"])
 
 
-def test_open_weather_api_connection_error(report):
-    """Test contacting Open Weather API with no internet connection."""
-    location = "London"
-    returned = report.open_weather_api(location)
-    assert returned[0] == -1
-    assert returned[1] == "Unable to establish internet connection." \
-                          " Please connect to the internet."
+# def test_open_weather_api_connection_error(monkeypatch, report):
+#     """Test contacting Open Weather API with a response 400."""
+#     import socket
+#     with pytest.raises(report.requests.exceptions.ConnectionError) as exc_info:
+#
+#     location = "London"
+#     expected_dict = {"cod": 400, "message": "error_test"}
+#     mock_response = mock.Mock()
+#     mock_response.return_value.status_code = 400
+#     mock_response.return_value.json.return_value = expected_dict
+#     monkeypatch.setattr("weather_backend.requests.get", mock_response)
+#     returned = report.open_weather_api(location)
+#
+#     exception_raised = exc_info.value
+#
+#     assert type(returned) == tuple
+#     assert mock_response.call_count == 1
+#     assert returned[0] == -1
+#     assert returned[1] == "Error: {0}, {1}".format(
+#         expected_dict["cod"], expected_dict["message"])
 
 
 def test_geonames_api(monkeypatch, report):
@@ -213,7 +226,7 @@ def test_geonames_api(monkeypatch, report):
 
 
 def test_geonames_api_error_response(monkeypatch, report):
-    """Test contacting geonames API with an error message from
+    """Test contacting Open Weather API with an error message from
     API."""
     lat = 50
     lon = 0
@@ -227,62 +240,21 @@ def test_geonames_api_error_response(monkeypatch, report):
         expected_dict["status"]["value"],
         expected_dict["status"]["message"])
     assert returned[0] == -1
+    # report.open_weather_api.assert_called_once_with(location)
 
 
-def test_geonames_api_no_internet_connection(report):
-    """Test contacting geonames API with no internet connection."""
-    lat = 50
-    lon = 0
-    returned = report.geonames_api(lat, lon)
-    assert returned[0] == -1
-    assert returned[1] == "Unable to establish internet connection. Please " \
-                          "connect to the internet."
+test_deg_conv_data = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
+                      (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
+                      (140, "SE"), (146.25, "SSE"), (170, "S"),
+                      (191.25, "SSW"), (236.249999, "SW"), (236.25, "WSW"),
+                      (260, "W"), (303.749999, "WNW"), (304, "NW"),
+                      (348, "NNW")]
 
 
-test_deg_conv_parameters = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),
-                            (50, "NE"), (57, "ENE"), (100, "E"), (123, "ESE"),
-                            (140, "SE"), (146.25, "SSE"), (170, "S"),
-                            (191.25, "SSW"), (236.249999, "SW"),
-                            (236.25, "WSW"),
-                            (260, "W"), (303.749999, "WNW"), (304, "NW"),
-                            (348, "NNW")]
-
-
-@pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_parameters)
+@pytest.mark.parametrize("wind_dir_deg, expected", test_deg_conv_data)
 def test_finish_deg_conv(report, wind_dir_deg, expected):
     """Test degree to cardinal direction conversion."""
     assert report.finish_deg_conv(wind_dir_deg) == expected
-
-
-# Parameters: unix time, dst offset bool, dst offset value, expected day of
-# the week and date
-test_finish_get_date_parameters = {(1504697560, True, 1, ("Wednesday",
-                                                          "06/09/2017")),
-                                   (1504656000, False, 10, ("Wednesday",
-                                                            "06/09/2017")),
-                                   (1504655999, False, 0, ("Tuesday",
-                                                           "05/09/2017")),
-                                   (1504652400, True, 1, ("Wednesday",
-                                                          "06/09/2017")),
-                                   (1504652399, True, 1, ("Tuesday",
-                                                          '05/09/2017')),
-                                   (1504648800, True, 1, ("Tuesday",
-                                                          "05/09/2017")),
-                                   (1504648800, True, 2, ("Wednesday",
-                                                          "06/09/2017")),
-                                   (1504569600, True, -1, ("Monday",
-                                                           "04/09/2017"))
-                                   }
-
-
-@pytest.mark.parametrize("unix_time, dst_offset_bool, dst_offset_value, "
-                         "expected",
-                         test_finish_get_date_parameters)
-def test_finish_get_date(report, unix_time, dst_offset_bool,
-                         dst_offset_value, expected):
-    """Test converting unix time to date and day of the week"""
-    report.v_link["timezone"]["dstOffset"] = dst_offset_value
-    assert report.finish_get_date(unix_time, dst_offset_bool) == expected
 
 
 if __name__ == "__main__":

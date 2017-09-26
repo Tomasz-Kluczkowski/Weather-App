@@ -1,0 +1,7 @@
+When using virtual environment make sure you copy 2 DLLs (tk86t.dll, tcl86t.dll)
+from the equivalent base Python installation (32 or 64 bit - important !)
+if error is thrown that it cannot find those files when using cx_Freeze script on Windows.
+
+Because of the virtual environment not everything is copied from the base installation
+and those DLLs have to be copied manually.
+
