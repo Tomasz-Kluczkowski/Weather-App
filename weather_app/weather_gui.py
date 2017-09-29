@@ -23,7 +23,7 @@ class WeatherApp(tk.Tk):
     
     Inherits from tk.TK object (main window).    
     We will apply Model-View-Controller(Adapter) architecture to the 
-    project to decouple each segment from the other. The View has no 
+    project to decouple each segment from the other. The View has no
     direct contact with the Model and vice versa. All communication is
     done via the Controller. 
     Due to the nature of tkinter library we have to initialise a root
@@ -89,7 +89,7 @@ class WeatherApp(tk.Tk):
 
         # Application icon. Linux does not display it at all.
         if self.system == "Windows":
-            self.iconbitmap("app_icon48x48.ico")
+            self.iconbitmap("../app_icon48x48.ico")
         # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
         # self.tk.call("wm", "iconphoto", self._w, img_icon)
         self.show_display("title")
@@ -420,7 +420,7 @@ class DisplayShort(tk.Frame):
 
         # Search button.
         self.search_img = tk.PhotoImage(
-            file="Resources/Buttons/magnifier-tool.png")
+            file="../Data/Buttons/magnifier-tool.png")
         search_button = HoverButton(loc_frame, controller,
                                     "Press to get a weather report.",
                                     clear_cnf, image=self.search_img,
@@ -468,7 +468,7 @@ class DisplayShort(tk.Frame):
         self.yscrollbar.config(command=self.main_canvas.yview)
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        image = Image.open("Resources/Images/main_background.jpg")
+        image = Image.open("../Data/Images/main_background.jpg")
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
@@ -750,7 +750,7 @@ class DisplayShort(tk.Frame):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "26px"
-        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size + "-" \
+        icon_prefix = "../Data/Icons/Parameters/Icons-" + icon_size + "-" \
                       + icon_color + "/"
 
         # Display location information.
@@ -796,7 +796,7 @@ class DisplayShort(tk.Frame):
                             **main_cnf)
 
         # Draw a current weather icon.
-        icon_path = "Resources/Icons/Weather/" \
+        icon_path = "../Data/Icons/Weather/" \
                     + cw_link["weather"][0]["icon"] + ".png"
         # Images have to be added as attributes or otherwise they get
         # garbage collected and will not display at all.
@@ -932,7 +932,7 @@ class DisplayShort(tk.Frame):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "20px"
-        icon_prefix = "Resources/Icons/Parameters/Icons-" + icon_size \
+        icon_prefix = "../Data/Icons/Parameters/Icons-" + icon_size \
                       + "-" + icon_color + "/"
 
         # Here we iterate through w_d_short dictionary to confirm on
@@ -1071,7 +1071,7 @@ class DisplayShort(tk.Frame):
                               **hr_w_cnf)
 
             # Hourly Weather icon.
-            icon_path = "Resources/Icons/Weather/" \
+            icon_path = "../Data/Icons/Weather/" \
                         + item["weather"][0]["icon"] + ".png"
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
