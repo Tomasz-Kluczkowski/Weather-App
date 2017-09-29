@@ -284,6 +284,27 @@ def test_finish_get_date(report, unix_time, dst_offset_bool,
     report.v_link["timezone"]["dstOffset"] = dst_offset_value
     assert report.finish_get_date(unix_time, dst_offset_bool) == expected
 
+# Parameters: unix time, dst offset bool, dst offset value, expected time in
+#  H:m
+test_finish_get_time_parameters = {(1504697560, True, 1, "12:32"),
+                                   (1504656000, False, 10, "00:00"),
+                                   (1504655999, False, 0, "23:59"),
+                                   (1504652400, True, 1, "00:00"),
+                                   (1504652399, True, 1, "23:59"),
+                                   (1504648800, True, 1, "23:00"),
+                                   (1504648800, True, 2, "00:00"),
+                                   (1504569600, True, -1, "23:00")
+                                   }
+
+@pytest.mark.parametrize("unix_time, dst_offset_bool, dst_offset_value, "
+                         "expected",
+                         test_finish_get_time_parameters)
+def test_finish_get_time(report, unix_time, dst_offset_bool,
+                         dst_offset_value, expected):
+    """Test converting unix time to H:m"""
+    report.v_link["timezone"]["dstOffset"] = dst_offset_value
+    assert report.finish_get_time(unix_time, dst_offset_bool) == expected
+
 
 if __name__ == "__main__":
     pytest.main()
