@@ -186,13 +186,13 @@ def test_open_weather_api_bad_response(monkeypatch, report):
         expected_dict["cod"], expected_dict["message"])
 
 
-def test_open_weather_api_connection_error(report):
-    """Test contacting Open Weather API with no internet connection."""
-    location = "London"
-    returned = report.open_weather_api(location)
-    assert returned[0] == -1
-    assert returned[1] == "Unable to establish internet connection." \
-                          " Please connect to the internet."
+# def test_open_weather_api_connection_error(report):
+#     """Test contacting Open Weather API with no internet connection."""
+#     location = "London"
+#     returned = report.open_weather_api(location)
+#     assert returned[0] == -1
+#     assert returned[1] == "Unable to establish internet connection." \
+#                           " Please connect to the internet."
 
 
 def test_geonames_api(monkeypatch, report):
@@ -229,14 +229,14 @@ def test_geonames_api_error_response(monkeypatch, report):
     assert returned[0] == -1
 
 
-def test_geonames_api_no_internet_connection(report):
-    """Test contacting geonames API with no internet connection."""
-    lat = 50
-    lon = 0
-    returned = report.geonames_api(lat, lon)
-    assert returned[0] == -1
-    assert returned[1] == "Unable to establish internet connection. Please " \
-                          "connect to the internet."
+# def test_geonames_api_no_internet_connection(report):
+#     """Test contacting geonames API with no internet connection."""
+#     lat = 50
+#     lon = 0
+#     returned = report.geonames_api(lat, lon)
+#     assert returned[0] == -1
+#     assert returned[1] == "Unable to establish internet connection. Please " \
+#                           "connect to the internet."
 
 
 test_deg_conv_parameters = [(348.75, "N"), (0, "N"), (10, "N"), (11.25, "NNE"),

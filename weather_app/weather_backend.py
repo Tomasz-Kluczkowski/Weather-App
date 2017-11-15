@@ -89,10 +89,10 @@ class Report(object):
                 Second item is an error message in case of an exception or
                 weather_dicts - list of dictionaries with all weather reports.
         """
-        # We must remove any gibberish from location string before
-        # making a call to the API.
+        # We must remove any gibberish (apart from comma) from location
+        # string before making a call to the API.
         # For this translate function is the best tool.
-        punctuation = string.punctuation
+        punctuation = """!"#$%&'()*+-./:;<=>?@[\]^_`{|}~"""
         translator = str.maketrans("", "", punctuation)
         location = location.translate(translator)
 

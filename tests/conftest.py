@@ -9,8 +9,8 @@ or with a mark
 def test_explicitly_enable_socket_with_mark():
     assert socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 """
-
-from pytest_socket import disable_socket
-
-def pytest_runtest_setup():
-    disable_socket()
+#
+# from pytest_socket import disable_socket
+#
+# def pytest_runtest_setup():
+#     disable_socket()
