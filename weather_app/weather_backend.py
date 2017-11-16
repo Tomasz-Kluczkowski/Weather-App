@@ -1,6 +1,5 @@
 import sqlite3
 import requests
-import string
 import datetime
 import json
 import calendar
@@ -90,11 +89,10 @@ class Report(object):
                 weather_dicts - list of dictionaries with all weather reports.
         """
         # We must remove any gibberish (apart from comma) from location
-        # string before making a call to the API.
-        # For this translate function is the best tool.
-        punctuation = """!"#$%&'()*+-./:;<=>?@[\]^_`{|}~"""
-        translator = str.maketrans("", "", punctuation)
-        location = location.translate(translator)
+        # string before making a call to the API. Also Open Weather stopped
+        # accepting spaces in the input string as the separator (10/11/2017)
+        # and we must add commas now if user uses spaces as a separator.
+        location = self._sanitize_input(location)
 
         # Get dictionaries.
         data = self.open_weather_api(location)
@@ -157,6 +155,23 @@ class Report(object):
                 self.v_link["var_status"].set("")
                 self.controller.display_report()
                 # Now we are ready do display the report.
+
+    @staticmethod
+    def _sanitize_input(input_str):
+        """Removes spaces, punctuation and returns comma-space separated string.
+
+        Args:
+            input_str (str): location string entered by the user.
+
+        Returns:
+            output_str (str): location string with comma separated values.
+        """
+        punctuation = """!"#$£¬%&'()*+-./:;<=>?@[\]^_`{|}~"""
+        translator = str.maketrans(",", " ", punctuation)
+        output_str = input_str.translate(translator)
+        output_str = ", ".join(output_str.split())
+
+        return output_str
 
     def geonames_api(self, lat, lon):
         """Contacts geonames.org to get the timezone based on lat (latitude)
