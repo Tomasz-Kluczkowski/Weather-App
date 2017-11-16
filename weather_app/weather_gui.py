@@ -89,7 +89,8 @@ class WeatherApp(tk.Tk):
 
         # Application icon. Linux does not display it at all.
         if self.system == "Windows":
-            self.iconbitmap("../app_icon48x48.ico")
+
+            self.iconbitmap("../Data/Icons/app_icon/app_icon48x48.ico")
         # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
         # self.tk.call("wm", "iconphoto", self._w, img_icon)
         self.show_display("title")
