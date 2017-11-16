@@ -13,16 +13,16 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["../Data/", "../Data/Icons/app_icon/app_icon48x48.ico",
-                 os.path.join("../Data/DLLs/64bit", 'tk86t.dll'),
-                 os.path.join("../Data/DLLs/64bit", 'tcl86t.dll'),
+include_files = ["../weather_app/Data/", "../weather_app/Data/Icons/app_icon/app_icon48x48.ico",
+                 os.path.join("../weather_app/Data/DLLs/64bit", 'tk86t.dll'),
+                 os.path.join("../weather_app/Data/DLLs/64bit", 'tcl86t.dll'),
                  ]
 includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter", "idna"]
 executables = [
     cx_Freeze.Executable("../weather_app/weather_gui.py", base=base,
-                         icon="../Data/Icons/app_icon/app_icon96x96.ico",
+                         icon="../weather_app/Data/Icons/app_icon/app_icon96x96.ico",
                          targetName="Weather_App_64bit.exe")]
 
 cx_Freeze.setup(
