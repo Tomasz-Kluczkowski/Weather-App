@@ -1,4 +1,5 @@
 #!/bin/bash
+
 @echo off
 clear
 
@@ -9,8 +10,8 @@ echo Cx_Freeze build completed successfully.
 
 echo Creating archive for deployment.
 #cd ../..
-mv build_linux_64bit/exe.linux-x86_64-3.5 build_linux_64bit/Weather_App_Linux_64bit
-cd build_linux_64bit
+mv ../build_linux_64bit/exe.linux-x86_64-3.5 ../build_linux_64bit/Weather_App_Linux_64bit
+cd ../build_linux_64bit
 tar -cvzf Weather_App_Linux_64bit.tar.gz Weather_App_Linux_64bit
 #scp Weather_App_Linux_64bit.tar.gz kilthar@kilt:C:/Users/Kilthar/Documents/GitHub/Weather-App/build_linux_64bit
 read -rsp $'Press any key to continue...\n' -n 1 key
@@ -18,15 +19,17 @@ read -rsp $'Press any key to continue...\n' -n 1 key
 
 
 function proceed {
-if [ -d build_linux_64bit ] ; then
+
+if [ -d ../build_linux_64bit ] ; then
     echo Deleting build directory.
-    rm -rf build_linux_64bit
+    rm -rf ../build_linux_64bit
 fi
-source virtual_envs/python353-64bit/bin/activate
+source ../virtual_envs/python353-64bit/bin/activate
 echo Running cx_Freeze script.
-python cx_setup_linux_64bit.py build -b build_linux_64bit &
+
+python ../Cx_Freeze_Configs/cx_setup_linux_64bit.py build -b ../build_linux_64bit &
 wait
-if [ -d build_linux_64bit ] ; then
+if [ -d ../build_linux_64bit ] ; then
     deactivate
     success
 else
