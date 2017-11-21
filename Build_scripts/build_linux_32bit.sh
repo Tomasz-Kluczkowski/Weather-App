@@ -7,7 +7,7 @@ function success {
 echo Cx_Freeze build completed successfully.
 echo Creating archive for deployment.
 
-mv ../build_linux_32bit/exe.linux-i686-* build_linux_32bit/Weather_App_Linux_32bit
+mv ../build_linux_32bit/exe.linux-i686-* ../build_linux_32bit/Weather_App_Linux_32bit
 cd ../build_linux_32bit
 
 tar -cvzf Weather_App_Linux_32bit.tar.gz Weather_App_Linux_32bit
