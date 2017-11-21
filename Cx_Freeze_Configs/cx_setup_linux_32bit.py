@@ -19,7 +19,8 @@ include_files = ["../weather_app/Data/",
 includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter", "idna", "multiprocessing", "PIL"]
-executables = [cx_Freeze.Executable("../weather_app/weather_gui.py", base=base,
+executables = [cx_Freeze.Executable("../weather_app/weather_gui.py",
+                                    base=base,
                                     icon="../weather_app/Data/Icons/app_icon/app_icon96x96.ico",
                                     targetName="Weather_App_32bit")]
 
