@@ -24,7 +24,7 @@ if [ -d ../build_linux_64bit ] ; then
     echo Deleting build directory.
     rm -rf ../build_linux_64bit
 fi
-source ../virtual_envs/python353-64bit/bin/activate
+source ~/.virtualenvs/test_env/bin/activate
 echo Running cx_Freeze script.
 
 python ../Cx_Freeze_Configs/cx_setup_linux_64bit.py build -b ../build_linux_64bit &

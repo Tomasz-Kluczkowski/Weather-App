@@ -13,7 +13,8 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["../weather_app/Data/", "../weather_app/Data/Icons/app_icon/app_icon48x48.ico",
+include_files = ["../weather_app/Data/",
+                 "../weather_app/Data/Icons/app_icon/app_icon48x48.ico",
                  os.path.join("../weather_app/Data/DLLs/64bit", 'tk86t.dll'),
                  os.path.join("../weather_app/Data/DLLs/64bit", 'tcl86t.dll'),
                  ]
