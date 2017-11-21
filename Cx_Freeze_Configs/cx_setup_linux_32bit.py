@@ -15,7 +15,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
 
 include_files = [data,
-                 data + "app_icon/app_icon48x48.ico",
+                 data + "Icons/app_icon/app_icon48x48.ico",
                  data + "README_Linux_32bit.txt"]
 
 includes = []
