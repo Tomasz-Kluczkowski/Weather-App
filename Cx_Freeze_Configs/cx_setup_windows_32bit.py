@@ -10,11 +10,13 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 base = None
 # base = "Console" # use for testing in deployed version
 
+data = "../weather_app/Data/"
+
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = ["../weather_app/Data/",
-                 "../weather_app/Data/Icons/app_icon/app_icon48x48.ico",
+include_files = [data,
+                 data + "Icons/app_icon/app_icon48x48.ico",
                  os.path.join("../weather_app/Data/DLLs/32bit", 'tk86t.dll'),
                  os.path.join("../weather_app/Data/DLLs/32bit", 'tcl86t.dll'),
                  ]
@@ -23,7 +25,7 @@ excludes = ["PyQt5"]
 packages = ["tkinter", "idna"]
 executables = [
     cx_Freeze.Executable("../weather_app/weather_gui.py", base=base,
-                         icon="../weather_app/Data/Icons/app_icon/app_icon96x96.ico",
+                         icon=data + "Icons/app_icon/app_icon96x96.ico",
                          targetName="Weather_App_32bit.exe")]
 
 cx_Freeze.setup(
