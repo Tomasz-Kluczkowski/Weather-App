@@ -16,7 +16,7 @@ if sys.platform == "win32":
 
 include_files = [data,
                  data + "Icons/app_icon/app_icon48x48.ico",
-                 data + "README_Linux_32bit.txt"]
+                 data + "Text_files/README_Linux_32bit.txt"]
 
 includes = []
 excludes = ["PyQt5"]
