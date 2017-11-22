@@ -12,6 +12,7 @@ cd ../build_linux_64bit
 
 rm -rf Weather_App_Linux_64bit/Data/Scripts
 rm -rf Weather_App_Linux_64bit/Data/Text_files
+rm -rf Weather_App_Linux_64bit/Data/DLLs
 
 tar -cvzf Weather_App_Linux_64bit.tar.gz Weather_App_Linux_64bit
 echo Finished creating archive.

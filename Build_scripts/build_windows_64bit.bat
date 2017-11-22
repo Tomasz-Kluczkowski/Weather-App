@@ -17,10 +17,16 @@ if exist ..\build_64bit (
 )
 echo Running cx_Freeze script.
 start /wait python ..\Cx_Freeze_Configs\cx_setup_windows_64bit.py build -b ..\build_64bit
-if exist ..\build_64bit (
+if %ERRORLEVEL% EQU 0 (
+
+rmdir ..\build_64bit\exe.win-amd64-3.6\Data\Scripts /s /q
+rmdir ..\build_64bit\exe.win-amd64-3.6\Data\Text_files /s /q
+rmdir ..\build_64bit\exe.win-amd64-3.6\Data\DLLs /s /q
+
 goto success
 ) else (
 echo Cx_Freeze build failed. Please check your cx_freeze setup file.
+echo Exit status code: %ERRORLEVEL%
 goto terminate
 )
 
@@ -28,10 +34,11 @@ goto terminate
 echo Cx_Freeze build completed successfully
 echo Starting Inno setup compilation.
 start /wait iscc ..\Inno_Setup_Configs\inno_setup_windows_64bit.iss /O+
-if exist ..\build_64bit\Weather_App_Win_64bit_Setup.exe (
-echo Inno setup compilation successul.
+if %ERRORLEVEL% EQU 0 (
+echo Inno setup compilation successful.
 ) else (
 echo Inno setup compilation failed. Please check your setup script.
+echo Exit status code: %ERRORLEVEL%
 )
 
 :terminate
