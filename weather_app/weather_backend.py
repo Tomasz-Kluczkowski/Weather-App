@@ -168,8 +168,10 @@ class Report(object):
         """
         punctuation = """!"#$£¬%&'()*+-./:;<=>?@[\]^_`{|}~"""
         translator = str.maketrans("", "", punctuation)
+        # translator = str.maketrans(",", " ", punctuation)
         output_str = input_str.translate(translator)
         output_str = " ".join(output_str.split())
+        # output_str = ",".join(output_str.split())
         print(output_str)
 
         return output_str
