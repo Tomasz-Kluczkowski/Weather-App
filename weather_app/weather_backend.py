@@ -167,9 +167,10 @@ class Report(object):
             output_str (str): location string with comma separated values.
         """
         punctuation = """!"#$£¬%&'()*+-./:;<=>?@[\]^_`{|}~"""
-        translator = str.maketrans(",", " ", punctuation)
+        translator = str.maketrans("", "", punctuation)
         output_str = input_str.translate(translator)
-        output_str = ", ".join(output_str.split())
+        output_str = " ".join(output_str.split())
+        print(output_str)
 
         return output_str
 
