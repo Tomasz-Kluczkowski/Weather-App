@@ -1,18 +1,21 @@
 #Weather App
 
 Author: Tomasz Kluczkowski
+
 Email: tomaszk1@hotmail.co.uk
+
+![Screenshot](Images/Weather App Title.jpg)
 
 ##Installation For End Users:
 
 ###Windows:
-- Donwload & run the exe file matching your OS version.
+- Download & run the exe file matching your OS version.
 - This will open an installer with default settings.
+- Follow the prompts and install in location you prefer.
 
 ###Linux:
-- Download and extract the version matching your OS version.
-- Start application in terminal using ./Weather_App_32bit or ./Weather_App_64bit
-depending on your configuration.
+- Download and extract the archive matching your OS version.
+- Start application in terminal using ./Weather_App_32bit or ./Weather_App_64bit depending on your configuration.
 
 ##Development:
 
