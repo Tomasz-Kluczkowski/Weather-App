@@ -4,7 +4,7 @@ Author: Tomasz Kluczkowski
 
 Email: tomaszk1@hotmail.co.uk
 
-![Screenshot](Images/Weather App Title.jpg)
+![Screenshot](https://user-images.githubusercontent.com/26039401/33391594-79bad240-d531-11e7-9826-c2e248f95fae.jpg)
 
 ## Installation For End Users:
 
