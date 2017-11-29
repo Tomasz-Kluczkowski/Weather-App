@@ -1,4 +1,4 @@
-#Weather App
+# Weather App
 
 Author: Tomasz Kluczkowski
 
@@ -6,18 +6,18 @@ Email: tomaszk1@hotmail.co.uk
 
 ![Screenshot](Images/Weather App Title.jpg)
 
-##Installation For End Users:
+## Installation For End Users:
 
-###Windows:
+### Windows:
 - Download & run the exe file matching your OS version.
 - This will open an installer with default settings.
 - Follow the prompts and install in location you prefer.
 
-###Linux:
+### Linux:
 - Download and extract the archive matching your OS version.
 - Start application in terminal using ./Weather_App_32bit or ./Weather_App_64bit depending on your configuration.
 
-##Development:
+## Development:
 
 If you are interested in adding / modifying this application, here are the main details to get you going:
 
@@ -27,14 +27,14 @@ If you are interested in adding / modifying this application, here are the main 
 - Main compiler: cx_Freeze v. 5.0.2 (for creating executable builds)
 - Windows Installer compiler: Inno setup compiler v. 5.5.9 (for making an installable version for Windows OS)
 
-###Installation For Development:
+### Installation For Development:
 
 - create virtual environment
 - cd to project's folder
 - pip install -r requirements.txt
 
 
-##My Goal in This Application:
+## My Goal in This Application:
 `To create a visual representation of a weather report obtained via Open Weather API.`
 
 The APIs used for this project:
