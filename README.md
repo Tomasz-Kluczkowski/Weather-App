@@ -24,6 +24,7 @@ If you are interested in adding to / modifying this application, here are the ma
 - Main language: Python 3.6
 - GUI created using: tkinter v. 8.6.
 - Internet communication library: requests v. 2.13.0.
+- Database handling: sqlite3
 - Main compiler: cx_Freeze v. 5.0.2 (for creating executable builds)
 - Windows Installer compiler: Inno setup compiler v. 5.5.9 (for making an installable version for Windows OS)
 
