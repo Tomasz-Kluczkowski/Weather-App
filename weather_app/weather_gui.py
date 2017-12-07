@@ -12,15 +12,20 @@ from PIL import Image, ImageTk
 from weather_app.weather_backend import Report
 from weather_app.controller import Controller
 
+# Data file folders.
+app_root = os.path.dirname(inspect.getfile(inspect.currentframe()))
+app_images = os.path.join(app_root, "Data", "Images")
+app_icons = os.path.join(app_root, "Data", "Icons")
+app_buttons = os.path.join(app_root, "Data", "Buttons")
+
+print("app_buttons: ", app_buttons)
+
 
 # TODO: See if autocompletion is possible in the entry field.
 # TODO: Add mousewheel movement for MAC. (needs testing)
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
-# TODO: stick all styling / color definitions into style module and
-# TODO: import *.
-# TODO: Change root finding to use inspect to avoid issues when app launched
-# TODO: not from its own folder.
+# TODO: stick all styling / color definitions into style module.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -93,8 +98,8 @@ class WeatherApp(tk.Tk):
 
         # Application icon. Linux does not display it at all.
         if self.system == "Windows":
-
-            self.iconbitmap("Data/Icons/app_icon/app_icon48x48.ico")
+            self.iconbitmap(os.path.join(app_icons,
+                                         "app_icon/app_icon48x48.ico"))
         # img_icon = ImageTk.PhotoImage(file="app_icon48x48.ico")
         # self.tk.call("wm", "iconphoto", self._w, img_icon)
         self.show_display("title")
@@ -424,8 +429,13 @@ class DisplayShort(tk.Frame):
         self.loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
+        app_root = os.path.dirname(inspect.getfile(inspect.currentframe()))
+        app_images = os.path.join(app_root, "Data", "Images")
+        app_icons = os.path.join(app_root, "Data", "Icons")
+        app_buttons = os.path.join(app_root, "Data", "Buttons")
+        print("app_buttons: ", app_buttons)
         self.search_img = tk.PhotoImage(
-            file="Data/Buttons/magnifier-tool.png")
+            file=os.path.join(app_buttons, "magnifier-tool.png"))
         search_button = HoverButton(loc_frame, controller,
                                     "Press to get a weather report.",
                                     clear_cnf, image=self.search_img,
@@ -473,7 +483,7 @@ class DisplayShort(tk.Frame):
         self.yscrollbar.config(command=self.main_canvas.yview)
 
         self.main_canvas.config(yscrollcommand=self.yscrollbar.set)
-        image = Image.open("Data/Images/main_background.jpg")
+        image = Image.open(os.path.join(app_images, "main_background.jpg"))
         image_conv = ImageTk.PhotoImage(image)
         self.canvas_bg_img = image_conv
         self.main_canvas.create_image(0, 0, image=self.canvas_bg_img,
@@ -755,8 +765,9 @@ class DisplayShort(tk.Frame):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "26px"
-        icon_prefix = "Data/Icons/Parameters/Icons-" + icon_size + "-" \
-                      + icon_color + "/"
+        icon_prefix = os.path.join(app_icons,
+                                   "Parameters",
+                                   "Icons-" + icon_size + "-" + icon_color)
 
         # Display location information.
         # Start coordinates in pixels of the report title.
@@ -801,8 +812,8 @@ class DisplayShort(tk.Frame):
                             **main_cnf)
 
         # Draw a current weather icon.
-        icon_path = "Data/Icons/Weather/" \
-                    + cw_link["weather"][0]["icon"] + ".png"
+        icon_path = os.path.join(app_icons, "Weather",
+                                 cw_link["weather"][0]["icon"] + ".png")
         # Images have to be added as attributes or otherwise they get
         # garbage collected and will not display at all.
         self.cur_icon = CanvasImg(self.main_canvas, icon_path, rel_obj=coords,
@@ -846,7 +857,7 @@ class DisplayShort(tk.Frame):
 
         # Pressure.
         max_temp_bounds = self.main_canvas.bbox(max_temp.id_num)
-        icon_path = icon_prefix + "atmospheric_pressure.png"
+        icon_path = os.path.join(icon_prefix, "atmospheric_pressure.png")
         self.pressure_img = CanvasImg(self.main_canvas, icon_path,
                                       coordinates=(450, max_temp_bounds[1]),
                                       offset=(0, 0), **img_nw_cnf)
@@ -856,7 +867,7 @@ class DisplayShort(tk.Frame):
                               text=pressure_text, font=h2, **cent_cnf)
 
         # Cloud coverage.
-        icon_path = icon_prefix + "cloud.png"
+        icon_path = os.path.join(icon_prefix, "cloud.png")
         self.clouds_img = CanvasImg(self.main_canvas, icon_path,
                                     rel_obj=w_desc,
                                     rel_pos="BL", offset=(0, 3), **img_nw_cnf)
@@ -868,7 +879,7 @@ class DisplayShort(tk.Frame):
                             text=clouds_text, font=h2, **clouds_cnf)
 
         # Humidity.
-        icon_path = icon_prefix + "humidity.png"
+        icon_path = os.path.join(icon_prefix, "humidity.png")
         self.humidity_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.pressure_img,
                                       rel_pos="BL", offset=(0, 4),
@@ -879,7 +890,7 @@ class DisplayShort(tk.Frame):
                               text=humidity_text, font=h2, **cent_cnf)
 
         # Wind speed.
-        icon_path = icon_prefix + "windsock_filled.png"
+        icon_path = os.path.join(icon_prefix, "windsock_filled.png")
         self.wind_img = CanvasImg(self.main_canvas, icon_path,
                                   rel_obj=self.humidity_img,
                                   rel_pos="BL", offset=(0, 4), **img_nw_cnf)
@@ -893,7 +904,7 @@ class DisplayShort(tk.Frame):
                           text=wind_text, font=h2, **cent_cnf)
 
         # Wind direction.
-        icon_path = icon_prefix + "wind_rose.png"
+        icon_path = os.path.join(icon_prefix, "wind_rose.png")
         self.wind_dir_img = CanvasImg(self.main_canvas, icon_path,
                                       rel_obj=self.wind_img,
                                       rel_pos="BL", offset=(0, 4),
@@ -911,7 +922,7 @@ class DisplayShort(tk.Frame):
                               text=wind_dir_text, font=h2, **cent_cnf)
 
         # Sunrise.
-        icon_path = icon_prefix + "sunrise.png"
+        icon_path = os.path.join(icon_prefix, "sunrise.png")
         self.sunrise_img = CanvasImg(self.main_canvas, icon_path,
                                      coordinates=(670, max_temp_bounds[1]),
                                      offset=(0, 0), **img_nw_cnf)
@@ -922,7 +933,7 @@ class DisplayShort(tk.Frame):
                              text=sunrise_text, font=h2, **cent_cnf)
 
         # Sunset.
-        icon_path = icon_prefix + "sunset.png"
+        icon_path = os.path.join(icon_prefix, "sunset.png")
         self.sunset_img = CanvasImg(self.main_canvas, icon_path,
                                     rel_obj=self.sunrise_img, rel_pos="BL",
                                     offset=(0, 4), **img_nw_cnf)
@@ -937,8 +948,9 @@ class DisplayShort(tk.Frame):
         # Icon size and color.
         icon_color = "true-blue"
         icon_size = "20px"
-        icon_prefix = "Data/Icons/Parameters/Icons-" + icon_size \
-                      + "-" + icon_color + "/"
+        icon_prefix = os.path.join(app_icons,
+                                   "Parameters",
+                                   "Icons-" + icon_size + "-" + icon_color)
 
         # Here we iterate through w_d_short dictionary to confirm on
         # which days we have rain and/or snow to display their
@@ -997,42 +1009,43 @@ class DisplayShort(tk.Frame):
                                  **hr_nw_cnf)
 
                 # Draw temperature icon.
-                icon_path = icon_prefix + "temperature.png"
+                icon_path = os.path.join(icon_prefix, "temperature.png")
                 self.hr_temp_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=day, rel_pos="BL", offset=(0, 0),
                               **hr_img_nw_cnf))
 
                 # Draw pressure icon.
-                icon_path = icon_prefix + "atmospheric_pressure.png"
+                icon_path = os.path.join(icon_prefix,
+                                         "atmospheric_pressure.png")
                 self.hr_pressure_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=self.hr_temp_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw cloud coverage icon.
-                icon_path = icon_prefix + "cloud.png"
+                icon_path = os.path.join(icon_prefix, "cloud.png")
                 self.hr_cloud_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=self.hr_pressure_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw humidity icon.
-                icon_path = icon_prefix + "humidity.png"
+                icon_path = os.path.join(icon_prefix, "humidity.png")
                 self.hr_humidity_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=self.hr_cloud_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw wind icon.
-                icon_path = icon_prefix + "windsock_filled.png"
+                icon_path = os.path.join(icon_prefix, "windsock_filled.png")
                 self.hr_wind_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=self.hr_humidity_icons[-1], rel_pos="BL",
                               offset=(0, 0), **hr_img_nw_cnf))
 
                 # Draw wind direction icon.
-                icon_path = icon_prefix + "wind_rose.png"
+                icon_path = os.path.join(icon_prefix, "wind_rose.png")
                 self.hr_wind_dir_icons.append(
                     CanvasImg(self.main_canvas, icon_path,
                               rel_obj=self.hr_wind_icons[-1], rel_pos="BL",
@@ -1040,7 +1053,7 @@ class DisplayShort(tk.Frame):
 
                 # Draw rain icon if phenomena present during the day.
                 if day_text in rain_dates:
-                    icon_path = icon_prefix + "rain" + ".png"
+                    icon_path = os.path.join(icon_prefix, "rain.png")
                     self.hr_rain_icons.append(
                         CanvasImg(self.main_canvas, icon_path,
                                   rel_obj=self.hr_wind_dir_icons[-1],
@@ -1054,7 +1067,7 @@ class DisplayShort(tk.Frame):
                     rel_obj_icon = self.hr_wind_dir_icons[-1]
 
                 if day_text in snow_dates:
-                    icon_path = icon_prefix + "snow" + ".png"
+                    icon_path = os.path.join(icon_prefix, "snow.png")
                     self.hr_snow_icons.append(
                         CanvasImg(self.main_canvas, icon_path,
                                   rel_obj=rel_obj_icon,
@@ -1076,8 +1089,8 @@ class DisplayShort(tk.Frame):
                               **hr_w_cnf)
 
             # Hourly Weather icon.
-            icon_path = "Data/Icons/Weather/" \
-                        + item["weather"][0]["icon"] + ".png"
+            icon_path = os.path.join(app_icons, "Weather",
+                                     item["weather"][0]["icon"] + ".png")
             self.hr_weather_icons.append(
                 CanvasImg(self.main_canvas, icon_path, rel_obj=hour,
                           rel_pos="BC", offset=(0, -5), **hr_img_n_cnf))
@@ -1572,6 +1585,7 @@ class CanvasImg(CanvasObject):
         id_num = canvas.create_image(self.pos_x, self.pos_y, image=self.img,
                                      **args)
         self.id_num = id_num
+
 
 # Launch application.
 if __name__ == "__main__":
