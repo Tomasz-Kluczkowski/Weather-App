@@ -8,3 +8,4 @@ Pillow==4.2.1
 pytest==3.2.5
 requests==2.18.4
 urllib3==1.22
+pypiwin32 >=1.0 ; sys_platform == 'win32'

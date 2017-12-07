@@ -1,6 +1,12 @@
 import cx_Freeze
 import sys
 import os.path
+from version_hunter.versioner import Versioner
+
+# Collect version file
+v = Versioner()
+version = v.get_version()
+print(version)
 
 # This is needed for Cx_Freeze to find path to tcl and tk libraries.
 PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
@@ -30,7 +36,7 @@ executables = [
 
 cx_Freeze.setup(
     name='Weather_App_32bit',
-    version='1.02',
+    version=version,
     description='Weather report application',
     author='Tomasz Kluczkowski',
     author_email='tomaszk1@hotmail.co.uk',

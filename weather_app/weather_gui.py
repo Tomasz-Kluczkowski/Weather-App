@@ -10,8 +10,10 @@ import threading
 import tkinter as tk
 import tkinter.ttk as tkk
 from PIL import Image, ImageTk
-from weather_app.weather_backend import Report
-from weather_app.controller import Controller
+from weather_backend import Report
+from controller import Controller
+# from weather_app.weather_backend import Report
+# from weather_app.controller import Controller
 
 # Data file folders.
 if getattr(sys, 'frozen', False):
@@ -25,8 +27,6 @@ else:
 app_images = os.path.join(app_root, "Data", "Images")
 app_icons = os.path.join(app_root, "Data", "Icons")
 app_buttons = os.path.join(app_root, "Data", "Buttons")
-
-print("app_buttons: ", app_buttons)
 
 
 # TODO: See if autocompletion is possible in the entry field.

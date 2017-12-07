@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Weather App"
-#define MyAppVersion "1.02"
+#define MyAppVersion GetFileVersion('../build_32bit/exe.win32-3.6/Weather_App_32bit.exe')
 #define MyAppPublisher "Tomasz Kluczkowski"
 #define MyAppURL "https://github.com/Tomasz-Kluczkowski/Weather-App"
 #define MyAppExeName "Weather_App_32bit.exe"
@@ -12,9 +12,10 @@
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{55BD515A-07DF-472D-B484-A2AC4B1DC11D}
-AppName={#MyAppName}
+AppName={#MyAppName} {#MyAppVersion}
 AppVersion={#MyAppVersion}
-AppVerName={#MyAppName}
+VersionInfoVersion={#MyAppVersion}
+AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
