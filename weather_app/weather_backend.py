@@ -38,8 +38,9 @@ class Report(object):
         self.v_link = self.controller.app_data
         """:type : dict[str, any]"""
 
-        # Create necessary application folders in 
-        # C:\Users\User\AppData\Local
+        # Create necessary application folders in :
+        # C:\Users\<user_name>\AppData\Local - Windows
+        # /home/<user_name>/.local/share/Weather_App/ - Linux
         user_dirs = appdirs.AppDirs("Weather_App", "")
         local_app_dir = user_dirs.user_data_dir
         self.data_dirs = {"Database": "",

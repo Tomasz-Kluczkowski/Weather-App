@@ -3,9 +3,9 @@ from unittest import mock
 import shutil
 import appdirs
 import os
-from weather_backend import Report
-from controller import Controller
-from weather_gui import WeatherApp
+from weather_app.weather_backend import Report
+from weather_app.controller import Controller
+from weather_app.weather_gui import WeatherApp
 
 
 @pytest.fixture(scope="module", autouse=True)

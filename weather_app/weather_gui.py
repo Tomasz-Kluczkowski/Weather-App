@@ -3,12 +3,14 @@
 # email: tomaszk1@hotmail.co.uk
 
 import platform
+import inspect
+import os
 import threading
 import tkinter as tk
 import tkinter.ttk as tkk
 from PIL import Image, ImageTk
-from weather_backend import Report
-from controller import Controller
+from weather_app.weather_backend import Report
+from weather_app.controller import Controller
 
 
 # TODO: See if autocompletion is possible in the entry field.
@@ -17,6 +19,8 @@ from controller import Controller
 # TODO: Add 16 day daily report.
 # TODO: stick all styling / color definitions into style module and
 # TODO: import *.
+# TODO: Change root finding to use inspect to avoid issues when app launched
+# TODO: not from its own folder.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
