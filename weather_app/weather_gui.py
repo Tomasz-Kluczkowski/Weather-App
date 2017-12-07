@@ -5,6 +5,7 @@
 import platform
 import inspect
 import os
+import sys
 import threading
 import tkinter as tk
 import tkinter.ttk as tkk
@@ -13,7 +14,14 @@ from weather_app.weather_backend import Report
 from weather_app.controller import Controller
 
 # Data file folders.
-app_root = os.path.dirname(inspect.getfile(inspect.currentframe()))
+if getattr(sys, 'frozen', False):
+    # The application is frozen
+    app_root = os.path.dirname(sys.executable)
+else:
+    # The application is not frozen
+    # Change this bit to match where you store your data files:
+    app_root = os.path.dirname(__file__)
+
 app_images = os.path.join(app_root, "Data", "Images")
 app_icons = os.path.join(app_root, "Data", "Icons")
 app_buttons = os.path.join(app_root, "Data", "Buttons")
@@ -429,11 +437,6 @@ class DisplayShort(tk.Frame):
         self.loc_combobox.bind("<Key>", lambda e: self.clear_error_message())
 
         # Search button.
-        app_root = os.path.dirname(inspect.getfile(inspect.currentframe()))
-        app_images = os.path.join(app_root, "Data", "Images")
-        app_icons = os.path.join(app_root, "Data", "Icons")
-        app_buttons = os.path.join(app_root, "Data", "Buttons")
-        print("app_buttons: ", app_buttons)
         self.search_img = tk.PhotoImage(
             file=os.path.join(app_buttons, "magnifier-tool.png"))
         search_button = HoverButton(loc_frame, controller,
