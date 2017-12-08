@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Weather App
+Comment=Weather Application
+Terminal=false
+Name=Weather App
+Exec=/home/tomasz_kluczkowski/Dev/Weather-App/build_linux_64bit/Weather_App_Linux_64bit/Weather_App_64bit
+Icon=/home/tomasz_kluczkowski/Dev/Weather-App/weather_app/Data/Icons/app_icon/app_icon96x96.ico
+Categories=Application;Desktop
+Version=1.0.2
+Type=Application
+StartupWMClass=weather_app

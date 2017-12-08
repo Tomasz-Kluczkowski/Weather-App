@@ -18,11 +18,12 @@ from controller import Controller
 # Data file folders.
 if getattr(sys, 'frozen', False):
     # The application is frozen
-    app_root = os.path.dirname(sys.executable)
+    app_root = os.path.dirname(os.path.abspath(sys.executable))
 else:
     # The application is not frozen
     # Change this bit to match where you store your data files:
-    app_root = os.path.dirname(__file__)
+    app_root = os.path.dirname(os.path.abspath(__file__))
+
 
 app_images = os.path.join(app_root, "Data", "Images")
 app_icons = os.path.join(app_root, "Data", "Icons")
@@ -34,6 +35,7 @@ app_buttons = os.path.join(app_root, "Data", "Buttons")
 # TODO: Add temperature graphs in bokeh / matplotlib.
 # TODO: Add 16 day daily report.
 # TODO: stick all styling / color definitions into style module.
+# TODO: 4k scaling is needed for widgets and fonts.
 
 class WeatherApp(tk.Tk):
     """Generates graphic user interface for the weather application.
@@ -72,7 +74,7 @@ class WeatherApp(tk.Tk):
             application.
         :displays (dict) dictionary storing all displays.
         """
-        super().__init__()
+        super().__init__(className="weather_app")
 
         self.system = platform.system()
         # Add Controller to the WeatherApp class instance.
