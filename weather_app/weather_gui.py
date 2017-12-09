@@ -3,7 +3,6 @@
 # email: tomaszk1@hotmail.co.uk
 
 import platform
-import inspect
 import os
 import sys
 import threading
@@ -12,8 +11,6 @@ import tkinter.ttk as tkk
 from PIL import Image, ImageTk
 from weather_backend import Report
 from controller import Controller
-# from weather_app.weather_backend import Report
-# from weather_app.controller import Controller
 
 # Data file folders.
 if getattr(sys, 'frozen', False):
