@@ -6,7 +6,6 @@ from version_hunter.versioner import Versioner
 # Collect version file
 v = Versioner()
 version = v.get_version()
-print(version)
 
 
 # This is needed for Cx_Freeze to find path to tcl and tk libraries.
