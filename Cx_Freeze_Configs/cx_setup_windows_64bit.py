@@ -7,7 +7,6 @@ from version_hunter.versioner import Versioner
 v = Versioner()
 version = v.get_version()
 
-
 # This is needed for Cx_Freeze to find path to tcl and tk libraries.
 PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
 os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
@@ -16,23 +15,30 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 base = None
 # base = "Console" # use for testing in deployed version
 
-data = "../weather_app/Data/"
+DATA_DIR = "../weather_app/Data/"
 
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = [data,
-                 data + "Icons/app_icon/app_icon48x48.ico",
-                 os.path.join("../weather_app/Data/DLLs/64bit", 'tk86t.dll'),
-                 os.path.join("../weather_app/Data/DLLs/64bit", 'tcl86t.dll'),
+include_files = [DATA_DIR,
+                 os.path.join(DATA_DIR,
+                              "Icons",
+                              "app_icon",
+                              "app_icon48x48.ico"),
+                 os.path.join(DATA_DIR, "DLLs", "64bit", 'tk86t.dll'),
+                 os.path.join(DATA_DIR, "DLLs", "64bit", 'tcl86t.dll'),
                  ]
 includes = []
 excludes = ["PyQt5"]
 packages = ["tkinter", "idna"]
-executables = [
-    cx_Freeze.Executable("../weather_app/weather_gui.py", base=base,
-                         icon=data + "Icons/app_icon/app_icon96x96.ico",
-                         targetName="Weather_App_64bit.exe")]
+executables = [cx_Freeze.Executable("../weather_app/weather_gui.py",
+                                    base=base,
+                                    icon=os.path.join(DATA_DIR,
+                                                      "Icons",
+                                                      "app_icon",
+                                                      "app_icon96x96.ico"),
+                                    targetName="Weather_App_64bit.exe"),
+               ]
 
 cx_Freeze.setup(
     name='Weather_App_64bit',
