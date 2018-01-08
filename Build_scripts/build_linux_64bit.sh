@@ -29,7 +29,7 @@ fi
 source ~/.virtualenvs/weather_app_64b_env/bin/activate
 echo Running cx_Freeze script.
 
-python ../Cx_Freeze_Configs/cx_setup_linux_64bit.py build -b ../build_linux_64bit &
+python ../Cx_Freeze_Configs/cx_setup_linux_64bit.py </dev/tty build -b ../build_linux_64bit &
 pid=$!
 wait ${pid}
 status=$?
