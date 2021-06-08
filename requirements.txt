@@ -4,7 +4,7 @@ chardet==3.0.4
 cx-Freeze==5.0.2
 idna==2.6
 olefile==0.44
-Pillow==4.2.1
+Pillow==8.2.0
 pytest==3.2.5
 requests==2.18.4
 urllib3==1.22
